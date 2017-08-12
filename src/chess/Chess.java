@@ -1,7 +1,17 @@
 package chess;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.WindowConstants;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +24,7 @@ public class Chess {
     private static final int PIXEL_SIZE = SQUARE_AMOUNT * SQUARE_SIZE;
     private final Color[][] pixels = new Color[PIXEL_SIZE][PIXEL_SIZE];
     private Piece[][] board;
+    private GameState state;
 
     public static void main(String[] args) {
         final Chess chess = new Chess();
@@ -22,6 +33,7 @@ public class Chess {
         board.resetBoard();
         chess.board = board.getBoard();
         chess.refreshPixels();
+        chess.state = new GameState(chess.board, chess);
     }
 
     private void configureGUI() {
@@ -34,7 +46,7 @@ public class Chess {
         frame.setVisible(true);
     }
 
-    private void refreshPixels() {
+    void refreshPixels() {
         setBackGround();
         setPieces();
     }
@@ -81,7 +93,19 @@ public class Chess {
 
     private class GridPane extends JPanel {
 
-        private final List<Rectangle> cells = new ArrayList<>(PIXEL_SIZE * PIXEL_SIZE);
+        private final List<Rectangle> cells;
+
+        GridPane() {
+            cells = new ArrayList<>(PIXEL_SIZE * PIXEL_SIZE);
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    final int horizontalClickPosition = (e.getX()) / (getWidth() / SQUARE_SIZE);
+                    final int verticalClickPosition = (e.getY()) / (getHeight() / SQUARE_SIZE);
+                    state.clicked(horizontalClickPosition, verticalClickPosition);
+                }
+            });
+        }
 
         @Override
         public Dimension getPreferredSize() {

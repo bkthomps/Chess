@@ -1,14 +1,17 @@
 package chess;
 
 import java.awt.Color;
+import java.awt.Point;
 
 class Knight extends Piece {
 
     private Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
+    private final Piece[][] board;
     private final boolean isWhite;
 
-    Knight(boolean isWhite) {
+    Knight(boolean isWhite, Piece[][] board) {
         this.isWhite = isWhite;
+        this.board = board;
         final int[][] pixels =
                 {
                         {0, 1, 0, 0, 0, 0},
@@ -29,5 +32,10 @@ class Knight extends Piece {
     @Override
     public boolean isWhite() {
         return isWhite;
+    }
+
+    @Override
+    boolean isActionLegal(Point start, Point end) {
+        return false;
     }
 }

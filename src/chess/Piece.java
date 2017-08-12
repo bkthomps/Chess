@@ -1,6 +1,7 @@
 package chess;
 
 import java.awt.Color;
+import java.awt.Point;
 
 abstract class Piece {
 
@@ -9,6 +10,17 @@ abstract class Piece {
     abstract Color[][] getImage();
 
     abstract boolean isWhite();
+
+    abstract boolean isActionLegal(Point start, Point end);
+
+    void move(Point start, Point end, Piece[][] board, Piece me) {
+        board[(int) start.getY()][(int) start.getX()] = null;
+        board[(int) end.getY()][(int) end.getX()] = me;
+    }
+
+    int delta(double start, double end) {
+        return Math.abs((int) end - (int) start);
+    }
 
     void getColor(Color[][] image, int[][] pixels, boolean isWhite) {
         for (int i = 0; i < pixels.length; i++) {
