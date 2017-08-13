@@ -1,6 +1,7 @@
 package chess;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Point;
 
 class King extends Piece {
 
@@ -35,6 +36,9 @@ class King extends Piece {
 
     @Override
     boolean isActionLegal(Point start, Point end) {
-        return false;
+        final int x1 = (int) start.getX(), x2 = (int) end.getX();
+        final int y1 = (int) start.getY(), y2 = (int) end.getY();
+        return delta(x2, x1) + delta(y2, y1) != 0 && delta(x2, x1) <= 1 && delta(y2, y1) <= 1
+                && canMoveOnto(x2, y2, board, isWhite);
     }
 }

@@ -36,6 +36,11 @@ class Queen extends Piece {
 
     @Override
     boolean isActionLegal(Point start, Point end) {
-        return false;
+        final Bishop bishop = new Bishop(isWhite, board);
+        final Rook rook = new Rook(isWhite, board);
+        if (bishop.isEachCoordinateDeltaSame(start, end)) {
+            return bishop.isBishopActionLegal(start, end);
+        }
+        return rook.isActionLegal(start, end);
     }
 }

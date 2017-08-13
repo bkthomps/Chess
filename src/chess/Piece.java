@@ -13,13 +13,12 @@ abstract class Piece {
 
     abstract boolean isActionLegal(Point start, Point end);
 
-    void move(Point start, Point end, Piece[][] board, Piece me) {
-        board[(int) start.getY()][(int) start.getX()] = null;
-        board[(int) end.getY()][(int) end.getX()] = me;
-    }
-
     int delta(double start, double end) {
         return Math.abs((int) end - (int) start);
+    }
+
+    boolean canMoveOnto(int x, int y, Piece[][] board, boolean isWhite) {
+        return board[y][x] == null || board[y][x].isWhite() != isWhite;
     }
 
     void getColor(Color[][] image, int[][] pixels, boolean isWhite) {

@@ -36,6 +36,29 @@ class Rook extends Piece {
 
     @Override
     boolean isActionLegal(Point start, Point end) {
-        return false;
+        final int x1 = (int) start.getX(), x2 = (int) end.getX();
+        final int y1 = (int) start.getY(), y2 = (int) end.getY();
+        if ((x1 == x2 && y1 == y2) || (x1 != x2 && y1 != y2)) {
+            return false;
+        }
+        if (x1 == x2) {
+            final int one = (y1 < y2) ? y1 : y2;
+            final int two = (y1 < y2) ? y2 : y1;
+            for (int i = one + 1; i < two; i++) {
+                if (board[i][x1] != null) {
+                    return false;
+                }
+            }
+        } else {
+            final int one = (x1 < x2) ? x1 : x2;
+            final int two = (x1 < x2) ? x2 : x1;
+            for (int i = one + 1; i < two; i++) {
+                if (board[y1][i] != null) {
+                    return false;
+                }
+            }
+
+        }
+        return canMoveOnto(x2, y2, board, isWhite);
     }
 }

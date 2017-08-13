@@ -29,11 +29,17 @@ class GameState {
         }
         final Point to = new Point(x, y);
         if (moving.isActionLegal(from, to)) {
+            move(from, to, moving);
             isWhiteTurn = !isWhiteTurn;
             flipBoard();
         }
         moving = null;
         from = null;
+    }
+
+    private void move(Point start, Point end, Piece me) {
+        board[(int) start.getY()][(int) start.getX()] = null;
+        board[(int) end.getY()][(int) end.getX()] = me;
     }
 
     private void flipBoard() {

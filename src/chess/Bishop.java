@@ -36,6 +36,27 @@ class Bishop extends Piece {
 
     @Override
     boolean isActionLegal(Point start, Point end) {
-        return false;
+        return isEachCoordinateDeltaSame(start, end) && isBishopActionLegal(start, end);
+    }
+
+    boolean isEachCoordinateDeltaSame(Point start, Point end) {
+        return delta(end.getY(), start.getY()) == delta(end.getX(), start.getX());
+    }
+
+    boolean isBishopActionLegal(Point start, Point end) {
+        final int x1 = (int) start.getX(), x2 = (int) end.getX();
+        final int y1 = (int) start.getY(), y2 = (int) end.getY();
+        final int xSign = (x2 > x1) ? 1 : -1;
+        final int ySign = (y2 > y1) ? 1 : -1;
+        int x = x1;
+        int y = y1;
+        for (int i = x1 + 1; i < x2; i++) {
+            x += xSign;
+            y += ySign;
+            if (board[y][x] != null) {
+                return false;
+            }
+        }
+        return canMoveOnto(x2, y2, board, isWhite);
     }
 }

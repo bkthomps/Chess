@@ -41,15 +41,12 @@ class Pawn extends Piece {
         final int y1 = (int) start.getY(), y2 = (int) end.getY();
         if (board[y2][x2] == null && x2 == x1) {
             if (y2 == y1 - 1) {
-                move(start, end, board, this);
                 return true;
             } else if (y2 == y1 - 2 && board[y1 - 1][x1] == null && !hasMoved) {
-                move(start, end, board, this);
                 hasMoved = true;
                 return true;
             }
         } else if (board[y2][x2] != null && board[y2][x2].isWhite() != isWhite && y2 == y1 - 1 && delta(x2, x1) == 1) {
-            move(start, end, board, this);
             return true;
         }
         return false;

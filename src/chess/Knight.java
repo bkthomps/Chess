@@ -36,6 +36,9 @@ class Knight extends Piece {
 
     @Override
     boolean isActionLegal(Point start, Point end) {
-        return false;
+        final int x1 = (int) start.getX(), x2 = (int) end.getX();
+        final int y1 = (int) start.getY(), y2 = (int) end.getY();
+        return (delta(x1, x2) == 2 && delta(y1, y2) == 1) || (delta(x1, x2) == 1 && delta(y1, y2) == 2)
+                && canMoveOnto(x2, y2, board, isWhite);
     }
 }
