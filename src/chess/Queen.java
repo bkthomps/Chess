@@ -8,6 +8,7 @@ class Queen extends Piece {
     private Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final Piece[][] board;
     private final boolean isWhite;
+    private boolean hasMoved;
 
     Queen(boolean isWhite, Piece[][] board) {
         this.isWhite = isWhite;
@@ -42,5 +43,15 @@ class Queen extends Piece {
             return bishop.isBishopActionLegal(start, end);
         }
         return rook.isActionLegal(start, end);
+    }
+
+    @Override
+    boolean hasMoved() {
+        return hasMoved;
+    }
+
+    @Override
+    void setMove() {
+        hasMoved = true;
     }
 }

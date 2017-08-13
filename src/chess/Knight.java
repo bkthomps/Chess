@@ -8,6 +8,7 @@ class Knight extends Piece {
     private Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final Piece[][] board;
     private final boolean isWhite;
+    private boolean hasMoved;
 
     Knight(boolean isWhite, Piece[][] board) {
         this.isWhite = isWhite;
@@ -40,5 +41,15 @@ class Knight extends Piece {
         final int y1 = (int) start.getY(), y2 = (int) end.getY();
         return (delta(x1, x2) == 2 && delta(y1, y2) == 1) || (delta(x1, x2) == 1 && delta(y1, y2) == 2)
                 && canMoveOnto(x2, y2, board, isWhite);
+    }
+
+    @Override
+    boolean hasMoved() {
+        return hasMoved;
+    }
+
+    @Override
+    void setMove() {
+        hasMoved = true;
     }
 }

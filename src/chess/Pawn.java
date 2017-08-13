@@ -39,16 +39,18 @@ class Pawn extends Piece {
     boolean isActionLegal(Point start, Point end) {
         final int x1 = (int) start.getX(), x2 = (int) end.getX();
         final int y1 = (int) start.getY(), y2 = (int) end.getY();
-        if (board[y2][x2] == null && x2 == x1) {
-            if (y2 == y1 - 1) {
-                return true;
-            } else if (y2 == y1 - 2 && board[y1 - 1][x1] == null && !hasMoved) {
-                hasMoved = true;
-                return true;
-            }
-        } else if (board[y2][x2] != null && board[y2][x2].isWhite() != isWhite && y2 == y1 - 1 && delta(x2, x1) == 1) {
-            return true;
-        }
-        return false;
+        return ((board[y2][x2] == null && x2 == x1)
+                && ((y2 == y1 - 1) || (y2 == y1 - 2 && board[y1 - 1][x1] == null && !hasMoved)))
+                || (board[y2][x2] != null && board[y2][x2].isWhite() != isWhite && y2 == y1 - 1 && delta(x2, x1) == 1);
+    }
+
+    @Override
+    boolean hasMoved() {
+        return hasMoved;
+    }
+
+    @Override
+    void setMove() {
+        hasMoved = true;
     }
 }

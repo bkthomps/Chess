@@ -13,6 +13,10 @@ abstract class Piece {
 
     abstract boolean isActionLegal(Point start, Point end);
 
+    abstract boolean hasMoved();
+
+    abstract void setMove();
+
     int delta(double start, double end) {
         return Math.abs((int) end - (int) start);
     }

@@ -8,6 +8,7 @@ class King extends Piece {
     private Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final Piece[][] board;
     private final boolean isWhite;
+    private boolean hasMoved;
 
     King(boolean isWhite, Piece[][] board) {
         this.isWhite = isWhite;
@@ -40,5 +41,15 @@ class King extends Piece {
         final int y1 = (int) start.getY(), y2 = (int) end.getY();
         return delta(x2, x1) + delta(y2, y1) != 0 && delta(x2, x1) <= 1 && delta(y2, y1) <= 1
                 && canMoveOnto(x2, y2, board, isWhite);
+    }
+
+    @Override
+    boolean hasMoved() {
+        return hasMoved;
+    }
+
+    @Override
+    void setMove() {
+        hasMoved = true;
     }
 }
