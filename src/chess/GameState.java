@@ -48,7 +48,32 @@ class GameState {
             isWhiteTurn = !isWhiteTurn;
             flipBoard();
         } else if (moving.isActionLegal(from, to)) {
-            move(from, to, moving);
+            if ((int) to.getY() == 0 && moving.getClass() == Pawn.class) {
+                final String text = "What would you like to promote your pawn to?";
+                final String[] options = {"QUEEN", "KNIGHT", "ROOK", "BISHOP"};
+                final int promotion = customText(text, options);
+                final Piece piece;
+                switch (promotion) {
+                    case 0:
+                        piece = new Queen(moving.isWhite(), board);
+                        break;
+                    case 1:
+                        piece = new Knight(moving.isWhite(), board);
+                        break;
+                    case 2:
+                        piece = new Rook(moving.isWhite(), board);
+                        break;
+                    case 3:
+                        piece = new Bishop(moving.isWhite(), board);
+                        break;
+                    default:
+                        piece = moving;
+                        break;
+                }
+                move(from, to, piece);
+            } else {
+                move(from, to, moving);
+            }
             isWhiteTurn = !isWhiteTurn;
             flipBoard();
             warnIfCheck();
@@ -64,8 +89,7 @@ class GameState {
             isInCheck = true;
             final String text = "Warning: you are in check.\nYou must get out of check.";
             final String[] options = {"OK"};
-            JOptionPane.showOptionDialog(null, text, Chess.GAME_TITLE, JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+            customText(text, options);
         }
     }
 
@@ -149,5 +173,10 @@ class GameState {
             board[i] = tempSlice;
         }
         chess.refreshPixels();
+    }
+
+    private int customText(String text, String[] options) {
+        return JOptionPane.showOptionDialog(null, text, Chess.GAME_TITLE, JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
     }
 }

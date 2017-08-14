@@ -54,7 +54,6 @@ class King extends Piece {
     }
 
     boolean isCheck(int xCheck, int yCheck) {
-        System.out.println("CHECKING for " + isWhite);
         return isCheckDiagonal(xCheck, yCheck, -1, -1) || isCheckDiagonal(xCheck, yCheck, -1, 1)
                 || isCheckDiagonal(xCheck, yCheck, 1, -1) || isCheckDiagonal(xCheck, yCheck, 1, 1)
                 || isCheckStraight(xCheck, yCheck, 0, -1) || isCheckStraight(xCheck, yCheck, 0, 1)
