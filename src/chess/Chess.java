@@ -17,7 +17,7 @@ import java.util.List;
 
 public class Chess {
 
-    private static final String GAME_TITLE = "Chess";
+    static final String GAME_TITLE = "Chess";
     private static final JFrame frame = new JFrame(GAME_TITLE);
     private static final int SQUARE_AMOUNT = 8;
     private static final int SQUARE_SIZE = 8;
