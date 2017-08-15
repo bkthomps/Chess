@@ -2,6 +2,8 @@ package chess;
 
 import javax.swing.JOptionPane;
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
 
 class GameState {
 
@@ -12,6 +14,7 @@ class GameState {
     private Point from;
     private boolean isInCheck;
     private Point enPassant;
+    private int drawCounter;
 
     GameState(Piece[][] board, Chess chess) {
         this.board = board;
@@ -133,22 +136,9 @@ class GameState {
         } else if (isStalemate(king, x, y)) {
             final String text = "Draw! Because of stalemate!";
             finishGame(text);
-        } else if (false) {
-            /*
-             * TODO: if draw, 4 ways to get draw
-             * 1. Stalemate: exact same as checkmate except king is not currently in check
-             * 2. 50 moves without pawn move or piece capture, just use a counter
-             * 3. Board repeated 3 times, just use an ArrayList and compare after every move and keep a counter, resetting
-             *    the ArrayList when a pawn moves or a piece is capture, can use counter from draw type 2.
-             * 4. Not enough pieces to cause a checkmate. 4 ways for this to happen
-             *    a. king vs. king
-             *    b. king and bishop vs. king
-             *    c. king and knight vs king
-             *    d. king and bishop vs. king and bishop, when bishops are on the same color
-             */
-        } else {
-            warnIfCheck(king, location);
         }
+        otherDraw();
+        warnIfCheck(king, location);
     }
 
     private boolean isCheckmate(King king, int x, int y) {
@@ -187,6 +177,85 @@ class GameState {
             }
         }
         return false;
+    }
+
+    /**
+     * There are 4 types of draws:
+     * 1. Stalemate
+     * 2. 50 moves without pawn move or piece capture
+     * 3. Board repeated 3 times
+     * 4. Insufficient mating material
+     */
+    // for number 3, i can have an array list and reset it every time a pawn moves or a piece is captured
+    private void otherDraw() {
+        determineIfTooManyMoves();
+        determineIfTooManyBoardRepetitions();
+        determineIfInsufficientMatingMaterial();
+    }
+
+    /**
+     * Draw if 50 moves without pawn move or piece capture
+     */
+    private void determineIfTooManyMoves() {
+        final int MAX_UNPRODUCTIVE_MOVES = 50;
+        if (drawCounter == MAX_UNPRODUCTIVE_MOVES) {
+            final String text = "Draw! 50 moves without pawn move or piece capture!";
+            finishGame(text);
+        } else if (drawCounter > MAX_UNPRODUCTIVE_MOVES) {
+            throw new IllegalStateException("drawCounter > 50");
+        }
+    }
+
+    /**
+     * Draw if board repeated 3 times
+     */
+    private void determineIfTooManyBoardRepetitions() {
+        // TODO: code
+    }
+
+    /**
+     * Draw if insufficient mating material
+     */
+    private void determineIfInsufficientMatingMaterial() {
+        final List<Piece> ally = new ArrayList<>();
+        final List<Piece> enemy = new ArrayList<>();
+        findPieces(ally, enemy);
+        if (isInsufficientMating(ally, enemy)) {
+            final String text = "Draw! Not enough pieces to cause a checkmate!";
+            finishGame(text);
+        }
+    }
+
+    private void findPieces(List<Piece> ally, List<Piece> enemy) {
+        for (Piece[] slice : board) {
+            for (Piece me : slice) {
+                if (me == null || me.getClass() == King.class) {
+                    continue;
+                }
+                if (me.isWhite() == isWhiteTurn) {
+                    ally.add(me);
+                } else {
+                    enemy.add(me);
+                }
+            }
+        }
+    }
+
+    /**
+     * Determines if insufficient mating material
+     *
+     * @param ally  pieces allied with the King not including the King
+     * @param enemy pieces enemy to the King not including the King
+     * @return is lone King against: lone King, or King and Knight, or King and Bishop, or King and two Knights
+     */
+    private boolean isInsufficientMating(List<Piece> ally, List<Piece> enemy) {
+        if (ally.size() != 0 && enemy.size() != 0) {
+            return false;
+        }
+        final List<Piece> group = (ally.size() == 0) ? enemy : ally;
+        return (group.size() == 0) || (group.size() == 1 && (group.get(0).getClass() == Knight.class
+                || group.get(0).getClass() == Bishop.class)) || (group.size() == 2
+                && group.get(0).getClass() == Knight.class && group.get(1).getClass() == Knight.class);
     }
 
     private void finishGame(String text) {
@@ -255,6 +324,11 @@ class GameState {
     }
 
     private void move(Point start, Point end, Piece me) {
+        if (board[(int) end.getY()][(int) end.getX()] != null || me.getClass() == Pawn.class) {
+            drawCounter = 0;
+        } else {
+            drawCounter++;
+        }
         rawMove(start, end, me);
         me.setMove();
     }
