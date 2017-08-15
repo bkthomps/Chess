@@ -1,6 +1,6 @@
 /**
  * Bailey Thompson <br>
- * Chess (0.4.1) <br>
+ * Chess (0.4.2) <br>
  * 14 August 2017 <br>
  * <br>
  * Chess simulation. Click on the piece to move, and the location to move it to. If the action is legal, it will be
