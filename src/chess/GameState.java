@@ -11,6 +11,7 @@ class GameState {
     private Piece moving;
     private Point from;
     private boolean isInCheck;
+    private Point enPassant;
 
     GameState(Piece[][] board, Chess chess) {
         this.board = board;
@@ -19,67 +20,122 @@ class GameState {
 
     void clicked(int x, int y) {
         if (moving == null) {
-            final Piece toMove = board[y][x];
-            if (toMove != null && toMove.isWhite() == isWhiteTurn) {
-                moving = toMove;
-                from = new Point(x, y);
-                return;
-            }
-            moving = null;
-            from = null;
+            lockOntoPiece(x, y);
             return;
         }
         final Point to = new Point(x, y);
+        /*
+         * TODO: if checkmate
+         * If a move cannot be taken without putting the King in check, and the King is currently in check.
+         */
+        /*
+         * TODO: if draw, 4 ways to get draw
+         * 1. Stalemate: exact same as checkmate except king is not currently in check
+         * 2. 50 moves without pawn move or piece capture, just use a counter
+         * 3. Board repeated 3 times, just use an ArrayList and compare after every move and keep a counter, resetting
+         *    the ArrayList when a pawn moves or a piece is capture, can use counter from draw type 2.
+         * 4. Not enough pieces to cause a checkmate. 4 ways for this to happen
+         *    a. king vs. king
+         *    b. king and bishop vs. king
+         *    c. king and knight vs king
+         *    d. king and bishop vs. king and bishop, when bishops are on the same color
+         */
         if (isInCheck) {
-            if (moving.isActionLegal(from, to)) {
-                move(from, to, moving);
-                final Point location = locateKing();
-                final King king = new King(isWhiteTurn, board);
-                if (!king.isCheck((int) location.getX(), (int) location.getY())) {
-                    isWhiteTurn = !isWhiteTurn;
-                    flipBoard();
-                    warnIfCheck();
-                    isInCheck = false;
-                } else {
-                    move(to, from, moving);
-                }
-            }
+            doMoveInCheck(to);
         } else if (canCastle(to)) {
             isWhiteTurn = !isWhiteTurn;
             flipBoard();
+            enPassant = null;
+        } else if (isEnPassantLegal(to)) {
+            doEnPassant();
         } else if (moving.isActionLegal(from, to)) {
-            if ((int) to.getY() == 0 && moving.getClass() == Pawn.class) {
-                final String text = "What would you like to promote your pawn to?";
-                final String[] options = {"QUEEN", "KNIGHT", "ROOK", "BISHOP"};
-                final int promotion = customText(text, options);
-                final Piece piece;
-                switch (promotion) {
-                    case 0:
-                        piece = new Queen(moving.isWhite(), board);
-                        break;
-                    case 1:
-                        piece = new Knight(moving.isWhite(), board);
-                        break;
-                    case 2:
-                        piece = new Rook(moving.isWhite(), board);
-                        break;
-                    case 3:
-                        piece = new Bishop(moving.isWhite(), board);
-                        break;
-                    default:
-                        piece = moving;
-                        break;
-                }
-                move(from, to, piece);
-            } else {
-                move(from, to, moving);
-            }
-            isWhiteTurn = !isWhiteTurn;
-            flipBoard();
-            warnIfCheck();
+            checkEnPassant(to);
+            doMove(to);
         }
         moving = null;
         from = null;
+    }
+
+    private void lockOntoPiece(int x, int y) {
+        final Piece toMove = board[y][x];
+        if (toMove != null && toMove.isWhite() == isWhiteTurn) {
+            moving = toMove;
+            from = new Point(x, y);
+            return;
+        }
+        moving = null;
+        from = null;
+    }
+
+    private void doMoveInCheck(Point to) {
+        if (moving.isActionLegal(from, to)) {
+            checkEnPassant(to);
+            move(from, to, moving);
+            final Point location = locateKing();
+            final King king = new King(isWhiteTurn, board);
+            if (!king.isCheck((int) location.getX(), (int) location.getY())) {
+                isWhiteTurn = !isWhiteTurn;
+                flipBoard();
+                warnIfCheck();
+                isInCheck = false;
+            } else {
+                move(to, from, moving);
+            }
+        }
+    }
+
+    private void doMove(Point to) {
+        if ((int) to.getY() == 0 && moving.getClass() == Pawn.class) {
+            final String text = "What would you like to promote your pawn to?";
+            final String[] options = {"QUEEN", "KNIGHT", "ROOK", "BISHOP"};
+            final int promotion = customText(text, options);
+            final Piece piece;
+            switch (promotion) {
+                case 0:
+                    piece = new Queen(moving.isWhite(), board);
+                    break;
+                case 1:
+                    piece = new Knight(moving.isWhite(), board);
+                    break;
+                case 2:
+                    piece = new Rook(moving.isWhite(), board);
+                    break;
+                case 3:
+                    piece = new Bishop(moving.isWhite(), board);
+                    break;
+                default:
+                    piece = moving;
+                    break;
+            }
+            move(from, to, piece);
+        } else {
+            move(from, to, moving);
+        }
+        isWhiteTurn = !isWhiteTurn;
+        flipBoard();
+        warnIfCheck();
+    }
+
+    private boolean isEnPassantLegal(Point to) {
+        return enPassant != null && to.equals(enPassant) && moving.getClass() == Pawn.class
+                && moving.isWhite() != board[(int) to.getY() + 1][(int) to.getX()].isWhite();
+    }
+
+    private void doEnPassant() {
+        move(from, enPassant, moving);
+        board[(int) enPassant.getY() + 1][(int) enPassant.getX()] = null;
+        enPassant = null;
+        isWhiteTurn = !isWhiteTurn;
+        flipBoard();
+        warnIfCheck();
+    }
+
+    private void checkEnPassant(Point to) {
+        if (moving.getClass() == Pawn.class && from.getY() - to.getY() == 2) {
+            enPassant = new Point((int) to.getX(), (int) to.getY() - 2);
+        } else {
+            enPassant = null;
+        }
     }
 
     private void warnIfCheck() {
