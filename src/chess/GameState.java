@@ -24,22 +24,6 @@ class GameState {
             return;
         }
         final Point to = new Point(x, y);
-        /*
-         * TODO: if checkmate
-         * If a move cannot be taken without putting the King in check, and the King is currently in check.
-         */
-        /*
-         * TODO: if draw, 4 ways to get draw
-         * 1. Stalemate: exact same as checkmate except king is not currently in check
-         * 2. 50 moves without pawn move or piece capture, just use a counter
-         * 3. Board repeated 3 times, just use an ArrayList and compare after every move and keep a counter, resetting
-         *    the ArrayList when a pawn moves or a piece is capture, can use counter from draw type 2.
-         * 4. Not enough pieces to cause a checkmate. 4 ways for this to happen
-         *    a. king vs. king
-         *    b. king and bishop vs. king
-         *    c. king and knight vs king
-         *    d. king and bishop vs. king and bishop, when bishops are on the same color
-         */
         if (isInCheck) {
             doMoveInCheck(to);
         } else if (canCastle(to)) {
@@ -76,7 +60,7 @@ class GameState {
             if (!king.isCheck((int) location.getX(), (int) location.getY())) {
                 isWhiteTurn = !isWhiteTurn;
                 flipBoard();
-                warnIfCheck();
+                checkEndgame();
                 isInCheck = false;
             } else {
                 move(to, from, moving);
@@ -113,7 +97,7 @@ class GameState {
         }
         isWhiteTurn = !isWhiteTurn;
         flipBoard();
-        warnIfCheck();
+        checkEndgame();
     }
 
     private boolean isEnPassantLegal(Point to) {
@@ -127,7 +111,7 @@ class GameState {
         enPassant = null;
         isWhiteTurn = !isWhiteTurn;
         flipBoard();
-        warnIfCheck();
+        checkEndgame();
     }
 
     private void checkEnPassant(Point to) {
@@ -138,9 +122,80 @@ class GameState {
         }
     }
 
-    private void warnIfCheck() {
+    private void checkEndgame() {
         final Point location = locateKing();
+        final int x = (int) location.getX(), y = (int) location.getY();
         final King king = new King(isWhiteTurn, board);
+        if (isCheckmate(king, x, y)) {
+            final String team = (isWhiteTurn) ? "Black" : "White";
+            final String text = "Checkmate! " + team + " wins!";
+            finishGame(text);
+        } else if (isStalemate(king, x, y)) {
+            final String text = "Draw! Because of stalemate!";
+            finishGame(text);
+        } else if (false) {
+            /*
+             * TODO: if draw, 4 ways to get draw
+             * 1. Stalemate: exact same as checkmate except king is not currently in check
+             * 2. 50 moves without pawn move or piece capture, just use a counter
+             * 3. Board repeated 3 times, just use an ArrayList and compare after every move and keep a counter, resetting
+             *    the ArrayList when a pawn moves or a piece is capture, can use counter from draw type 2.
+             * 4. Not enough pieces to cause a checkmate. 4 ways for this to happen
+             *    a. king vs. king
+             *    b. king and bishop vs. king
+             *    c. king and knight vs king
+             *    d. king and bishop vs. king and bishop, when bishops are on the same color
+             */
+        } else {
+            warnIfCheck(king, location);
+        }
+    }
+
+    private boolean isCheckmate(King king, int x, int y) {
+        return king.isCheck(x, y) && !isMovePossible(king, x, y);
+    }
+
+    private boolean isStalemate(King king, int x, int y) {
+        return !king.isCheck(x, y) && !isMovePossible(king, x, y);
+    }
+
+    private boolean isMovePossible(King king, int x, int y) {
+        if (board[y][x].getClass() != King.class) {
+            throw new IllegalStateException("King not where specified!");
+        }
+        final int boardLength = board.length;
+        for (int i = 0; i < boardLength; i++) {
+            for (int j = 0; j < boardLength; j++) {
+                final Piece me = board[j][i];
+                if (me != null && me.isWhite() == isWhiteTurn) {
+                    for (int k = 0; k < boardLength; k++) {
+                        for (int l = 0; l < boardLength; l++) {
+                            final Point start = new Point(i, j);
+                            final Point end = new Point(k, l);
+                            if (me.isActionLegal(start, end)) {
+                                rawMove(start, end, me);
+                                final Point kingLocation = locateKing();
+                                if (!king.isCheck((int) kingLocation.getX(), (int) kingLocation.getY())) {
+                                    rawMove(end, start, me);
+                                    return true;
+                                }
+                                rawMove(end, start, me);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private void finishGame(String text) {
+        final String[] options = {"OK"};
+        customText(text, options);
+        System.exit(0);
+    }
+
+    private void warnIfCheck(King king, Point location) {
         if (king.isCheck((int) location.getX(), (int) location.getY())) {
             isInCheck = true;
             final String text = "Warning: you are in check.\nYou must get out of check.";
@@ -169,7 +224,7 @@ class GameState {
             return false;
         }
         final King king = new King(isWhiteTurn, board);
-        if (isWhiteTurn && x1 == 4 && x2 == 0) {
+        if (x1 == 4 && x2 == 0) {
             if (hasMoved(slice[0]) && slice[1] == null && slice[2] == null && slice[3] == null && hasMoved(slice[4])) {
                 if (!king.isCheck(4, 7) && !king.isCheck(3, 7) && !king.isCheck(2, 7)) {
                     setMove(4, 2);
@@ -177,27 +232,11 @@ class GameState {
                     return true;
                 }
             }
-        } else if (isWhiteTurn && x1 == 4 && x2 == 7) {
+        } else if (x1 == 4 && x2 == 7) {
             if (hasMoved(slice[4]) && slice[5] == null && slice[6] == null && hasMoved(slice[7])) {
                 if (!king.isCheck(4, 7) && !king.isCheck(5, 7) && !king.isCheck(6, 7)) {
                     setMove(4, 6);
                     setMove(7, 5);
-                    return true;
-                }
-            }
-        } else if (!isWhiteTurn && x1 == 3 && x2 == 0) {
-            if (hasMoved(slice[0]) && slice[1] == null && slice[2] == null && hasMoved(slice[3])) {
-                if (!king.isCheck(3, 7) && !king.isCheck(2, 7) && !king.isCheck(1, 7)) {
-                    setMove(3, 1);
-                    setMove(0, 2);
-                    return true;
-                }
-            }
-        } else if (!isWhiteTurn && x1 == 3 && x2 == 7) {
-            if (hasMoved(slice[3]) && slice[4] == null && slice[5] == null && slice[6] == null && hasMoved(slice[7])) {
-                if (!king.isCheck(3, 7) && !king.isCheck(4, 7) && !king.isCheck(5, 7)) {
-                    setMove(3, 5);
-                    setMove(7, 4);
                     return true;
                 }
             }
@@ -216,9 +255,13 @@ class GameState {
     }
 
     private void move(Point start, Point end, Piece me) {
+        rawMove(start, end, me);
+        me.setMove();
+    }
+
+    private void rawMove(Point start, Point end, Piece me) {
         board[(int) start.getY()][(int) start.getX()] = null;
         board[(int) end.getY()][(int) end.getX()] = me;
-        me.setMove();
     }
 
     private void flipBoard() {

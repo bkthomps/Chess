@@ -2,6 +2,8 @@ package chess;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
 
 class King extends Piece {
 
@@ -53,12 +55,12 @@ class King extends Piece {
         hasMoved = true;
     }
 
-    boolean isCheck(int xCheck, int yCheck) {
-        return isCheckDiagonal(xCheck, yCheck, -1, -1) || isCheckDiagonal(xCheck, yCheck, -1, 1)
-                || isCheckDiagonal(xCheck, yCheck, 1, -1) || isCheckDiagonal(xCheck, yCheck, 1, 1)
-                || isCheckStraight(xCheck, yCheck, 0, -1) || isCheckStraight(xCheck, yCheck, 0, 1)
-                || isCheckStraight(xCheck, yCheck, -1, 0) || isCheckStraight(xCheck, yCheck, 1, 0)
-                || isCheckPawn(xCheck, yCheck) || isCheckKnight(xCheck, yCheck);
+    boolean isCheck(int x, int y) {
+        return isCheckDiagonal(x, y, -1, -1) || isCheckDiagonal(x, y, -1, 1)
+                || isCheckDiagonal(x, y, 1, -1) || isCheckDiagonal(x, y, 1, 1)
+                || isCheckStraight(x, y, 0, -1) || isCheckStraight(x, y, 0, 1)
+                || isCheckStraight(x, y, -1, 0) || isCheckStraight(x, y, 1, 0)
+                || isCheckPawn(x, y) || isCheckKnight(x, y);
     }
 
     private boolean isCheckDiagonal(int xCheck, int yCheck, int xScale, int yScale) {

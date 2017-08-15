@@ -18,7 +18,7 @@ import java.util.List;
 public class Chess {
 
     static final String GAME_TITLE = "Chess";
-    private static final JFrame frame = new JFrame(GAME_TITLE);
+    private final JFrame frame = new JFrame(GAME_TITLE);
 
     private static final int BOARD_SIZE = 8;
     private static final int PIXELS_PER_SQUARE = 8;
@@ -50,8 +50,8 @@ public class Chess {
         board[0][0] = new Rook(false, board);
         board[0][1] = new Knight(false, board);
         board[0][2] = new Bishop(false, board);
-        board[0][3] = new King(false, board);
-        board[0][4] = new Queen(false, board);
+        board[0][3] = new Queen(false, board);
+        board[0][4] = new King(false, board);
         board[0][5] = new Bishop(false, board);
         board[0][6] = new Knight(false, board);
         board[0][7] = new Rook(false, board);
@@ -79,7 +79,7 @@ public class Chess {
         final Color lightBrown = new Color(200, 100, 0);
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                final Color usedColor = ((i + j) % 2 == 0) ? darkBrown : lightBrown;
+                final Color usedColor = ((i + j) % 2 == 0) ? lightBrown : darkBrown;
                 fillInSubSection(usedColor, j * PIXELS_PER_SQUARE, i * PIXELS_PER_SQUARE);
             }
         }
