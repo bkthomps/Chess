@@ -15,6 +15,9 @@ class GameState {
     private boolean isInCheck;
     private Point enPassant;
     private int drawCounter;
+    private List<Piece[][]> boardHistory = new ArrayList<>();
+    private List<Point> enPassantHistory = new ArrayList<>();
+    private List<Boolean> canCastleHistory = new ArrayList<>();
 
     GameState(Piece[][] board, Chess chess) {
         this.board = board;
@@ -33,6 +36,7 @@ class GameState {
             isWhiteTurn = !isWhiteTurn;
             flipBoard();
             enPassant = null;
+            enPassantHistory.add(null);
         } else if (isEnPassantLegal(to)) {
             doEnPassant();
         } else if (moving.isActionLegal(from, to)) {
@@ -112,6 +116,7 @@ class GameState {
         move(from, enPassant, moving);
         board[(int) enPassant.getY() + 1][(int) enPassant.getX()] = null;
         enPassant = null;
+        enPassantHistory.add(null);
         isWhiteTurn = !isWhiteTurn;
         flipBoard();
         checkEndgame();
@@ -119,9 +124,12 @@ class GameState {
 
     private void checkEnPassant(Point to) {
         if (moving.getClass() == Pawn.class && from.getY() - to.getY() == 2) {
-            enPassant = new Point((int) to.getX(), (int) to.getY() - 2);
+            final Point p = new Point((int) to.getX(), (int) to.getY() - 2);
+            enPassant = p;
+            enPassantHistory.add(p);
         } else {
             enPassant = null;
+            enPassantHistory.add(null);
         }
     }
 
@@ -197,12 +205,13 @@ class GameState {
      * Draw if 50 moves without pawn move or piece capture
      */
     private void determineIfTooManyMoves() {
-        final int MAX_UNPRODUCTIVE_MOVES = 50;
+        final int MAX_MOVE_PER_SIDE = 50;
+        final int MAX_UNPRODUCTIVE_MOVES = 2 * MAX_MOVE_PER_SIDE;
         if (drawCounter == MAX_UNPRODUCTIVE_MOVES) {
-            final String text = "Draw! 50 moves without pawn move or piece capture!";
+            final String text = "Draw! " + MAX_MOVE_PER_SIDE + " moves without pawn move or piece capture!";
             finishGame(text);
         } else if (drawCounter > MAX_UNPRODUCTIVE_MOVES) {
-            throw new IllegalStateException("drawCounter > 50");
+            throw new IllegalStateException("drawCounter > " + MAX_UNPRODUCTIVE_MOVES);
         }
     }
 
@@ -210,7 +219,44 @@ class GameState {
      * Draw if board repeated 3 times
      */
     private void determineIfTooManyBoardRepetitions() {
-        // TODO: code
+        if (isTooManyBoardRepetitions()) {
+            final String text = "Draw! Board repeated 3 times!";
+            finishGame(text);
+        }
+    }
+
+    private boolean isTooManyBoardRepetitions() {
+        final int historySize = boardHistory.size();
+        if (historySize != canCastleHistory.size() || historySize != enPassantHistory.size()) {
+            throw new IllegalStateException("History lists are not same size!");
+        }
+        for (int i = 0; i < historySize; i++) {
+            int count = 0;
+            for (int j = 0; j < historySize; j++) {
+                if (isSameBoard(boardHistory.get(i), boardHistory.get(j))
+                        && canCastleHistory.get(i).equals(canCastleHistory.get(j))
+                        && ((enPassantHistory.get(i) == null && enPassantHistory.get(j) == null)
+                        || (enPassantHistory.get(i) != null && enPassantHistory.get(j) != null
+                        && enPassantHistory.get(i).equals(enPassantHistory.get(j))))) {
+                    count++;
+                }
+                if (count == 3) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isSameBoard(Piece[][] boardOne, Piece[][] boardTwo) {
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board.length; j++) {
+                if (boardOne[j][i] != boardTwo[j][i]) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -326,8 +372,21 @@ class GameState {
     private void move(Point start, Point end, Piece me) {
         if (board[(int) end.getY()][(int) end.getX()] != null || me.getClass() == Pawn.class) {
             drawCounter = 0;
+            boardHistory.clear();
+            enPassantHistory.clear();
+            canCastleHistory.clear();
         } else {
             drawCounter++;
+            final int boardLength = board.length;
+            final Piece[][] boardCopy = new Piece[boardLength][boardLength];
+            for (int i = 0; i < boardLength; i++) {
+                for (int j = 0; j < boardLength; j++) {
+                    boardCopy[j][i] = board[j][i];
+                }
+            }
+            boardHistory.add(boardCopy);
+            final Point kingLocation = locateKing();
+            canCastleHistory.add(board[(int) kingLocation.getY()][(int) kingLocation.getX()].hasMoved());
         }
         rawMove(start, end, me);
         me.setMove();
