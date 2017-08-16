@@ -233,6 +233,7 @@ class GameState {
                 if (me != null && me.isWhite() == isWhiteTurn) {
                     for (int k = 0; k < boardLength; k++) {
                         for (int l = 0; l < boardLength; l++) {
+                            final Piece save = board[l][k];
                             final Point start = new Point(i, j);
                             final Point end = new Point(k, l);
                             if (me.isActionLegal(start, end)) {
@@ -240,9 +241,11 @@ class GameState {
                                 final Point kingLocation = locateKing();
                                 if (!king.isCheck((int) kingLocation.getX(), (int) kingLocation.getY())) {
                                     rawMove(end, start, me);
+                                    board[l][k] = save;
                                     return true;
                                 }
                                 rawMove(end, start, me);
+                                board[l][k] = save;
                             }
                         }
                     }
