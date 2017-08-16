@@ -3,6 +3,9 @@ package chess;
 import java.awt.Color;
 import java.awt.Point;
 
+/**
+ * The chess board contains pieces which may be moved, and have their own abilities.
+ */
 abstract class Piece {
 
     static final int PIECE_SIZE = 6;
@@ -25,6 +28,14 @@ abstract class Piece {
         return board[y][x] == null || board[y][x].isWhite() != isWhite;
     }
 
+    /**
+     * Set the color of each piece displayed on the board based on which squares contain pieces and if they are white or
+     * black.
+     *
+     * @param image   the color representation of the board
+     * @param pixels  the pixels on the board
+     * @param isWhite if the piece is white
+     */
     void getColor(Color[][] image, int[][] pixels, boolean isWhite) {
         for (int i = 0; i < pixels.length; i++) {
             for (int j = 0; j < pixels.length; j++) {

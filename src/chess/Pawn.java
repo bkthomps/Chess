@@ -3,6 +3,9 @@ package chess;
 import java.awt.Color;
 import java.awt.Point;
 
+/**
+ * The pawn can only move one square forward, but can move two on its first move. It eats on a diagonal.
+ */
 class Pawn extends Piece {
 
     private Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
@@ -35,6 +38,14 @@ class Pawn extends Piece {
         return isWhite;
     }
 
+    /**
+     * Determines if the action is legal. It is legal is it moves one square or two squares on its first turn to move.
+     * To eat, it moves one square diagonally.
+     *
+     * @param start the beginning position
+     * @param end   the final position
+     * @return if the action is legal
+     */
     @Override
     boolean isActionLegal(Point start, Point end) {
         final int x1 = (int) start.getX(), x2 = (int) end.getX();

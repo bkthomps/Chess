@@ -24,6 +24,12 @@ class GameState {
         this.chess = chess;
     }
 
+    /**
+     * Handles a click event.
+     *
+     * @param x the x-coordinate of the click
+     * @param y the y-coordinate of the click
+     */
     void clicked(int x, int y) {
         if (moving == null) {
             lockOntoPiece(x, y);
@@ -47,6 +53,12 @@ class GameState {
         from = null;
     }
 
+    /**
+     * Determine the piece which was clicked to operate on.
+     *
+     * @param x the x-coordinate
+     * @param y the y-coordinate
+     */
     private void lockOntoPiece(int x, int y) {
         final Piece toMove = board[y][x];
         if (toMove != null && toMove.isWhite() == isWhiteTurn) {
@@ -58,6 +70,11 @@ class GameState {
         from = null;
     }
 
+    /**
+     * Determine if the move is legal to make when the king is in check.
+     *
+     * @param to where to move the king to
+     */
     private void doMoveInCheck(Point to) {
         if (moving.isActionLegal(from, to)) {
             checkEnPassant(to);
@@ -75,6 +92,12 @@ class GameState {
         }
     }
 
+    /**
+     * Move the piece. If it is a pawn moving into a promotion square, ask the user what to promote the pawn to and
+     * promote the pawn based on user input.
+     *
+     * @param to where to move to
+     */
     private void doMove(Point to) {
         if ((int) to.getY() == 0 && moving.getClass() == Pawn.class) {
             final String text = "What would you like to promote your pawn to?";
@@ -107,11 +130,21 @@ class GameState {
         checkEndgame();
     }
 
+    /**
+     * Determine if en passant may be used.
+     *
+     * @param to where to move the piece to
+     * @return if en passant is legal
+     */
     private boolean isEnPassantLegal(Point to) {
         return enPassant != null && to.equals(enPassant) && moving.getClass() == Pawn.class
                 && moving.isWhite() != board[(int) to.getY() + 1][(int) to.getX()].isWhite();
     }
 
+    /**
+     * Perform en passant. En passant is a move which lets a pawn eat a pawn which just moved two squares as if it only
+     * moved one square immediately after it happens.
+     */
     private void doEnPassant() {
         move(from, enPassant, moving);
         board[(int) enPassant.getY() + 1][(int) enPassant.getX()] = null;
@@ -122,6 +155,11 @@ class GameState {
         checkEndgame();
     }
 
+    /**
+     * Keep a record that en passant may be used at this location.
+     *
+     * @param to location to move to
+     */
     private void checkEnPassant(Point to) {
         if (moving.getClass() == Pawn.class && from.getY() - to.getY() == 2) {
             final Point p = new Point((int) to.getX(), (int) to.getY() - 2);
@@ -133,6 +171,9 @@ class GameState {
         }
     }
 
+    /**
+     * Check if game is over. It may be over by checkmate or by draw. The are 4 types of draws.
+     */
     private void checkEndgame() {
         final Point location = locateKing();
         final int x = (int) location.getX(), y = (int) location.getY();
@@ -149,14 +190,38 @@ class GameState {
         warnIfCheck(king, location);
     }
 
+    /**
+     * Determine if the game is over by checkmate.
+     *
+     * @param king the king
+     * @param x    the x-coordinate
+     * @param y    the y-coordinate
+     * @return if the game is over by checkmate
+     */
     private boolean isCheckmate(King king, int x, int y) {
         return king.isCheck(x, y) && !isMovePossible(king, x, y);
     }
 
+    /**
+     * Determine if the game is over by stalemate.
+     *
+     * @param king the king
+     * @param x    the x-coordinate
+     * @param y    the y-coordinate
+     * @return if the game is over by stalemate
+     */
     private boolean isStalemate(King king, int x, int y) {
         return !king.isCheck(x, y) && !isMovePossible(king, x, y);
     }
 
+    /**
+     * Determine if any move can be done which results in king not being in check.
+     *
+     * @param king the king
+     * @param x    the x-coordinate
+     * @param y    the y-coordinate
+     * @return if any move can be done which results in king not being in check
+     */
     private boolean isMovePossible(King king, int x, int y) {
         if (board[y][x].getClass() != King.class) {
             throw new IllegalStateException("King not where specified!");
@@ -194,7 +259,6 @@ class GameState {
      * 3. Board repeated 3 times
      * 4. Insufficient mating material
      */
-    // for number 3, i can have an array list and reset it every time a pawn moves or a piece is captured
     private void otherDraw() {
         determineIfTooManyMoves();
         determineIfTooManyBoardRepetitions();
@@ -202,7 +266,7 @@ class GameState {
     }
 
     /**
-     * Draw if 50 moves without pawn move or piece capture
+     * Draw if 50 moves without pawn move or piece capture.
      */
     private void determineIfTooManyMoves() {
         final int MAX_MOVE_PER_SIDE = 50;
@@ -216,7 +280,7 @@ class GameState {
     }
 
     /**
-     * Draw if board repeated 3 times
+     * Draw if board repeated 3 times.
      */
     private void determineIfTooManyBoardRepetitions() {
         if (isTooManyBoardRepetitions()) {
@@ -225,6 +289,11 @@ class GameState {
         }
     }
 
+    /**
+     * Determine if the board has repeated 3 times.
+     *
+     * @return if the board has repeated 3 times
+     */
     private boolean isTooManyBoardRepetitions() {
         final int historySize = boardHistory.size();
         if (historySize != canCastleHistory.size() || historySize != enPassantHistory.size()) {
@@ -248,6 +317,13 @@ class GameState {
         return false;
     }
 
+    /**
+     * Determine if two boards are the same.
+     *
+     * @param boardOne the first board
+     * @param boardTwo the second board
+     * @return if two boards are the same
+     */
     private boolean isSameBoard(Piece[][] boardOne, Piece[][] boardTwo) {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board.length; j++) {
@@ -260,7 +336,7 @@ class GameState {
     }
 
     /**
-     * Draw if insufficient mating material
+     * Draw if insufficient mating material. Mating material is any pieces which could force a checkmate.
      */
     private void determineIfInsufficientMatingMaterial() {
         final List<Piece> ally = new ArrayList<>();
@@ -272,6 +348,12 @@ class GameState {
         }
     }
 
+    /**
+     * Find pieces on the board.
+     *
+     * @param ally  the ally pieces
+     * @param enemy the enemy pieces
+     */
     private void findPieces(List<Piece> ally, List<Piece> enemy) {
         for (Piece[] slice : board) {
             for (Piece me : slice) {
@@ -288,7 +370,7 @@ class GameState {
     }
 
     /**
-     * Determines if insufficient mating material
+     * Determines if insufficient mating material.
      *
      * @param ally  pieces allied with the King not including the King
      * @param enemy pieces enemy to the King not including the King
@@ -304,12 +386,23 @@ class GameState {
                 && group.get(0).getClass() == Knight.class && group.get(1).getClass() == Knight.class);
     }
 
+    /**
+     * Gives a user a message and terminates the program.
+     *
+     * @param text the text to display to the user
+     */
     private void finishGame(String text) {
         final String[] options = {"OK"};
         customText(text, options);
         System.exit(0);
     }
 
+    /**
+     * Warns the user if the king is in check.
+     *
+     * @param king     the king which is in check
+     * @param location the location of the king in check
+     */
     private void warnIfCheck(King king, Point location) {
         if (king.isCheck((int) location.getX(), (int) location.getY())) {
             isInCheck = true;
@@ -319,6 +412,11 @@ class GameState {
         }
     }
 
+    /**
+     * Determine location of king.
+     *
+     * @return location of king
+     */
     private Point locateKing() {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board.length; j++) {
@@ -331,6 +429,12 @@ class GameState {
         throw new IllegalStateException("No King!");
     }
 
+    /**
+     * Determine if the king can castle, and if so, castle.
+     *
+     * @param to the location to move to
+     * @return if the king can castle
+     */
     private boolean canCastle(Point to) {
         final int x1 = (int) from.getX(), x2 = (int) to.getX();
         final int y1 = (int) from.getY(), y2 = (int) to.getY();
@@ -342,16 +446,16 @@ class GameState {
         if (x1 == 4 && x2 == 0) {
             if (hasMoved(slice[0]) && slice[1] == null && slice[2] == null && slice[3] == null && hasMoved(slice[4])) {
                 if (!king.isCheck(4, 7) && !king.isCheck(3, 7) && !king.isCheck(2, 7)) {
-                    setMove(4, 2);
-                    setMove(0, 3);
+                    moveCastle(4, 2);
+                    moveCastle(0, 3);
                     return true;
                 }
             }
         } else if (x1 == 4 && x2 == 7) {
             if (hasMoved(slice[4]) && slice[5] == null && slice[6] == null && hasMoved(slice[7])) {
                 if (!king.isCheck(4, 7) && !king.isCheck(5, 7) && !king.isCheck(6, 7)) {
-                    setMove(4, 6);
-                    setMove(7, 5);
+                    moveCastle(4, 6);
+                    moveCastle(7, 5);
                     return true;
                 }
             }
@@ -359,16 +463,35 @@ class GameState {
         return false;
     }
 
+    /**
+     * Determine if the piece has moved.
+     *
+     * @param me the piece
+     * @return if the piece has moved
+     */
     private boolean hasMoved(Piece me) {
         return me != null && !me.hasMoved();
     }
 
-    private void setMove(int from, int to) {
+    /**
+     * Move the piece when castling.
+     *
+     * @param from location to move from
+     * @param to   location to move to
+     */
+    private void moveCastle(int from, int to) {
         board[7][to] = board[7][from];
         board[7][from] = null;
         board[7][to].setMove();
     }
 
+    /**
+     * Move the piece.
+     *
+     * @param start the location to move from
+     * @param end   the location to move to
+     * @param me    the piece to move
+     */
     private void move(Point start, Point end, Piece me) {
         if (board[(int) end.getY()][(int) end.getX()] != null || me.getClass() == Pawn.class) {
             drawCounter = 0;
@@ -392,11 +515,21 @@ class GameState {
         me.setMove();
     }
 
+    /**
+     * Move the piece without setting the piece to moved state. Used when checking the board and not actually moving it.
+     *
+     * @param start the location to move from
+     * @param end   the location to move to
+     * @param me    the piece to move
+     */
     private void rawMove(Point start, Point end, Piece me) {
         board[(int) start.getY()][(int) start.getX()] = null;
         board[(int) end.getY()][(int) end.getX()] = me;
     }
 
+    /**
+     * Flip the board so that the opposite player can play with the correct orientation.
+     */
     private void flipBoard() {
         final int BOARD_SIZE = board.length;
         for (int i = 0; i < BOARD_SIZE / 2; i++) {
@@ -407,6 +540,13 @@ class GameState {
         chess.refreshPixels();
     }
 
+    /**
+     * Display text to the user using a dialog box.
+     *
+     * @param text    what to display
+     * @param options the options the user can click
+     * @return the option choice the user picked
+     */
     private int customText(String text, String[] options) {
         return JOptionPane.showOptionDialog(null, text, Chess.GAME_TITLE, JOptionPane.DEFAULT_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, options, options[0]);

@@ -3,6 +3,10 @@ package chess;
 import java.awt.Color;
 import java.awt.Point;
 
+/**
+ * The rook, sometimes called the castle, may move any amount of squares horizontally or vertically, but must not pass
+ * through other pieces.
+ */
 class Rook extends Piece {
 
     private Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
@@ -35,6 +39,14 @@ class Rook extends Piece {
         return isWhite;
     }
 
+    /**
+     * Determines if the action is legal. It is legal if it moves without passing through other pieces, and eats just
+     * as it would move normally.
+     *
+     * @param start the beginning position
+     * @param end   the final position
+     * @return if the action is legal
+     */
     @Override
     boolean isActionLegal(Point start, Point end) {
         final int x1 = (int) start.getX(), x2 = (int) end.getX();

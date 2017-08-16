@@ -3,6 +3,10 @@ package chess;
 import java.awt.Color;
 import java.awt.Point;
 
+/**
+ * The bishop is the chess piece which can travel as many squares as it wants diagonally, as long as it does not travel
+ * through anything.
+ */
 class Bishop extends Piece {
 
     private Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
@@ -35,15 +39,36 @@ class Bishop extends Piece {
         return isWhite;
     }
 
+    /**
+     * Determine if the action is legal.
+     *
+     * @param start the original position
+     * @param end   the final position
+     * @return if the action is legal
+     */
     @Override
     boolean isActionLegal(Point start, Point end) {
         return isEachCoordinateDeltaSame(start, end) && isBishopActionLegal(start, end);
     }
 
+    /**
+     * Checks to see if the change in x is the same as the change in y.
+     *
+     * @param start the original position
+     * @param end   the final position
+     * @return if the change in x is the same as the change in y
+     */
     boolean isEachCoordinateDeltaSame(Point start, Point end) {
         return delta(end.getY(), start.getY()) == delta(end.getX(), start.getX());
     }
 
+    /**
+     * Bishop can eat enemy and can travel as long as nothing is in its way.
+     *
+     * @param start the original position
+     * @param end   the final position
+     * @return if bishop action is legal
+     */
     boolean isBishopActionLegal(Point start, Point end) {
         final int x1 = (int) start.getX(), x2 = (int) end.getX();
         final int y1 = (int) start.getY(), y2 = (int) end.getY();

@@ -3,6 +3,10 @@ package chess;
 import java.awt.Color;
 import java.awt.Point;
 
+/**
+ * The knight, sometimes called the horse, is the chess piece which must travel in an L-shape, moving either 2 spaces
+ * horizontally and 1 vertically or vice-versa. It can jump over other pieces.
+ */
 class Knight extends Piece {
 
     private Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
@@ -35,6 +39,14 @@ class Knight extends Piece {
         return isWhite;
     }
 
+    /**
+     * Determines if the action is legal. The action is legal if it moves 2 spaces in one direction and 1 in the other.
+     * It may eat any piece as it would move normally.
+     *
+     * @param start the beginning position
+     * @param end   the final position
+     * @return if the action is legal
+     */
     @Override
     boolean isActionLegal(Point start, Point end) {
         final int x1 = (int) start.getX(), x2 = (int) end.getX();

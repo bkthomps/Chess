@@ -15,6 +15,9 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The main class, which is the starting point of the program. Initializes all chess logic.
+ */
 public class Chess {
 
     static final String GAME_TITLE = "Chess";
@@ -36,6 +39,9 @@ public class Chess {
         chess.state = new GameState(chess.board, chess);
     }
 
+    /**
+     * Initializes the graphical user interface.
+     */
     private void configureGUI() {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setResizable(false);
@@ -46,6 +52,9 @@ public class Chess {
         frame.setVisible(true);
     }
 
+    /**
+     * Sets up the chess pieces on the chess board.
+     */
     private void resetBoard() {
         board[0][0] = new Rook(false, board);
         board[0][1] = new Knight(false, board);
@@ -69,11 +78,17 @@ public class Chess {
         board[7][7] = new Rook(true, board);
     }
 
+    /**
+     * Refresh the display on the graphical user interface.
+     */
     void refreshPixels() {
         setBackGround();
         setPieces();
     }
 
+    /**
+     * Set the checkerboard pattern for the board on the graphical user interface.
+     */
     private void setBackGround() {
         final Color darkBrown = new Color(160, 80, 0);
         final Color lightBrown = new Color(200, 100, 0);
@@ -85,6 +100,9 @@ public class Chess {
         }
     }
 
+    /**
+     * Add the pieces to the chess board on the graphical user interface.
+     */
     private void setPieces() {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
@@ -96,6 +114,13 @@ public class Chess {
         }
     }
 
+    /**
+     * Determine the color of the piece on the chess board.
+     *
+     * @param x     the x-coordinate
+     * @param y     the y-coordinate
+     * @param image the image of the chess piece
+     */
     private void setPieceColor(int x, int y, Color[][] image) {
         for (int i = 1; i < PIXELS_PER_SQUARE - 1; i++) {
             for (int j = 1; j < PIXELS_PER_SQUARE - 1; j++) {
@@ -106,6 +131,13 @@ public class Chess {
         }
     }
 
+    /**
+     * Fills in the specified square for the checkerboard pattern.
+     *
+     * @param color the color to fill in
+     * @param x     the x-coordinate
+     * @param y     the y-coordinate
+     */
     private void fillInSubSection(Color color, int x, int y) {
         for (int i = 0; i < PIXELS_PER_SQUARE; i++) {
             for (int j = 0; j < PIXELS_PER_SQUARE; j++) {
@@ -114,6 +146,9 @@ public class Chess {
         }
     }
 
+    /**
+     * Manages the square graphics on the graphical user interface.
+     */
     private class GridPane extends JPanel {
 
         private final List<Rectangle> cells;
