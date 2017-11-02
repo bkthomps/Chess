@@ -6,9 +6,9 @@ import java.awt.Point;
 /**
  * The pawn can only move one square forward, but can move two on its first move. It eats on a diagonal.
  */
-final class Pawn extends Piece {
+class Pawn extends Piece {
 
-    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
+    private Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final Piece[][] board;
     private final boolean isWhite;
     private boolean hasMoved;
@@ -50,9 +50,10 @@ final class Pawn extends Piece {
     boolean isActionLegal(Point start, Point end) {
         final int x1 = (int) start.getX(), x2 = (int) end.getX();
         final int y1 = (int) start.getY(), y2 = (int) end.getY();
-        return ((board[y2][x2] == null && x2 == x1)
+        return (((board[y2][x2] == null && x2 == x1)
                 && ((y2 == y1 - 1) || (y2 == y1 - 2 && board[y1 - 1][x1] == null && !hasMoved)))
-                || (board[y2][x2] != null && board[y2][x2].isWhite() != isWhite && y2 == y1 - 1 && delta(x2, x1) == 1);
+                || (board[y2][x2] != null && board[y2][x2].isWhite() != isWhite && y2 == y1 - 1 && delta(x2, x1) == 1))
+                && GameState.wouldNotPutKingIntoCheck(this, start, end, board, isWhite);
     }
 
     @Override

@@ -48,7 +48,8 @@ final class Bishop extends Piece {
      */
     @Override
     boolean isActionLegal(Point start, Point end) {
-        return isEachCoordinateDeltaSame(start, end) && isBishopActionLegal(start, end);
+        return isEachCoordinateDeltaSame(start, end) && isBishopActionLegal(start, end)
+                && GameState.wouldNotPutKingIntoCheck(this, start, end, board, isWhite);
     }
 
     /**

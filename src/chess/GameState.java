@@ -28,6 +28,32 @@ final class GameState {
     }
 
     /**
+     * Determines if moving the piece would put the allied king in check.
+     *
+     * @param me      the piece to move
+     * @param start   the start position
+     * @param end     the end position
+     * @param board   the board to move on
+     * @param isWhite if the piece is white
+     * @return if moving the piece would put the king in check
+     */
+    static boolean wouldNotPutKingIntoCheck(Piece me, Point start, Point end, Piece[][] board, boolean isWhite) {
+        final int x1 = (int) start.getX(), x2 = (int) end.getX();
+        final int y1 = (int) start.getY(), y2 = (int) end.getY();
+        final Piece backup = board[y2][x2];
+        board[y2][x2] = me;
+        board[y1][x1] = null;
+        final Point kingPoint = GameState.locateKing(board, isWhite);
+        final int kingX = (int) kingPoint.getX();
+        final int kingY = (int) kingPoint.getY();
+        final King king = (King) board[kingY][kingX];
+        final boolean isAllowed = !king.isCheck(kingX, kingY);
+        board[y1][x1] = me;
+        board[y2][x2] = backup;
+        return isAllowed;
+    }
+
+    /**
      * Handles a click event.
      *
      * @param x the x-coordinate of the click
@@ -82,7 +108,7 @@ final class GameState {
         if (moving.isActionLegal(from, to)) {
             checkEnPassant(to);
             move(from, to, moving);
-            final Point location = locateKing();
+            final Point location = locateKing(board, isWhiteTurn);
             final King king = new King(isWhiteTurn, board);
             if (!king.isCheck((int) location.getX(), (int) location.getY())) {
                 isWhiteTurn = !isWhiteTurn;
@@ -178,7 +204,7 @@ final class GameState {
      * Check if game is over. It may be over by checkmate or by draw. The are 4 types of draws.
      */
     private void checkEndgame() {
-        final Point location = locateKing();
+        final Point location = locateKing(board, isWhiteTurn);
         final int x = (int) location.getX(), y = (int) location.getY();
         final King king = new King(isWhiteTurn, board);
         if (isCheckmate(king, x, y)) {
@@ -242,7 +268,7 @@ final class GameState {
                             final Point end = new Point(k, l);
                             if (me.isActionLegal(start, end)) {
                                 rawMove(start, end, me);
-                                final Point kingLocation = locateKing();
+                                final Point kingLocation = locateKing(board, isWhiteTurn);
                                 if (!king.isCheck((int) kingLocation.getX(), (int) kingLocation.getY())) {
                                     rawMove(end, start, me);
                                     board[l][k] = save;
@@ -426,16 +452,23 @@ final class GameState {
      * Determine location of king.
      *
      * @return location of king
-     * @throws IllegalStateException if the board contains no king
+     * @throws IllegalStateException if there is no allied king or more than one allied king
      */
-    private Point locateKing() {
+    private static Point locateKing(Piece[][] board, boolean isWhiteTurn) {
+        Point king = null;
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board.length; j++) {
                 final Piece item = board[i][j];
                 if (item != null && item.getClass() == King.class && item.isWhite() == isWhiteTurn) {
-                    return new Point(j, i);
+                    if (king != null) {
+                        throw new IllegalStateException("Multiple Kings!");
+                    }
+                    king = new Point(j, i);
                 }
             }
+        }
+        if (king != null) {
+            return king;
         }
         throw new IllegalStateException("No King!");
     }
@@ -519,7 +552,7 @@ final class GameState {
                 }
             }
             boardHistory.add(boardCopy);
-            final Point kingLocation = locateKing();
+            final Point kingLocation = locateKing(board, isWhiteTurn);
             canCastleHistory.add(board[(int) kingLocation.getY()][(int) kingLocation.getX()].hasMoved());
         }
         rawMove(start, end, me);
