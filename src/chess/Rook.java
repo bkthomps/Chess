@@ -7,9 +7,9 @@ import java.awt.Point;
  * The rook, sometimes called the castle, may move any amount of squares horizontally or vertically, but must not pass
  * through other pieces.
  */
-class Rook extends Piece {
+final class Rook extends Piece {
 
-    private Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
+    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final Piece[][] board;
     private final boolean isWhite;
     private boolean hasMoved;

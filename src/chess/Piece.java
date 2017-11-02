@@ -20,11 +20,11 @@ abstract class Piece {
 
     abstract void setMove();
 
-    int delta(double start, double end) {
+    final int delta(double start, double end) {
         return Math.abs((int) end - (int) start);
     }
 
-    boolean canMoveOnto(int x, int y, Piece[][] board, boolean isWhite) {
+    final boolean canMoveOnto(int x, int y, Piece[][] board, boolean isWhite) {
         return board[y][x] == null || board[y][x].isWhite() != isWhite;
     }
 
@@ -35,8 +35,9 @@ abstract class Piece {
      * @param image   the color representation of the board
      * @param pixels  the pixels on the board
      * @param isWhite if the piece is white
+     * @throws IllegalStateException if invalid pixel value on the pixel board
      */
-    void getColor(Color[][] image, int[][] pixels, boolean isWhite) {
+    final void getColor(Color[][] image, int[][] pixels, boolean isWhite) {
         for (int i = 0; i < pixels.length; i++) {
             for (int j = 0; j < pixels.length; j++) {
                 final int pixel = pixels[i][j];

@@ -6,9 +6,9 @@ import java.awt.Point;
 /**
  * The pawn can only move one square forward, but can move two on its first move. It eats on a diagonal.
  */
-class Pawn extends Piece {
+final class Pawn extends Piece {
 
-    private Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
+    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final Piece[][] board;
     private final boolean isWhite;
     private boolean hasMoved;

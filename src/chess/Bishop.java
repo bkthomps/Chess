@@ -7,9 +7,9 @@ import java.awt.Point;
  * The bishop is the chess piece which can travel as many squares as it wants diagonally, as long as it does not travel
  * through anything.
  */
-class Bishop extends Piece {
+final class Bishop extends Piece {
 
-    private Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
+    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final Piece[][] board;
     private final boolean isWhite;
     private boolean hasMoved;

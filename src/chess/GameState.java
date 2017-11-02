@@ -5,19 +5,22 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-class GameState {
+/**
+ * Keeps track of the state of the chess board and the pieces on it.
+ */
+final class GameState {
 
-    private Piece[][] board;
-    private Chess chess;
+    private final Piece[][] board;
+    private final Chess chess;
     private boolean isWhiteTurn = true;
     private Piece moving;
     private Point from;
     private boolean isInCheck;
     private Point enPassant;
     private int drawCounter;
-    private List<Piece[][]> boardHistory = new ArrayList<>();
-    private List<Point> enPassantHistory = new ArrayList<>();
-    private List<Boolean> canCastleHistory = new ArrayList<>();
+    private final List<Piece[][]> boardHistory = new ArrayList<>();
+    private final List<Point> enPassantHistory = new ArrayList<>();
+    private final List<Boolean> canCastleHistory = new ArrayList<>();
 
     GameState(Piece[][] board, Chess chess) {
         this.board = board;
@@ -221,6 +224,7 @@ class GameState {
      * @param x    the x-coordinate
      * @param y    the y-coordinate
      * @return if any move can be done which results in king not being in check
+     * @throws IllegalStateException if king is not at the specified area
      */
     private boolean isMovePossible(King king, int x, int y) {
         if (board[y][x].getClass() != King.class) {
@@ -270,6 +274,8 @@ class GameState {
 
     /**
      * Draw if 50 moves without pawn move or piece capture.
+     *
+     * @throws IllegalStateException if somehow went over the draw counter
      */
     private void determineIfTooManyMoves() {
         final int MAX_MOVE_PER_SIDE = 50;
@@ -296,6 +302,7 @@ class GameState {
      * Determine if the board has repeated 3 times.
      *
      * @return if the board has repeated 3 times
+     * @throws IllegalStateException if castle or en passant history size is invalid
      */
     private boolean isTooManyBoardRepetitions() {
         final int historySize = boardHistory.size();
@@ -419,6 +426,7 @@ class GameState {
      * Determine location of king.
      *
      * @return location of king
+     * @throws IllegalStateException if the board contains no king
      */
     private Point locateKing() {
         for (int i = 0; i < board.length; i++) {

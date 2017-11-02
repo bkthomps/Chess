@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * The main class, which is the starting point of the program. Initializes all chess logic.
  */
-public class Chess {
+public final class Chess {
 
     static final String GAME_TITLE = "Chess";
     private final JFrame frame = new JFrame(GAME_TITLE);
@@ -27,7 +27,7 @@ public class Chess {
     private static final int PIXELS_PER_SQUARE = 8;
     private static final int PIXELS_ON_BOARD = BOARD_SIZE * PIXELS_PER_SQUARE;
 
-    private Piece[][] board = new Piece[BOARD_SIZE][BOARD_SIZE];
+    private final Piece[][] board = new Piece[BOARD_SIZE][BOARD_SIZE];
     private final Color[][] pixels = new Color[PIXELS_ON_BOARD][PIXELS_ON_BOARD];
     private GameState state;
 

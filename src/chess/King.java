@@ -9,9 +9,9 @@ import java.awt.Point;
  * currently in check, it is a checkmate, and the opponent wins. If the king cannot move without going into check and is
  * not currently in check, it is a stalemate, and is a draw. The king cannot move into check.
  */
-class King extends Piece {
+final class King extends Piece {
 
-    private Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
+    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final Piece[][] board;
     private final boolean isWhite;
     private boolean hasMoved;

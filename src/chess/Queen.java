@@ -7,9 +7,9 @@ import java.awt.Point;
  * The queen may move as if it were a rook and a bishop. Meaning it can move horizontally, vertically, or diagonally any
  * amount of squares, as long as it does not pass through any other pieces.
  */
-class Queen extends Piece {
+final class Queen extends Piece {
 
-    private Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
+    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final Piece[][] board;
     private final boolean isWhite;
     private boolean hasMoved;

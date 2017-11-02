@@ -7,9 +7,9 @@ import java.awt.Point;
  * The knight, sometimes called the horse, is the chess piece which must travel in an L-shape, moving either 2 spaces
  * horizontally and 1 vertically or vice-versa. It can jump over other pieces.
  */
-class Knight extends Piece {
+final class Knight extends Piece {
 
-    private Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
+    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final Piece[][] board;
     private final boolean isWhite;
     private boolean hasMoved;
