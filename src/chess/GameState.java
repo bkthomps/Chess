@@ -17,37 +17,15 @@ final class GameState {
     private boolean isInCheck;
     private Point enPassant;
     private int drawCounter;
-    private final List<Piece[][]> boardHistory = new ArrayList<>();
-    private final List<Point> enPassantHistory = new ArrayList<>();
-    private final List<Boolean> canCastleHistory = new ArrayList<>();
+    private final List<Piece[][]> boardHistory;
+    private final List<Point> enPassantHistory;
+    private final List<Boolean> canCastleHistory;
 
     GameState(Chess chess) {
         this.chess = chess;
-    }
-
-    /**
-     * Determines if moving the piece would put the allied king in check.
-     *
-     * @param me      the piece to move
-     * @param start   the start position
-     * @param end     the end position
-     * @param isWhite if the piece is white
-     * @return if moving the piece would put the king in check
-     */
-    static boolean wouldNotPutKingIntoCheck(Piece me, Point start, Point end, boolean isWhite) {
-        final int x1 = (int) start.getX(), x2 = (int) end.getX();
-        final int y1 = (int) start.getY(), y2 = (int) end.getY();
-        final Piece backup = Chess.board[y2][x2];
-        Chess.board[y2][x2] = me;
-        Chess.board[y1][x1] = null;
-        final Point kingPoint = GameState.locateKing(Chess.board, isWhite);
-        final int kingX = (int) kingPoint.getX();
-        final int kingY = (int) kingPoint.getY();
-        final King king = (King) Chess.board[kingY][kingX];
-        final boolean isAllowed = !king.isCheck(kingX, kingY);
-        Chess.board[y1][x1] = me;
-        Chess.board[y2][x2] = backup;
-        return isAllowed;
+        boardHistory = new ArrayList<>();
+        enPassantHistory = new ArrayList<>();
+        canCastleHistory = new ArrayList<>();
     }
 
     /**
@@ -80,6 +58,31 @@ final class GameState {
     }
 
     /**
+     * Determine location of king.
+     *
+     * @return location of king
+     * @throws IllegalStateException if there is no allied king or more than one allied king
+     */
+    static Point locateKing(boolean isWhiteTurn) {
+        Point king = null;
+        for (int i = 0; i < Chess.board.length; i++) {
+            for (int j = 0; j < Chess.board.length; j++) {
+                final Piece item = Chess.board[i][j];
+                if (item != null && item.getClass() == King.class && item.isWhite() == isWhiteTurn) {
+                    if (king != null) {
+                        throw new IllegalStateException("Multiple Kings!");
+                    }
+                    king = new Point(j, i);
+                }
+            }
+        }
+        if (king != null) {
+            return king;
+        }
+        throw new IllegalStateException("No King!");
+    }
+
+    /**
      * Determine the piece which was clicked to operate on.
      *
      * @param x the x-coordinate
@@ -105,7 +108,7 @@ final class GameState {
         if (moving.isActionLegal(from, to)) {
             checkEnPassant(to);
             move(from, to, moving);
-            final Point location = locateKing(Chess.board, isWhiteTurn);
+            final Point location = locateKing(isWhiteTurn);
             final King king = new King(isWhiteTurn);
             if (!king.isCheck((int) location.getX(), (int) location.getY())) {
                 isWhiteTurn = !isWhiteTurn;
@@ -201,7 +204,7 @@ final class GameState {
      * Check if game is over. It may be over by checkmate or by draw. The are 4 types of draws.
      */
     private void checkEndgame() {
-        final Point location = locateKing(Chess.board, isWhiteTurn);
+        final Point location = locateKing(isWhiteTurn);
         final int x = (int) location.getX(), y = (int) location.getY();
         final King king = new King(isWhiteTurn);
         if (isCheckmate(king, x, y)) {
@@ -225,7 +228,7 @@ final class GameState {
      * @return if the game is over by checkmate
      */
     private boolean isCheckmate(King king, int x, int y) {
-        return king.isCheck(x, y) && !isMovePossible(king, x, y);
+        return king.isCheck(x, y) && isMoveImpossible(king, x, y);
     }
 
     /**
@@ -237,7 +240,7 @@ final class GameState {
      * @return if the game is over by stalemate
      */
     private boolean isStalemate(King king, int x, int y) {
-        return !king.isCheck(x, y) && !isMovePossible(king, x, y);
+        return !king.isCheck(x, y) && isMoveImpossible(king, x, y);
     }
 
     /**
@@ -249,7 +252,7 @@ final class GameState {
      * @return if any move can be done which results in king not being in check
      * @throws IllegalStateException if king is not at the specified area
      */
-    private boolean isMovePossible(King king, int x, int y) {
+    private boolean isMoveImpossible(King king, int x, int y) {
         if (Chess.board[y][x].getClass() != King.class) {
             throw new IllegalStateException("King not where specified!");
         }
@@ -265,11 +268,11 @@ final class GameState {
                             final Point end = new Point(k, l);
                             if (me.isActionLegal(start, end)) {
                                 rawMove(start, end, me);
-                                final Point kingLocation = locateKing(Chess.board, isWhiteTurn);
+                                final Point kingLocation = locateKing(isWhiteTurn);
                                 if (!king.isCheck((int) kingLocation.getX(), (int) kingLocation.getY())) {
                                     rawMove(end, start, me);
                                     Chess.board[l][k] = save;
-                                    return true;
+                                    return false;
                                 }
                                 rawMove(end, start, me);
                                 Chess.board[l][k] = save;
@@ -279,7 +282,7 @@ final class GameState {
                 }
             }
         }
-        return false;
+        return true;
     }
 
     /**
@@ -446,31 +449,6 @@ final class GameState {
     }
 
     /**
-     * Determine location of king.
-     *
-     * @return location of king
-     * @throws IllegalStateException if there is no allied king or more than one allied king
-     */
-    private static Point locateKing(Piece[][] board, boolean isWhiteTurn) {
-        Point king = null;
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board.length; j++) {
-                final Piece item = board[i][j];
-                if (item != null && item.getClass() == King.class && item.isWhite() == isWhiteTurn) {
-                    if (king != null) {
-                        throw new IllegalStateException("Multiple Kings!");
-                    }
-                    king = new Point(j, i);
-                }
-            }
-        }
-        if (king != null) {
-            return king;
-        }
-        throw new IllegalStateException("No King!");
-    }
-
-    /**
      * Determine if the king can castle, and if so, castle.
      *
      * @param to the location to move to
@@ -549,7 +527,7 @@ final class GameState {
                 }
             }
             boardHistory.add(boardCopy);
-            final Point kingLocation = locateKing(Chess.board, isWhiteTurn);
+            final Point kingLocation = locateKing(isWhiteTurn);
             canCastleHistory.add(Chess.board[(int) kingLocation.getY()][(int) kingLocation.getX()].hasMoved());
         }
         rawMove(start, end, me);

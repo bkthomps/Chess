@@ -50,9 +50,9 @@ final class Knight extends Piece {
     boolean isActionLegal(Point start, Point end) {
         final int x1 = (int) start.getX(), x2 = (int) end.getX();
         final int y1 = (int) start.getY(), y2 = (int) end.getY();
-        return ((delta(x1, x2) == 2 && delta(y1, y2) == 1) || (delta(x1, x2) == 1 && delta(y1, y2) == 2)
-                && canMoveOnto(x2, y2, isWhite))
-                && GameState.wouldNotPutKingIntoCheck(this, start, end, isWhite);
+        final boolean isMoveL = (delta(x1, x2) == 2 && delta(y1, y2) == 1)
+                || (delta(x1, x2) == 1 && delta(y1, y2) == 2);
+        return isMoveL && canMoveOnto(x2, y2, isWhite) && wouldNotPutKingIntoCheck(start, end);
     }
 
     @Override

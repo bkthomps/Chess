@@ -71,8 +71,7 @@ final class Rook extends Piece {
             }
 
         }
-        return canMoveOnto(x2, y2, isWhite)
-                && GameState.wouldNotPutKingIntoCheck(this, start, end, isWhite);
+        return canMoveOnto(x2, y2, isWhite) && wouldNotPutKingIntoCheck(start, end);
     }
 
     @Override

@@ -53,4 +53,27 @@ abstract class Piece {
             }
         }
     }
+
+    /**
+     * Determines if moving the piece would put the allied king in check.
+     *
+     * @param start the start position
+     * @param end   the end position
+     * @return if moving the piece would put the king in check
+     */
+    final boolean wouldNotPutKingIntoCheck(Point start, Point end) {
+        final int x1 = (int) start.getX(), x2 = (int) end.getX();
+        final int y1 = (int) start.getY(), y2 = (int) end.getY();
+        final Piece backup = Chess.board[y2][x2];
+        Chess.board[y2][x2] = this;
+        Chess.board[y1][x1] = null;
+        final Point kingPoint = GameState.locateKing(this.isWhite());
+        final int kingX = (int) kingPoint.getX();
+        final int kingY = (int) kingPoint.getY();
+        final King king = (King) Chess.board[kingY][kingX];
+        final boolean isAllowed = !king.isCheck(kingX, kingY);
+        Chess.board[y1][x1] = this;
+        Chess.board[y2][x2] = backup;
+        return isAllowed;
+    }
 }

@@ -49,13 +49,11 @@ final class Queen extends Piece {
     @Override
     boolean isActionLegal(Point start, Point end) {
         final Bishop bishop = new Bishop(isWhite);
-        final Rook rook = new Rook(isWhite);
         if (bishop.isEachCoordinateDeltaSame(start, end)) {
-            return bishop.isBishopActionLegal(start, end)
-                    && GameState.wouldNotPutKingIntoCheck(this, start, end, isWhite);
+            return bishop.isBishopActionLegal(start, end) && wouldNotPutKingIntoCheck(start, end);
         }
-        return rook.isActionLegal(start, end)
-                && GameState.wouldNotPutKingIntoCheck(this, start, end, isWhite);
+        final Rook rook = new Rook(isWhite);
+        return rook.isActionLegal(start, end) && wouldNotPutKingIntoCheck(start, end);
     }
 
     @Override

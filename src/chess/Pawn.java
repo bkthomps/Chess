@@ -49,10 +49,14 @@ final class Pawn extends Piece {
     boolean isActionLegal(Point start, Point end) {
         final int x1 = (int) start.getX(), x2 = (int) end.getX();
         final int y1 = (int) start.getY(), y2 = (int) end.getY();
-        return (((Chess.board[y2][x2] == null && x2 == x1)
-                && ((y2 == y1 - 1) || (y2 == y1 - 2 && Chess.board[y1 - 1][x1] == null && !hasMoved)))
-                || (Chess.board[y2][x2] != null && Chess.board[y2][x2].isWhite() != isWhite && y2 == y1 - 1 && delta(x2, x1) == 1))
-                && GameState.wouldNotPutKingIntoCheck(this, start, end, isWhite);
+        final boolean isForward = Chess.board[y2][x2] == null && x2 == x1;
+        final boolean isOneBlock = y2 == y1 - 1;
+        final boolean isJump = y2 == y1 - 2 && Chess.board[y1 - 1][x1] == null && !hasMoved;
+        final boolean isForwardAllowed = isForward && (isOneBlock || isJump);
+        final boolean isCapture = Chess.board[y2][x2] != null
+                && Chess.board[y2][x2].isWhite() != isWhite
+                && y2 == y1 - 1 && delta(x2, x1) == 1;
+        return (isForwardAllowed || isCapture) && wouldNotPutKingIntoCheck(start, end);
     }
 
     @Override
