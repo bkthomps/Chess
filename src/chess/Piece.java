@@ -24,8 +24,8 @@ abstract class Piece {
         return Math.abs((int) end - (int) start);
     }
 
-    final boolean canMoveOnto(int x, int y, Piece[][] board, boolean isWhite) {
-        return board[y][x] == null || board[y][x].isWhite() != isWhite;
+    final boolean canMoveOnto(int x, int y, boolean isWhite) {
+        return Chess.board[y][x] == null || Chess.board[y][x].isWhite() != isWhite;
     }
 
     /**

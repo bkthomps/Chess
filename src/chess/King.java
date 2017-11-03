@@ -11,14 +11,12 @@ import java.awt.Point;
  */
 final class King extends Piece {
 
-    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
-    private final Piece[][] board;
+    private final Color[][] image;
     private final boolean isWhite;
     private boolean hasMoved;
 
-    King(boolean isWhite, Piece[][] board) {
+    King(boolean isWhite) {
         this.isWhite = isWhite;
-        this.board = board;
         final int[][] pixels =
                 {
                         {0, 0, 1, 1, 0, 0},
@@ -28,6 +26,7 @@ final class King extends Piece {
                         {0, 1, 1, 1, 1, 0},
                         {0, 1, 1, 1, 1, 0}
                 };
+        image = new Color[PIECE_SIZE][PIECE_SIZE];
         getColor(image, pixels, isWhite);
     }
 
@@ -53,7 +52,7 @@ final class King extends Piece {
         final int x1 = (int) start.getX(), x2 = (int) end.getX();
         final int y1 = (int) start.getY(), y2 = (int) end.getY();
         return delta(x2, x1) + delta(y2, y1) != 0 && delta(x2, x1) <= 1 && delta(y2, y1) <= 1
-                && canMoveOnto(x2, y2, board, isWhite) && !isCheck(x2, y2);
+                && canMoveOnto(x2, y2, isWhite) && !isCheck(x2, y2);
     }
 
     @Override
@@ -93,11 +92,11 @@ final class King extends Piece {
     private boolean isCheckDiagonal(int xCheck, int yCheck, int xScale, int yScale) {
         int x = xCheck + xScale, y = yCheck + yScale;
         while (isInGridBounds(x, y)) {
-            if (board[y][x] != null && (board[y][x].getClass() == Bishop.class
-                    || board[y][x].getClass() == Queen.class) && board[y][x].isWhite() != isWhite) {
+            if (Chess.board[y][x] != null && (Chess.board[y][x].getClass() == Bishop.class
+                    || Chess.board[y][x].getClass() == Queen.class) && Chess.board[y][x].isWhite() != isWhite) {
                 return true;
             }
-            if (board[y][x] != null) {
+            if (Chess.board[y][x] != null) {
                 return false;
             }
             x += xScale;
@@ -118,11 +117,11 @@ final class King extends Piece {
     private boolean isCheckStraight(int xCheck, int yCheck, int xScale, int yScale) {
         int x = xCheck + xScale, y = yCheck + yScale;
         while (isInGridBounds(x, y)) {
-            if (board[y][x] != null && (board[y][x].getClass() == Rook.class
-                    || board[y][x].getClass() == Queen.class) && board[y][x].isWhite() != isWhite) {
+            if (Chess.board[y][x] != null && (Chess.board[y][x].getClass() == Rook.class
+                    || Chess.board[y][x].getClass() == Queen.class) && Chess.board[y][x].isWhite() != isWhite) {
                 return true;
             }
-            if (board[y][x] != null) {
+            if (Chess.board[y][x] != null) {
                 return false;
             }
             x += xScale;
@@ -139,7 +138,7 @@ final class King extends Piece {
      * @return if the coordinates are in bounds
      */
     private boolean isInGridBounds(int x, int y) {
-        return x >= 0 && y >= 0 && x < board.length && y < board.length;
+        return x >= 0 && y >= 0 && x < Chess.board.length && y < Chess.board.length;
     }
 
     /**
@@ -161,8 +160,8 @@ final class King extends Piece {
      * @return if the king is in check due to one side a pawn can eat from
      */
     private boolean isEnemyPawn(int x, int y) {
-        return x > 0 && y > 0 && x < board.length - 1 && y < board.length - 1 && board[y][x] != null
-                && board[y][x].getClass() == Pawn.class && board[y][x].isWhite() != isWhite;
+        return x > 0 && y > 0 && x < Chess.board.length - 1 && y < Chess.board.length - 1 && Chess.board[y][x] != null
+                && Chess.board[y][x].getClass() == Pawn.class && Chess.board[y][x].isWhite() != isWhite;
     }
 
     /**
@@ -187,7 +186,7 @@ final class King extends Piece {
      * @return if the king is in check due to one spot a knight can eat from
      */
     private boolean isEnemyKnight(int x, int y) {
-        return x > 0 && y > 0 && x < board.length - 1 && y < board.length - 1 && board[y][x] != null
-                && board[y][x].getClass() == Knight.class && board[y][x].isWhite() != isWhite;
+        return x > 0 && y > 0 && x < Chess.board.length - 1 && y < Chess.board.length - 1 && Chess.board[y][x] != null
+                && Chess.board[y][x].getClass() == Knight.class && Chess.board[y][x].isWhite() != isWhite;
     }
 }

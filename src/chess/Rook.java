@@ -9,14 +9,12 @@ import java.awt.Point;
  */
 final class Rook extends Piece {
 
-    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
-    private final Piece[][] board;
+    private final Color[][] image;
     private final boolean isWhite;
     private boolean hasMoved;
 
-    Rook(boolean isWhite, Piece[][] board) {
+    Rook(boolean isWhite) {
         this.isWhite = isWhite;
-        this.board = board;
         final int[][] pixels =
                 {
                         {1, 0, 1, 1, 0, 1},
@@ -26,6 +24,7 @@ final class Rook extends Piece {
                         {0, 1, 1, 1, 1, 0},
                         {1, 1, 1, 1, 1, 1}
                 };
+        image = new Color[PIECE_SIZE][PIECE_SIZE];
         getColor(image, pixels, isWhite);
     }
 
@@ -58,7 +57,7 @@ final class Rook extends Piece {
             final int one = (y1 < y2) ? y1 : y2;
             final int two = (y1 < y2) ? y2 : y1;
             for (int i = one + 1; i < two; i++) {
-                if (board[i][x1] != null) {
+                if (Chess.board[i][x1] != null) {
                     return false;
                 }
             }
@@ -66,14 +65,14 @@ final class Rook extends Piece {
             final int one = (x1 < x2) ? x1 : x2;
             final int two = (x1 < x2) ? x2 : x1;
             for (int i = one + 1; i < two; i++) {
-                if (board[y1][i] != null) {
+                if (Chess.board[y1][i] != null) {
                     return false;
                 }
             }
 
         }
-        return canMoveOnto(x2, y2, board, isWhite)
-                && GameState.wouldNotPutKingIntoCheck(this, start, end, board, isWhite);
+        return canMoveOnto(x2, y2, isWhite)
+                && GameState.wouldNotPutKingIntoCheck(this, start, end, isWhite);
     }
 
     @Override

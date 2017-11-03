@@ -9,14 +9,12 @@ import java.awt.Point;
  */
 final class Queen extends Piece {
 
-    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
-    private final Piece[][] board;
+    private final Color[][] image;
     private final boolean isWhite;
     private boolean hasMoved;
 
-    Queen(boolean isWhite, Piece[][] board) {
+    Queen(boolean isWhite) {
         this.isWhite = isWhite;
-        this.board = board;
         final int[][] pixels =
                 {
                         {0, 1, 0, 0, 1, 0},
@@ -26,6 +24,7 @@ final class Queen extends Piece {
                         {0, 1, 1, 1, 1, 0},
                         {1, 1, 1, 1, 1, 1}
                 };
+        image = new Color[PIECE_SIZE][PIECE_SIZE];
         getColor(image, pixels, isWhite);
     }
 
@@ -49,14 +48,14 @@ final class Queen extends Piece {
      */
     @Override
     boolean isActionLegal(Point start, Point end) {
-        final Bishop bishop = new Bishop(isWhite, board);
-        final Rook rook = new Rook(isWhite, board);
+        final Bishop bishop = new Bishop(isWhite);
+        final Rook rook = new Rook(isWhite);
         if (bishop.isEachCoordinateDeltaSame(start, end)) {
             return bishop.isBishopActionLegal(start, end)
-                    && GameState.wouldNotPutKingIntoCheck(this, start, end, board, isWhite);
+                    && GameState.wouldNotPutKingIntoCheck(this, start, end, isWhite);
         }
         return rook.isActionLegal(start, end)
-                && GameState.wouldNotPutKingIntoCheck(this, start, end, board, isWhite);
+                && GameState.wouldNotPutKingIntoCheck(this, start, end, isWhite);
     }
 
     @Override

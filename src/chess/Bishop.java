@@ -9,14 +9,12 @@ import java.awt.Point;
  */
 final class Bishop extends Piece {
 
-    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
-    private final Piece[][] board;
+    private final Color[][] image;
     private final boolean isWhite;
     private boolean hasMoved;
 
-    Bishop(boolean isWhite, Piece[][] board) {
+    Bishop(boolean isWhite) {
         this.isWhite = isWhite;
-        this.board = board;
         final int[][] pixels =
                 {
                         {0, 0, 1, 1, 0, 0},
@@ -26,6 +24,7 @@ final class Bishop extends Piece {
                         {0, 0, 1, 1, 0, 0},
                         {1, 1, 1, 1, 1, 1}
                 };
+        image = new Color[PIECE_SIZE][PIECE_SIZE];
         getColor(image, pixels, isWhite);
     }
 
@@ -49,7 +48,7 @@ final class Bishop extends Piece {
     @Override
     boolean isActionLegal(Point start, Point end) {
         return isEachCoordinateDeltaSame(start, end) && isBishopActionLegal(start, end)
-                && GameState.wouldNotPutKingIntoCheck(this, start, end, board, isWhite);
+                && GameState.wouldNotPutKingIntoCheck(this, start, end, isWhite);
     }
 
     /**
@@ -80,11 +79,11 @@ final class Bishop extends Piece {
         for (int i = x1 + 1; i < x2; i++) {
             x += xSign;
             y += ySign;
-            if (board[y][x] != null) {
+            if (Chess.board[y][x] != null) {
                 return false;
             }
         }
-        return canMoveOnto(x2, y2, board, isWhite);
+        return canMoveOnto(x2, y2, isWhite);
     }
 
     @Override
