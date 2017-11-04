@@ -41,7 +41,7 @@ final class GameState {
         final Point to = new Point(x, y);
         if (isInCheck) {
             doMoveInCheck(to);
-        } else if (canCastle(to)) {
+        } else if (castleIfPossible(to)) {
             isWhiteTurn = !isWhiteTurn;
             flipBoard();
             enPassant = null;
@@ -99,17 +99,27 @@ final class GameState {
         from = null;
     }
 
+    /**
+     * Creates marks on the board letting the user know where the piece can be moved.
+     */
     private void letUserKnowLegalMoves() {
         final Color darkGreen = new Color(0, 100, 40);
         final Color lightGreen = new Color(0, 140, 50);
-        for (int i = 0; i < Chess.board.length; i++) {
-            for (int j = 0; j < Chess.board.length; j++) {
+        final int boardLength = Chess.board.length;
+        for (int i = 0; i < boardLength; i++) {
+            for (int j = 0; j < boardLength; j++) {
                 final Point checkAt = new Point(j, i);
                 if (moving.isActionLegal(from, checkAt)) {
                     final Color usedColor = ((i + j) % 2 == 0) ? lightGreen : darkGreen;
                     chess.fillInSubSection(usedColor, j, i);
                 }
             }
+        }
+        if (canQueenSideCastle()) {
+            chess.fillInSubSection(darkGreen, 0, boardLength - 1);
+        }
+        if (canKingSideCastle()) {
+            chess.fillInSubSection(lightGreen, boardLength - 1, boardLength - 1);
         }
         chess.setPieces();
     }
@@ -469,32 +479,55 @@ final class GameState {
      * @param to the location to move to
      * @return if the king can castle
      */
-    private boolean canCastle(Point to) {
-        final int x1 = (int) from.getX(), x2 = (int) to.getX();
-        final int y1 = (int) from.getY(), y2 = (int) to.getY();
-        final Piece[] slice = Chess.board[7];
-        if (y1 != 7 || y2 != 7) {
+    private boolean castleIfPossible(Point to) {
+        final int x2 = (int) to.getX();
+        final int y2 = (int) to.getY();
+        if (y2 != 7) {
             return false;
         }
-        final King king = new King(isWhiteTurn);
-        if (x1 == 4 && x2 == 0) {
-            if (hasMoved(slice[0]) && slice[1] == null && slice[2] == null && slice[3] == null && hasMoved(slice[4])) {
-                if (!king.isCheck(4, 7) && !king.isCheck(3, 7) && !king.isCheck(2, 7)) {
-                    moveCastle(4, 2);
-                    moveCastle(0, 3);
-                    return true;
-                }
-            }
-        } else if (x1 == 4 && x2 == 7) {
-            if (hasMoved(slice[4]) && slice[5] == null && slice[6] == null && hasMoved(slice[7])) {
-                if (!king.isCheck(4, 7) && !king.isCheck(5, 7) && !king.isCheck(6, 7)) {
-                    moveCastle(4, 6);
-                    moveCastle(7, 5);
-                    return true;
-                }
-            }
+        if (x2 == 0 && canQueenSideCastle()) {
+            moveCastle(4, 2);
+            moveCastle(0, 3);
+            return true;
+        } else if (x2 == 7 && canKingSideCastle()) {
+            moveCastle(4, 6);
+            moveCastle(7, 5);
+            return true;
         }
         return false;
+    }
+
+    /**
+     * Determines if can queen side castle.
+     *
+     * @return If queen side castle is legal.
+     */
+    private boolean canQueenSideCastle() {
+        final int x1 = (int) from.getX();
+        final int y1 = (int) from.getY();
+        final Piece[] slice = Chess.board[7];
+        final King king = new King(isWhiteTurn);
+        final boolean isLockedOnKing = x1 == 4 && y1 == 7;
+        final boolean isClearPath = hasMoved(slice[0]) && slice[1] == null && slice[2] == null
+                && slice[3] == null && hasMoved(slice[4]);
+        final boolean isNotPassingThroughCheck = !king.isCheck(4, 7) && !king.isCheck(3, 7) && !king.isCheck(2, 7);
+        return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
+    }
+
+    /**
+     * Determines if can king side castle.
+     *
+     * @return If king side castle is legal.
+     */
+    private boolean canKingSideCastle() {
+        final int x1 = (int) from.getX();
+        final int y1 = (int) from.getY();
+        final Piece[] slice = Chess.board[7];
+        final King king = new King(isWhiteTurn);
+        final boolean isLockedOnKing = x1 == 4 && y1 == 7;
+        final boolean isClearPath = hasMoved(slice[4]) && slice[5] == null && slice[6] == null && hasMoved(slice[7]);
+        final boolean isNotPassingThroughCheck = !king.isCheck(4, 7) && !king.isCheck(5, 7) && !king.isCheck(6, 7);
+        return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
     }
 
     /**
