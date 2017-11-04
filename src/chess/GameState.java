@@ -121,6 +121,15 @@ final class GameState {
         if (canKingSideCastle()) {
             chess.fillInSubSection(lightGreen, boardLength - 1, boardLength - 1);
         }
+        if (enPassant != null) {
+            final int x = (int) enPassant.getX();
+            final int y = (int) enPassant.getY();
+            final boolean canCaptureEnPassant = from.getY() == y + 1 && Math.abs(from.getX() - x) == 1;
+            if (canCaptureEnPassant && isEnPassantLegal(enPassant)) {
+                final Color usedColor = ((y + x) % 2 == 0) ? lightGreen : darkGreen;
+                chess.fillInSubSection(usedColor, x, y);
+            }
+        }
         chess.setPieces();
     }
 
