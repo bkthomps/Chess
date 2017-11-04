@@ -9,7 +9,7 @@ import java.awt.Point;
  */
 final class Rook extends Piece {
 
-    private final Color[][] image;
+    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final boolean isWhite;
     private boolean hasMoved;
 
@@ -24,8 +24,7 @@ final class Rook extends Piece {
                         {0, 1, 1, 1, 1, 0},
                         {1, 1, 1, 1, 1, 1}
                 };
-        image = new Color[PIECE_SIZE][PIECE_SIZE];
-        getColor(image, pixels, isWhite);
+        getColor(pixels);
     }
 
     @Override
@@ -69,9 +68,8 @@ final class Rook extends Piece {
                     return false;
                 }
             }
-
         }
-        return canMoveOnto(x2, y2, isWhite) && wouldNotPutKingIntoCheck(start, end);
+        return canMoveOnto(x2, y2) && wouldNotPutKingIntoCheck(start, end);
     }
 
     @Override

@@ -17,15 +17,12 @@ final class GameState {
     private boolean isInCheck;
     private Point enPassant;
     private int drawCounter;
-    private final List<Piece[][]> boardHistory;
-    private final List<Point> enPassantHistory;
-    private final List<Boolean> canCastleHistory;
+    private final List<Piece[][]> boardHistory = new ArrayList<>();
+    private final List<Point> enPassantHistory = new ArrayList<>();
+    private final List<Boolean> canCastleHistory = new ArrayList<>();
 
     GameState(Chess chess) {
         this.chess = chess;
-        boardHistory = new ArrayList<>();
-        enPassantHistory = new ArrayList<>();
-        canCastleHistory = new ArrayList<>();
     }
 
     /**

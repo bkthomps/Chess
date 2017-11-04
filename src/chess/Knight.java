@@ -4,12 +4,12 @@ import java.awt.Color;
 import java.awt.Point;
 
 /**
- * The knight, sometimes called the horse, is the chess piece which must travel in an L-shape, moving either 2 spaces
- * horizontally and 1 vertically or vice-versa. It can jump over other pieces.
+ * The knight, sometimes called the horse, is the chess piece which must travel in an L-shape, moving either two spaces
+ * horizontally and one vertically or vice-versa. It can jump over other pieces.
  */
 final class Knight extends Piece {
 
-    private final Color[][] image;
+    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final boolean isWhite;
     private boolean hasMoved;
 
@@ -24,8 +24,7 @@ final class Knight extends Piece {
                         {0, 1, 1, 1, 1, 1},
                         {1, 1, 1, 1, 1, 1}
                 };
-        image = new Color[PIECE_SIZE][PIECE_SIZE];
-        getColor(image, pixels, isWhite);
+        getColor(pixels);
     }
 
     @Override
@@ -52,7 +51,7 @@ final class Knight extends Piece {
         final int y1 = (int) start.getY(), y2 = (int) end.getY();
         final boolean isMoveL = (delta(x1, x2) == 2 && delta(y1, y2) == 1)
                 || (delta(x1, x2) == 1 && delta(y1, y2) == 2);
-        return isMoveL && canMoveOnto(x2, y2, isWhite) && wouldNotPutKingIntoCheck(start, end);
+        return isMoveL && canMoveOnto(x2, y2) && wouldNotPutKingIntoCheck(start, end);
     }
 
     @Override

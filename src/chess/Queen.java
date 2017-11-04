@@ -9,7 +9,7 @@ import java.awt.Point;
  */
 final class Queen extends Piece {
 
-    private final Color[][] image;
+    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final boolean isWhite;
     private boolean hasMoved;
 
@@ -24,8 +24,7 @@ final class Queen extends Piece {
                         {0, 1, 1, 1, 1, 0},
                         {1, 1, 1, 1, 1, 1}
                 };
-        image = new Color[PIECE_SIZE][PIECE_SIZE];
-        getColor(image, pixels, isWhite);
+        getColor(pixels);
     }
 
     @Override

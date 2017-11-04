@@ -9,7 +9,7 @@ import java.awt.Point;
  */
 final class Bishop extends Piece {
 
-    private final Color[][] image;
+    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final boolean isWhite;
     private boolean hasMoved;
 
@@ -24,8 +24,7 @@ final class Bishop extends Piece {
                         {0, 0, 1, 1, 0, 0},
                         {1, 1, 1, 1, 1, 1}
                 };
-        image = new Color[PIECE_SIZE][PIECE_SIZE];
-        getColor(image, pixels, isWhite);
+        getColor(pixels);
     }
 
     @Override
@@ -83,7 +82,7 @@ final class Bishop extends Piece {
                 return false;
             }
         }
-        return canMoveOnto(x2, y2, isWhite);
+        return canMoveOnto(x2, y2);
     }
 
     @Override

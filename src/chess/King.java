@@ -11,7 +11,7 @@ import java.awt.Point;
  */
 final class King extends Piece {
 
-    private final Color[][] image;
+    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final boolean isWhite;
     private boolean hasMoved;
 
@@ -26,8 +26,7 @@ final class King extends Piece {
                         {0, 1, 1, 1, 1, 0},
                         {0, 1, 1, 1, 1, 0}
                 };
-        image = new Color[PIECE_SIZE][PIECE_SIZE];
-        getColor(image, pixels, isWhite);
+        getColor(pixels);
     }
 
     @Override
@@ -52,7 +51,7 @@ final class King extends Piece {
         final int x1 = (int) start.getX(), x2 = (int) end.getX();
         final int y1 = (int) start.getY(), y2 = (int) end.getY();
         return delta(x2, x1) + delta(y2, y1) != 0 && delta(x2, x1) <= 1 && delta(y2, y1) <= 1
-                && canMoveOnto(x2, y2, isWhite) && !isCheck(x2, y2);
+                && canMoveOnto(x2, y2) && !isCheck(x2, y2);
     }
 
     @Override
