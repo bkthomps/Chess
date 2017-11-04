@@ -1,6 +1,7 @@
 package chess;
 
 import javax.swing.JOptionPane;
+import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,7 @@ final class GameState {
             lockOntoPiece(x, y);
             return;
         }
+        chess.refreshPixels();
         final Point to = new Point(x, y);
         if (isInCheck) {
             doMoveInCheck(to);
@@ -90,10 +92,26 @@ final class GameState {
         if (toMove != null && toMove.isWhite() == isWhiteTurn) {
             moving = toMove;
             from = new Point(x, y);
+            letUserKnowLegalMoves();
             return;
         }
         moving = null;
         from = null;
+    }
+
+    private void letUserKnowLegalMoves() {
+        final Color darkGreen = new Color(0, 100, 40);
+        final Color lightGreen = new Color(0, 140, 50);
+        for (int i = 0; i < Chess.board.length; i++) {
+            for (int j = 0; j < Chess.board.length; j++) {
+                final Point checkAt = new Point(j, i);
+                if (moving.isActionLegal(from, checkAt)) {
+                    final Color usedColor = ((i + j) % 2 == 0) ? lightGreen : darkGreen;
+                    chess.fillInSubSection(usedColor, j, i);
+                }
+            }
+        }
+        chess.setPieces();
     }
 
     /**
@@ -205,7 +223,7 @@ final class GameState {
         final int x = (int) location.getX(), y = (int) location.getY();
         final King king = new King(isWhiteTurn);
         if (isCheckmate(king, x, y)) {
-            final String team = (isWhiteTurn) ? "Black" : "White";
+            final String team = isWhiteTurn ? "Black" : "White";
             final String text = "Checkmate! " + team + " wins!";
             finishGame(text);
         } else if (isStalemate(king, x, y)) {

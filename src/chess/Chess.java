@@ -95,7 +95,7 @@ public final class Chess {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 final Color usedColor = ((i + j) % 2 == 0) ? lightBrown : darkBrown;
-                fillInSubSection(usedColor, j * PIXELS_PER_SQUARE, i * PIXELS_PER_SQUARE);
+                fillInSubSection(usedColor, j, i);
             }
         }
     }
@@ -103,7 +103,7 @@ public final class Chess {
     /**
      * Add the pieces to the chess board on the graphical user interface.
      */
-    private void setPieces() {
+    void setPieces() {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 if (board[i][j] != null) {
@@ -138,10 +138,10 @@ public final class Chess {
      * @param x     the x-coordinate
      * @param y     the y-coordinate
      */
-    private void fillInSubSection(Color color, int x, int y) {
+    void fillInSubSection(Color color, int x, int y) {
         for (int i = 0; i < PIXELS_PER_SQUARE; i++) {
             for (int j = 0; j < PIXELS_PER_SQUARE; j++) {
-                pixels[i + y][j + x] = color;
+                pixels[i + y * PIXELS_PER_SQUARE][j + x * PIXELS_PER_SQUARE] = color;
             }
         }
     }

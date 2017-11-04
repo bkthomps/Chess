@@ -71,13 +71,13 @@ final class Bishop extends Piece {
     boolean isBishopActionLegal(Point start, Point end) {
         final int x1 = (int) start.getX(), x2 = (int) end.getX();
         final int y1 = (int) start.getY(), y2 = (int) end.getY();
-        final int xSign = (x2 > x1) ? 1 : -1;
-        final int ySign = (y2 > y1) ? 1 : -1;
+        final int min = Math.min(x1, x2);
+        final int max = Math.max(x1, x2);
         int x = x1;
         int y = y1;
-        for (int i = x1 + 1; i < x2; i++) {
-            x += xSign;
-            y += ySign;
+        for (int i = min + 1; i < max; i++) {
+            x += Math.signum(x2 - x1);
+            y += Math.signum(y2 - y1);
             if (Chess.board[y][x] != null) {
                 return false;
             }

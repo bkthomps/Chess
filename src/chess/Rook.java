@@ -53,17 +53,17 @@ final class Rook extends Piece {
             return false;
         }
         if (x1 == x2) {
-            final int one = (y1 < y2) ? y1 : y2;
-            final int two = (y1 < y2) ? y2 : y1;
-            for (int i = one + 1; i < two; i++) {
+            final int min = Math.min(y1, y2);
+            final int max = Math.max(y1, y2);
+            for (int i = min + 1; i < max; i++) {
                 if (Chess.board[i][x1] != null) {
                     return false;
                 }
             }
         } else {
-            final int one = (x1 < x2) ? x1 : x2;
-            final int two = (x1 < x2) ? x2 : x1;
-            for (int i = one + 1; i < two; i++) {
+            final int min = Math.min(x1, x2);
+            final int max = Math.max(x1, x2);
+            for (int i = min + 1; i < max; i++) {
                 if (Chess.board[y1][i] != null) {
                     return false;
                 }
