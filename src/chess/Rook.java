@@ -47,6 +47,17 @@ final class Rook extends Piece {
      */
     @Override
     boolean isActionLegal(Point start, Point end) {
+        return isRookActionLegal(start, end) && wouldNotPutKingIntoCheck(start, end);
+    }
+
+    /**
+     * Rook can capture enemy and can travel as long as nothing is in its way.
+     *
+     * @param start the original position
+     * @param end   the final position
+     * @return if rook action is legal
+     */
+    boolean isRookActionLegal(Point start, Point end) {
         final int x1 = (int) start.getX(), x2 = (int) end.getX();
         final int y1 = (int) start.getY(), y2 = (int) end.getY();
         if ((x1 == x2 && y1 == y2) || (x1 != x2 && y1 != y2)) {
@@ -69,7 +80,7 @@ final class Rook extends Piece {
                 }
             }
         }
-        return canMoveOnto(x2, y2) && wouldNotPutKingIntoCheck(start, end);
+        return canMoveOnto(x2, y2);
     }
 
     @Override

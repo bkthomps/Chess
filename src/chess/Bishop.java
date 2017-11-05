@@ -62,7 +62,7 @@ final class Bishop extends Piece {
     }
 
     /**
-     * Bishop can eat enemy and can travel as long as nothing is in its way.
+     * Bishop can capture enemy and can travel as long as nothing is in its way.
      *
      * @param start the original position
      * @param end   the final position

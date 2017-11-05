@@ -52,7 +52,7 @@ final class Queen extends Piece {
             return bishop.isBishopActionLegal(start, end) && wouldNotPutKingIntoCheck(start, end);
         }
         final Rook rook = new Rook(isWhite);
-        return rook.isActionLegal(start, end) && wouldNotPutKingIntoCheck(start, end);
+        return rook.isRookActionLegal(start, end) && wouldNotPutKingIntoCheck(start, end);
     }
 
     @Override
