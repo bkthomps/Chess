@@ -51,17 +51,36 @@ final class King extends Piece {
         final int x1 = (int) start.getX(), x2 = (int) end.getX();
         final int y1 = (int) start.getY(), y2 = (int) end.getY();
         return delta(x2, x1) + delta(y2, y1) != 0 && delta(x2, x1) <= 1 && delta(y2, y1) <= 1
-                && canMoveOnto(x2, y2) && !isCheck(x2, y2);
+                && canMoveOnto(x2, y2) && isNoAdjacentKing(x2, y2) && !isCheck(x2, y2);
     }
 
-    @Override
-    boolean hasMoved() {
-        return hasMoved;
+    /**
+     * Determines if there is no adjacent King.
+     *
+     * @param x the x-coordinate
+     * @param y the y-coordinate
+     * @return if there is no adjacent King
+     */
+    private boolean isNoAdjacentKing(int x, int y) {
+        return isKingNotAt(x - 1, y - 1) && isKingNotAt(x, y - 1) && isKingNotAt(x + 1, y - 1)
+                && isKingNotAt(x - 1, y) && isKingNotAt(x + 1, y)
+                && isKingNotAt(x - 1, y + 1) && isKingNotAt(x, y + 1) && isKingNotAt(x + 1, y + 1);
     }
 
-    @Override
-    void setMove() {
-        hasMoved = true;
+    /**
+     * Determines if there is no King at the specified location.
+     *
+     * @param x the x-coordinate
+     * @param y the y-coordinate
+     * @return if there is no King at the specified location
+     */
+    private boolean isKingNotAt(int x, int y) {
+        if (x < 0 || x >= Chess.board.length || y < 0 || y >= Chess.board.length) {
+            return true;
+        }
+        final Piece item = Chess.board[y][x];
+        final boolean isEnemyKing = item != null && item.getClass() == King.class && item.isWhite() != isWhite;
+        return !isEnemyKing;
     }
 
     /**
@@ -187,5 +206,15 @@ final class King extends Piece {
     private boolean isEnemyKnight(int x, int y) {
         return x > 0 && y > 0 && x < Chess.board.length - 1 && y < Chess.board.length - 1 && Chess.board[y][x] != null
                 && Chess.board[y][x].getClass() == Knight.class && Chess.board[y][x].isWhite() != isWhite;
+    }
+
+    @Override
+    boolean hasMoved() {
+        return hasMoved;
+    }
+
+    @Override
+    void setMove() {
+        hasMoved = true;
     }
 }

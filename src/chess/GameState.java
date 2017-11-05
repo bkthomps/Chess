@@ -499,7 +499,7 @@ final class GameState {
     private boolean castleIfPossible(Point to) {
         final int x2 = (int) to.getX();
         final int y2 = (int) to.getY();
-        if (y2 != 7) {
+        if (y2 != Chess.board.length - 1) {
             return false;
         }
         if (x2 == 0 && canQueenSideCastle()) {
@@ -522,7 +522,7 @@ final class GameState {
     private boolean canQueenSideCastle() {
         final int x1 = (int) from.getX();
         final int y1 = (int) from.getY();
-        final Piece[] slice = Chess.board[7];
+        final Piece[] slice = Chess.board[Chess.board.length - 1];
         final King king = new King(isWhiteTurn);
         final boolean isLockedOnKing = x1 == 4 && y1 == 7;
         final boolean isClearPath = hasMoved(slice[0]) && slice[1] == null && slice[2] == null
@@ -539,7 +539,7 @@ final class GameState {
     private boolean canKingSideCastle() {
         final int x1 = (int) from.getX();
         final int y1 = (int) from.getY();
-        final Piece[] slice = Chess.board[7];
+        final Piece[] slice = Chess.board[Chess.board.length - 1];
         final King king = new King(isWhiteTurn);
         final boolean isLockedOnKing = x1 == 4 && y1 == 7;
         final boolean isClearPath = hasMoved(slice[4]) && slice[5] == null && slice[6] == null && hasMoved(slice[7]);
@@ -564,9 +564,10 @@ final class GameState {
      * @param to   location to move to
      */
     private void moveCastle(int from, int to) {
-        Chess.board[7][to] = Chess.board[7][from];
-        Chess.board[7][from] = null;
-        Chess.board[7][to].setMove();
+        final int lastRow = Chess.board.length - 1;
+        Chess.board[lastRow][to] = Chess.board[lastRow][from];
+        Chess.board[lastRow][from] = null;
+        Chess.board[lastRow][to].setMove();
     }
 
     /**
