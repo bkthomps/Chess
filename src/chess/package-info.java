@@ -3,6 +3,6 @@
  * taken. The game is done once a King enters checkmate, or once there is a draw.
  *
  * @author Bailey Thompson
- * @version 1.1.9
+ * @version 1.1.10
  */
 package chess;
