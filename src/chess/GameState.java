@@ -45,7 +45,6 @@ final class GameState {
             isWhiteTurn = !isWhiteTurn;
             flipBoard();
             enPassant = null;
-            enPassantHistory.add(null);
         } else if (isEnPassantLegal(to)) {
             doEnPassant();
         } else if (moving.isActionLegal(from, to)) {
@@ -212,7 +211,6 @@ final class GameState {
         move(from, enPassant, moving);
         Chess.board[(int) enPassant.getY() + 1][(int) enPassant.getX()] = null;
         enPassant = null;
-        enPassantHistory.add(null);
         isWhiteTurn = !isWhiteTurn;
         flipBoard();
         checkEndgame();
@@ -225,12 +223,9 @@ final class GameState {
      */
     private void checkEnPassant(Point to) {
         if (moving.getClass() == Pawn.class && from.getY() - to.getY() == 2) {
-            final Point p = new Point((int) to.getX(), (int) to.getY() - 2);
-            enPassant = p;
-            enPassantHistory.add(p);
+            enPassant = new Point((int) to.getX(), (int) to.getY() - 2);
         } else {
             enPassant = null;
-            enPassantHistory.add(null);
         }
     }
 
@@ -584,6 +579,7 @@ final class GameState {
                 }
             }
             boardHistory.add(boardCopy);
+            enPassantHistory.add(enPassant);
             final Point kingLocation = locateKing(isWhiteTurn);
             canCastleHistory.add(Chess.board[(int) kingLocation.getY()][(int) kingLocation.getX()].hasMoved());
         }
