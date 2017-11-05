@@ -365,12 +365,12 @@ final class GameState {
      * @throws IllegalStateException if castle or en passant history size is invalid
      */
     private boolean isTooManyBoardRepetitions() {
+        final int historySize = boardHistory.size();
         Point enPassantBackup = null;
-        if (!enPassantHistory.isEmpty()) {
+        if (historySize == enPassantHistory.size() - 1) {
             enPassantBackup = enPassantHistory.get(enPassantHistory.size() - 1);
             enPassantHistory.remove(enPassantHistory.size() - 1);
         }
-        final int historySize = boardHistory.size();
         if (historySize != canCastleHistory.size() || historySize != enPassantHistory.size()) {
             throw new IllegalStateException("History lists are not same size!");
         }
