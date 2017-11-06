@@ -109,18 +109,17 @@ final class GameState {
         for (int i = 0; i < boardLength; i++) {
             for (int j = 0; j < boardLength; j++) {
                 final Point checkAt = new Point(j, i);
+                final Color usedColor = ((i + j) % 2 == 0) ? lightGreen : darkGreen;
                 if (moving.getClass() == King.class) {
                     final int x = (int) from.getX();
                     final int y = (int) from.getY();
-                    Piece backup = Chess.board[y][x];
+                    final Piece backup = Chess.board[y][x];
                     Chess.board[y][x] = null;
                     if (moving.isActionLegal(from, checkAt)) {
-                        final Color usedColor = ((i + j) % 2 == 0) ? lightGreen : darkGreen;
                         chess.fillInSubSection(usedColor, j, i);
                     }
                     Chess.board[y][x] = backup;
                 } else if (moving.isActionLegal(from, checkAt)) {
-                    final Color usedColor = ((i + j) % 2 == 0) ? lightGreen : darkGreen;
                     chess.fillInSubSection(usedColor, j, i);
                 }
             }
