@@ -44,3 +44,4 @@ There are four ways for a draw to occur:
 # Screenshots
 ![Start Of Game](/Images/StartOfGame.png?raw=true "Start Of Game")
 ![Middle Of Game](/Images/MiddleOfGame.png?raw=true "Middle Of Game")
+![Legal Moves](/Images/LegalMoves.png?raw=true "Legal Moves")
