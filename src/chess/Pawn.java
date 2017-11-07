@@ -38,12 +38,13 @@ final class Pawn extends Piece {
      */
     @Override
     boolean isActionLegal(Point start, Point end) {
-        final boolean isForward = Chess.board[end.y][end.x] == null && end.x == start.x;
+        final boolean isForward = Chess.getBoard(end) == null && end.x == start.x;
         final boolean isOneBlock = end.y == start.y - 1;
-        final boolean isJump = end.y == start.y - 2 && Chess.board[start.y - 1][start.x] == null && !hasMoved();
+        final Point oneBelowStart = new Point(start.x, start.y - 1);
+        final boolean isJump = end.y == start.y - 2 && Chess.getBoard(oneBelowStart) == null && !hasMoved();
         final boolean isForwardAllowed = isForward && (isOneBlock || isJump);
-        final boolean isCapture = Chess.board[end.y][end.x] != null
-                && Chess.board[end.y][end.x].isWhite() != isWhite
+        final boolean isCapture = Chess.getBoard(end) != null
+                && Chess.getBoard(end).isWhite() != isWhite
                 && end.y == start.y - 1 && Math.abs(end.x - start.x) == 1;
         return (isForwardAllowed || isCapture) && wouldNotPutKingIntoCheck(start, end);
     }

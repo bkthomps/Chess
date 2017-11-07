@@ -63,12 +63,11 @@ final class Bishop extends Piece {
     boolean isBishopActionLegal(Point start, Point end) {
         final int min = Math.min(start.x, end.x);
         final int max = Math.max(start.x, end.x);
-        int x = start.x;
-        int y = start.y;
+        final Point mutatingPoint = new Point(start);
         for (int i = min + 1; i < max; i++) {
-            x += Math.signum(end.x - start.x);
-            y += Math.signum(end.y - start.y);
-            if (Chess.board[y][x] != null) {
+            mutatingPoint.x += Math.signum(end.x - start.x);
+            mutatingPoint.y += Math.signum(end.y - start.y);
+            if (Chess.getBoard(mutatingPoint) != null) {
                 return false;
             }
         }

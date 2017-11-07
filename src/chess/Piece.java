@@ -48,7 +48,7 @@ abstract class Piece {
      * @return if the piece can move onto the location
      */
     final boolean canMoveOnto(Point point) {
-        return Chess.board[point.y][point.x] == null || Chess.board[point.y][point.x].isWhite() != isWhite();
+        return Chess.getBoard(point) == null || Chess.getBoard(point).isWhite() != isWhite();
     }
 
     /**
@@ -83,14 +83,14 @@ abstract class Piece {
      * @return if moving the piece would put the king in check
      */
     final boolean wouldNotPutKingIntoCheck(Point start, Point end) {
-        final Piece backup = Chess.board[end.y][end.x];
-        Chess.board[end.y][end.x] = this;
-        Chess.board[start.y][start.x] = null;
+        final Piece backup = Chess.getBoard(end);
+        Chess.setBoard(end, this);
+        Chess.setBoard(start, null);
         final Point kingPoint = GameState.locateKing(isWhite());
-        final King king = (King) Chess.board[kingPoint.y][kingPoint.x];
+        final King king = (King) Chess.getBoard(kingPoint);
         final boolean isAllowed = !king.isCheck(kingPoint);
-        Chess.board[start.y][start.x] = this;
-        Chess.board[end.y][end.x] = backup;
+        Chess.setBoard(start, this);
+        Chess.setBoard(end, backup);
         return isAllowed;
     }
 }

@@ -57,7 +57,8 @@ final class Rook extends Piece {
             final int min = Math.min(start.y, end.y);
             final int max = Math.max(start.y, end.y);
             for (int i = min + 1; i < max; i++) {
-                if (Chess.board[i][start.x] != null) {
+                final Point point = new Point(start.x, i);
+                if (Chess.getBoard(point) != null) {
                     return false;
                 }
             }
@@ -65,7 +66,8 @@ final class Rook extends Piece {
             final int min = Math.min(start.x, end.x);
             final int max = Math.max(start.x, end.x);
             for (int i = min + 1; i < max; i++) {
-                if (Chess.board[start.y][i] != null) {
+                final Point point = new Point(i, start.y);
+                if (Chess.getBoard(point) != null) {
                     return false;
                 }
             }

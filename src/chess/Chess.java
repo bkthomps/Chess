@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
@@ -23,11 +24,11 @@ final class Chess {
     static final String GAME_TITLE = "Chess";
     private final JFrame frame = new JFrame(GAME_TITLE);
 
-    private static final int BOARD_SIZE = 8;
+    static final int BOARD_SIZE = 8;
     private static final int PIXELS_PER_SQUARE = 8;
     private static final int PIXELS_ON_BOARD = BOARD_SIZE * PIXELS_PER_SQUARE;
 
-    static final Piece[][] board = new Piece[BOARD_SIZE][BOARD_SIZE];
+    private static final Piece[][] board = new Piece[BOARD_SIZE][BOARD_SIZE];
     private final Color[][] pixels = new Color[PIXELS_ON_BOARD][PIXELS_ON_BOARD];
     private GameState state;
 
@@ -37,6 +38,26 @@ final class Chess {
         chess.resetBoard();
         chess.refreshPixels();
         chess.state = new GameState(chess);
+    }
+
+    static void setBoard(Point point, Piece piece) {
+        board[point.y][point.x] = piece;
+    }
+
+    static Piece getBoard(Point point) {
+        return board[point.y][point.x];
+    }
+
+    /**
+     * Flip the board so that the opposite player can play with the correct orientation.
+     */
+    void flipBoard() {
+        for (int i = 0; i < BOARD_SIZE / 2; i++) {
+            final Piece[] tempSlice = board[BOARD_SIZE - i - 1];
+            board[BOARD_SIZE - i - 1] = board[i];
+            board[i] = tempSlice;
+        }
+        refreshPixels();
     }
 
     /**
