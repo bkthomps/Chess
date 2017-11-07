@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * The main class, which is the starting point of the program. Initializes all chess logic.
  */
-public final class Chess {
+final class Chess {
 
     static final String GAME_TITLE = "Chess";
     private final JFrame frame = new JFrame(GAME_TITLE);

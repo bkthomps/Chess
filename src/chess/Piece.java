@@ -8,22 +8,57 @@ import java.awt.Point;
  */
 abstract class Piece {
 
-    static final int PIECE_SIZE = 6;
-
-    abstract Color[][] getImage();
+    private static final int PIECE_SIZE = 6;
+    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
+    private boolean hasMoved;
 
     abstract boolean isWhite();
 
     abstract boolean isActionLegal(Point start, Point end);
 
-    abstract boolean hasMoved();
+    /**
+     * Determines if the piece has moved.
+     *
+     * @return if the piece has moved
+     */
+    final boolean hasMoved() {
+        return hasMoved;
+    }
 
-    abstract void setMove();
+    /**
+     * Sets the piece to be moved.
+     */
+    final void setMove() {
+        hasMoved = true;
+    }
 
+    /**
+     * Gets the color representation of the piece.
+     *
+     * @return the color representation of the piece
+     */
+    final Color[][] getImage() {
+        return image;
+    }
+
+    /**
+     * Determines the magnitude of the difference between two numbers.
+     *
+     * @param start the first number
+     * @param end   the second number
+     * @return the magnitude of the difference of the numbers
+     */
     final int delta(double start, double end) {
         return Math.abs((int) end - (int) start);
     }
 
+    /**
+     * Determines if a piece can move onto a grid location.
+     *
+     * @param x the x-coordinate
+     * @param y the y-coordinate
+     * @return if the piece can move onto the location
+     */
     final boolean canMoveOnto(int x, int y) {
         return Chess.board[y][x] == null || Chess.board[y][x].isWhite() != isWhite();
     }
@@ -39,7 +74,6 @@ abstract class Piece {
         for (int i = 0; i < pixels.length; i++) {
             for (int j = 0; j < pixels.length; j++) {
                 final int pixel = pixels[i][j];
-                final Color[][] image = getImage();
                 if (pixel == 0) {
                     image[i][j] = null;
                 } else if (pixel == 1 && isWhite()) {

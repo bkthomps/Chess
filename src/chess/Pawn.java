@@ -1,6 +1,5 @@
 package chess;
 
-import java.awt.Color;
 import java.awt.Point;
 
 /**
@@ -8,9 +7,7 @@ import java.awt.Point;
  */
 final class Pawn extends Piece {
 
-    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final boolean isWhite;
-    private boolean hasMoved;
 
     Pawn(boolean isWhite) {
         this.isWhite = isWhite;
@@ -27,12 +24,7 @@ final class Pawn extends Piece {
     }
 
     @Override
-    public Color[][] getImage() {
-        return image;
-    }
-
-    @Override
-    public boolean isWhite() {
+    boolean isWhite() {
         return isWhite;
     }
 
@@ -50,21 +42,11 @@ final class Pawn extends Piece {
         final int y1 = (int) start.getY(), y2 = (int) end.getY();
         final boolean isForward = Chess.board[y2][x2] == null && x2 == x1;
         final boolean isOneBlock = y2 == y1 - 1;
-        final boolean isJump = y2 == y1 - 2 && Chess.board[y1 - 1][x1] == null && !hasMoved;
+        final boolean isJump = y2 == y1 - 2 && Chess.board[y1 - 1][x1] == null && !hasMoved();
         final boolean isForwardAllowed = isForward && (isOneBlock || isJump);
         final boolean isCapture = Chess.board[y2][x2] != null
                 && Chess.board[y2][x2].isWhite() != isWhite
                 && y2 == y1 - 1 && delta(x2, x1) == 1;
         return (isForwardAllowed || isCapture) && wouldNotPutKingIntoCheck(start, end);
-    }
-
-    @Override
-    boolean hasMoved() {
-        return hasMoved;
-    }
-
-    @Override
-    void setMove() {
-        hasMoved = true;
     }
 }

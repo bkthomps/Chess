@@ -1,6 +1,5 @@
 package chess;
 
-import java.awt.Color;
 import java.awt.Point;
 
 /**
@@ -11,9 +10,7 @@ import java.awt.Point;
  */
 final class King extends Piece {
 
-    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final boolean isWhite;
-    private boolean hasMoved;
 
     King(boolean isWhite) {
         this.isWhite = isWhite;
@@ -30,12 +27,7 @@ final class King extends Piece {
     }
 
     @Override
-    public Color[][] getImage() {
-        return image;
-    }
-
-    @Override
-    public boolean isWhite() {
+    boolean isWhite() {
         return isWhite;
     }
 
@@ -206,15 +198,5 @@ final class King extends Piece {
     private boolean isEnemyKnight(int x, int y) {
         return x > 0 && y > 0 && x < Chess.board.length - 1 && y < Chess.board.length - 1 && Chess.board[y][x] != null
                 && Chess.board[y][x].getClass() == Knight.class && Chess.board[y][x].isWhite() != isWhite;
-    }
-
-    @Override
-    boolean hasMoved() {
-        return hasMoved;
-    }
-
-    @Override
-    void setMove() {
-        hasMoved = true;
     }
 }

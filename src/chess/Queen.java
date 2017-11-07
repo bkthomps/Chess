@@ -1,6 +1,5 @@
 package chess;
 
-import java.awt.Color;
 import java.awt.Point;
 
 /**
@@ -9,9 +8,7 @@ import java.awt.Point;
  */
 final class Queen extends Piece {
 
-    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final boolean isWhite;
-    private boolean hasMoved;
 
     Queen(boolean isWhite) {
         this.isWhite = isWhite;
@@ -28,12 +25,7 @@ final class Queen extends Piece {
     }
 
     @Override
-    public Color[][] getImage() {
-        return image;
-    }
-
-    @Override
-    public boolean isWhite() {
+    boolean isWhite() {
         return isWhite;
     }
 
@@ -53,15 +45,5 @@ final class Queen extends Piece {
         }
         final Rook rook = new Rook(isWhite);
         return rook.isRookActionLegal(start, end) && wouldNotPutKingIntoCheck(start, end);
-    }
-
-    @Override
-    boolean hasMoved() {
-        return hasMoved;
-    }
-
-    @Override
-    void setMove() {
-        hasMoved = true;
     }
 }

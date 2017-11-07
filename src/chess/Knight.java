@@ -1,6 +1,5 @@
 package chess;
 
-import java.awt.Color;
 import java.awt.Point;
 
 /**
@@ -9,9 +8,7 @@ import java.awt.Point;
  */
 final class Knight extends Piece {
 
-    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final boolean isWhite;
-    private boolean hasMoved;
 
     Knight(boolean isWhite) {
         this.isWhite = isWhite;
@@ -28,12 +25,7 @@ final class Knight extends Piece {
     }
 
     @Override
-    public Color[][] getImage() {
-        return image;
-    }
-
-    @Override
-    public boolean isWhite() {
+    boolean isWhite() {
         return isWhite;
     }
 
@@ -52,15 +44,5 @@ final class Knight extends Piece {
         final boolean isMoveL = (delta(x1, x2) == 2 && delta(y1, y2) == 1)
                 || (delta(x1, x2) == 1 && delta(y1, y2) == 2);
         return isMoveL && canMoveOnto(x2, y2) && wouldNotPutKingIntoCheck(start, end);
-    }
-
-    @Override
-    boolean hasMoved() {
-        return hasMoved;
-    }
-
-    @Override
-    void setMove() {
-        hasMoved = true;
     }
 }

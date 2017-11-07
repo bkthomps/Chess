@@ -1,6 +1,5 @@
 package chess;
 
-import java.awt.Color;
 import java.awt.Point;
 
 /**
@@ -9,9 +8,7 @@ import java.awt.Point;
  */
 final class Bishop extends Piece {
 
-    private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private final boolean isWhite;
-    private boolean hasMoved;
 
     Bishop(boolean isWhite) {
         this.isWhite = isWhite;
@@ -28,12 +25,7 @@ final class Bishop extends Piece {
     }
 
     @Override
-    public Color[][] getImage() {
-        return image;
-    }
-
-    @Override
-    public boolean isWhite() {
+    boolean isWhite() {
         return isWhite;
     }
 
@@ -83,15 +75,5 @@ final class Bishop extends Piece {
             }
         }
         return canMoveOnto(x2, y2);
-    }
-
-    @Override
-    boolean hasMoved() {
-        return hasMoved;
-    }
-
-    @Override
-    void setMove() {
-        hasMoved = true;
     }
 }
