@@ -70,6 +70,6 @@ final class Rook extends Piece {
                 }
             }
         }
-        return canMoveOnto(end.x, end.y);
+        return canMoveOnto(end);
     }
 }

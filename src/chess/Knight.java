@@ -41,6 +41,6 @@ final class Knight extends Piece {
     boolean isActionLegal(Point start, Point end) {
         final boolean isMoveL = (Math.abs(end.x - start.x) == 2 && Math.abs(end.y - start.y) == 1)
                 || (Math.abs(end.x - start.x) == 1 && Math.abs(end.y - start.y) == 2);
-        return isMoveL && canMoveOnto(end.x, end.y) && wouldNotPutKingIntoCheck(start, end);
+        return isMoveL && canMoveOnto(end) && wouldNotPutKingIntoCheck(start, end);
     }
 }

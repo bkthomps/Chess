@@ -147,16 +147,16 @@ final class GameState {
     private void doMoveInCheck(Point to) {
         if (moving.isActionLegal(from, to)) {
             checkEnPassant(to);
-            move(from, to, moving);
+            move(moving, from, to);
             final Point location = locateKing(isWhiteTurn);
             final King king = new King(isWhiteTurn);
-            if (!king.isCheck(location.x, location.y)) {
+            if (!king.isCheck(location)) {
                 isWhiteTurn = !isWhiteTurn;
                 flipBoard();
                 checkEndgame();
                 isInCheck = false;
             } else {
-                move(to, from, moving);
+                move(moving, to, from);
             }
         }
     }
@@ -190,9 +190,9 @@ final class GameState {
                     piece = moving;
                     break;
             }
-            move(from, to, piece);
+            move(piece, from, to);
         } else {
-            move(from, to, moving);
+            move(moving, from, to);
         }
         isWhiteTurn = !isWhiteTurn;
         flipBoard();
@@ -215,7 +215,7 @@ final class GameState {
      * only moved one square immediately after it happens.
      */
     private void doEnPassant() {
-        move(from, enPassant, moving);
+        move(moving, from, enPassant);
         Chess.board[enPassant.y + 1][enPassant.x] = null;
         enPassant = null;
         enPassantHistory.add(null);
@@ -231,13 +231,11 @@ final class GameState {
      */
     private void checkEnPassant(Point to) {
         if (moving.getClass() == Pawn.class && from.y - to.y == 2) {
-            final Point p = new Point(to.x, to.y - 2);
-            enPassant = p;
-            enPassantHistory.add(p);
+            enPassant = new Point(to.x, to.y - 2);
         } else {
             enPassant = null;
-            enPassantHistory.add(null);
         }
+        enPassantHistory.add(enPassant);
     }
 
     /**
@@ -246,11 +244,11 @@ final class GameState {
     private void checkEndgame() {
         final Point location = locateKing(isWhiteTurn);
         final King king = new King(isWhiteTurn);
-        if (isCheckmate(king, location.x, location.y)) {
+        if (isCheckmate(king, location)) {
             final String team = isWhiteTurn ? "Black" : "White";
             final String text = "Checkmate! " + team + " wins!";
             finishGame(text);
-        } else if (isStalemate(king, location.x, location.y)) {
+        } else if (isStalemate(king, location)) {
             final String text = "Draw! Because of stalemate!";
             finishGame(text);
         }
@@ -261,38 +259,35 @@ final class GameState {
     /**
      * Determine if the game is over by checkmate.
      *
-     * @param king the king
-     * @param x    the x-coordinate
-     * @param y    the y-coordinate
+     * @param king  the king
+     * @param point the location of the king
      * @return if the game is over by checkmate
      */
-    private boolean isCheckmate(King king, int x, int y) {
-        return king.isCheck(x, y) && isMoveImpossible(king, x, y);
+    private boolean isCheckmate(King king, Point point) {
+        return king.isCheck(point) && isMoveImpossible(king, point);
     }
 
     /**
      * Determine if the game is over by stalemate.
      *
-     * @param king the king
-     * @param x    the x-coordinate
-     * @param y    the y-coordinate
+     * @param king  the king
+     * @param point the location of the king
      * @return if the game is over by stalemate
      */
-    private boolean isStalemate(King king, int x, int y) {
-        return !king.isCheck(x, y) && isMoveImpossible(king, x, y);
+    private boolean isStalemate(King king, Point point) {
+        return !king.isCheck(point) && isMoveImpossible(king, point);
     }
 
     /**
      * Determine if any move can be done which results in king not being in check.
      *
-     * @param king the king
-     * @param x    the x-coordinate
-     * @param y    the y-coordinate
+     * @param king  the king
+     * @param point the location of the king
      * @return if any move can be done which results in king not being in check
      * @throws IllegalStateException if king is not at the specified area
      */
-    private boolean isMoveImpossible(King king, int x, int y) {
-        if (Chess.board[y][x].getClass() != King.class) {
+    private boolean isMoveImpossible(King king, Point point) {
+        if (Chess.board[point.y][point.x].getClass() != King.class) {
             throw new IllegalStateException("King not where specified!");
         }
         final int boardLength = Chess.board.length;
@@ -306,14 +301,14 @@ final class GameState {
                             final Point start = new Point(i, j);
                             final Point end = new Point(k, l);
                             if (me.isActionLegal(start, end)) {
-                                rawMove(start, end, me);
+                                rawMove(me, start, end);
                                 final Point kingLocation = locateKing(isWhiteTurn);
-                                if (!king.isCheck(kingLocation.x, kingLocation.y)) {
-                                    rawMove(end, start, me);
+                                if (!king.isCheck(kingLocation)) {
+                                    rawMove(me, end, start);
                                     Chess.board[l][k] = save;
                                     return false;
                                 }
-                                rawMove(end, start, me);
+                                rawMove(me, end, start);
                                 Chess.board[l][k] = save;
                             }
                         }
@@ -487,7 +482,7 @@ final class GameState {
      * @param location the location of the king in check
      */
     private void warnIfCheck(King king, Point location) {
-        if (king.isCheck(location.x, location.y)) {
+        if (king.isCheck(location)) {
             isInCheck = true;
             final String text = "Warning: you are in check.\nYou must get out of check.";
             final String[] options = {"OK"};
@@ -528,7 +523,8 @@ final class GameState {
         final boolean isLockedOnKing = from.x == 4 && from.y == 7;
         final boolean isClearPath = hasMoved(slice[0]) && slice[1] == null && slice[2] == null
                 && slice[3] == null && hasMoved(slice[4]);
-        final boolean isNotPassingThroughCheck = !king.isCheck(4, 7) && !king.isCheck(3, 7) && !king.isCheck(2, 7);
+        final boolean isNotPassingThroughCheck = !king.isCheck(new Point(4, 7))
+                && !king.isCheck(new Point(3, 7)) && !king.isCheck(new Point(2, 7));
         return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
     }
 
@@ -542,7 +538,8 @@ final class GameState {
         final King king = new King(isWhiteTurn);
         final boolean isLockedOnKing = from.x == 4 && from.y == 7;
         final boolean isClearPath = hasMoved(slice[4]) && slice[5] == null && slice[6] == null && hasMoved(slice[7]);
-        final boolean isNotPassingThroughCheck = !king.isCheck(4, 7) && !king.isCheck(5, 7) && !king.isCheck(6, 7);
+        final boolean isNotPassingThroughCheck = !king.isCheck(new Point(4, 7))
+                && !king.isCheck(new Point(5, 7)) && !king.isCheck(new Point(6, 7));
         return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
     }
 
@@ -572,11 +569,11 @@ final class GameState {
     /**
      * Move the piece.
      *
+     * @param me    the piece to move
      * @param start the location to move from
      * @param end   the location to move to
-     * @param me    the piece to move
      */
-    private void move(Point start, Point end, Piece me) {
+    private void move(Piece me, Point start, Point end) {
         if (Chess.board[end.y][end.x] != null || me.getClass() == Pawn.class) {
             drawCounter = 0;
             boardHistory.clear();
@@ -595,18 +592,18 @@ final class GameState {
             final Point kingLocation = locateKing(isWhiteTurn);
             canCastleHistory.add(Chess.board[kingLocation.y][kingLocation.x].hasMoved());
         }
-        rawMove(start, end, me);
+        rawMove(me, start, end);
         me.setMove();
     }
 
     /**
      * Move the piece without setting the piece to moved state. Used when checking the board and not actually moving it.
      *
+     * @param me    the piece to move
      * @param start the location to move from
      * @param end   the location to move to
-     * @param me    the piece to move
      */
-    private void rawMove(Point start, Point end, Piece me) {
+    private void rawMove(Piece me, Point start, Point end) {
         Chess.board[start.y][start.x] = null;
         Chess.board[end.y][end.x] = me;
     }

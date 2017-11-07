@@ -72,6 +72,6 @@ final class Bishop extends Piece {
                 return false;
             }
         }
-        return canMoveOnto(end.x, end.y);
+        return canMoveOnto(end);
     }
 }

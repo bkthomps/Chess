@@ -44,12 +44,11 @@ abstract class Piece {
     /**
      * Determines if a piece can move onto a grid location.
      *
-     * @param x the x-coordinate
-     * @param y the y-coordinate
+     * @param point location to check
      * @return if the piece can move onto the location
      */
-    final boolean canMoveOnto(int x, int y) {
-        return Chess.board[y][x] == null || Chess.board[y][x].isWhite() != isWhite();
+    final boolean canMoveOnto(Point point) {
+        return Chess.board[point.y][point.x] == null || Chess.board[point.y][point.x].isWhite() != isWhite();
     }
 
     /**
@@ -85,11 +84,11 @@ abstract class Piece {
      */
     final boolean wouldNotPutKingIntoCheck(Point start, Point end) {
         final Piece backup = Chess.board[end.y][end.x];
-        Chess.board[end.x][end.x] = this;
+        Chess.board[end.y][end.x] = this;
         Chess.board[start.y][start.x] = null;
         final Point kingPoint = GameState.locateKing(isWhite());
         final King king = (King) Chess.board[kingPoint.y][kingPoint.x];
-        final boolean isAllowed = !king.isCheck(kingPoint.x, kingPoint.y);
+        final boolean isAllowed = !king.isCheck(kingPoint);
         Chess.board[start.y][start.x] = this;
         Chess.board[end.y][end.x] = backup;
         return isAllowed;
