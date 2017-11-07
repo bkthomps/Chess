@@ -170,10 +170,12 @@ final class King extends Piece {
      * @return if the king is in check due to one side a pawn can capture from
      */
     private boolean isEnemyPawn(int x, int y) {
+        if (isNotInInnerGridBounds(x, y)) {
+            return false;
+        }
         final Point point = new Point(x, y);
         final Piece me = Chess.getBoard(point);
-        return x > 0 && y > 0 && x < Chess.BOARD_SIZE - 1 && y < Chess.BOARD_SIZE - 1 && me != null
-                && me.getClass() == Pawn.class && me.isWhite() != isWhite;
+        return me != null && me.getClass() == Pawn.class && me.isWhite() != isWhite;
     }
 
     /**
@@ -197,9 +199,23 @@ final class King extends Piece {
      * @return if the king is in check due to one spot a knight can capture from
      */
     private boolean isEnemyKnight(int x, int y) {
+        if (isNotInInnerGridBounds(x, y)) {
+            return false;
+        }
         final Point point = new Point(x, y);
         final Piece me = Chess.getBoard(point);
-        return x > 0 && y > 0 && x < Chess.BOARD_SIZE - 1 && y < Chess.BOARD_SIZE - 1 && me != null
-                && me.getClass() == Knight.class && me.isWhite() != isWhite;
+        return me != null && me.getClass() == Knight.class && me.isWhite() != isWhite;
+    }
+
+    /**
+     * Determines if the location is outside the inner grid. The inner grid being one smaller on each side than the
+     * total grid.
+     *
+     * @param x the x-coordinate
+     * @param y the y-coordinate
+     * @return if the location is outside the inner grid
+     */
+    private boolean isNotInInnerGridBounds(int x, int y) {
+        return x <= 0 || y <= 0 || x >= Chess.BOARD_SIZE - 1 || y >= Chess.BOARD_SIZE - 1;
     }
 }
