@@ -31,7 +31,7 @@ final class Knight extends Piece {
 
     /**
      * Determines if the action is legal. The action is legal if it moves 2 spaces in one direction and 1 in the other.
-     * It may eat any piece as it would move normally.
+     * It may capture any piece as it would move normally.
      *
      * @param start the beginning position
      * @param end   the final position
@@ -39,10 +39,8 @@ final class Knight extends Piece {
      */
     @Override
     boolean isActionLegal(Point start, Point end) {
-        final int x1 = (int) start.getX(), x2 = (int) end.getX();
-        final int y1 = (int) start.getY(), y2 = (int) end.getY();
-        final boolean isMoveL = (delta(x1, x2) == 2 && delta(y1, y2) == 1)
-                || (delta(x1, x2) == 1 && delta(y1, y2) == 2);
-        return isMoveL && canMoveOnto(x2, y2) && wouldNotPutKingIntoCheck(start, end);
+        final boolean isMoveL = (Math.abs(end.x - start.x) == 2 && Math.abs(end.y - start.y) == 1)
+                || (Math.abs(end.x - start.x) == 1 && Math.abs(end.y - start.y) == 2);
+        return isMoveL && canMoveOnto(end.x, end.y) && wouldNotPutKingIntoCheck(start, end);
     }
 }

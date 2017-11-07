@@ -111,14 +111,12 @@ final class GameState {
                 final Point checkAt = new Point(j, i);
                 final Color usedColor = ((i + j) % 2 == 0) ? lightGreen : darkGreen;
                 if (moving.getClass() == King.class) {
-                    final int x = (int) from.getX();
-                    final int y = (int) from.getY();
-                    final Piece backup = Chess.board[y][x];
-                    Chess.board[y][x] = null;
+                    final Piece backup = Chess.board[from.y][from.x];
+                    Chess.board[from.y][from.x] = null;
                     if (moving.isActionLegal(from, checkAt)) {
                         chess.fillInSubSection(usedColor, j, i);
                     }
-                    Chess.board[y][x] = backup;
+                    Chess.board[from.y][from.x] = backup;
                 } else if (moving.isActionLegal(from, checkAt)) {
                     chess.fillInSubSection(usedColor, j, i);
                 }
@@ -131,12 +129,11 @@ final class GameState {
             chess.fillInSubSection(lightGreen, boardLength - 1, boardLength - 1);
         }
         if (enPassant != null) {
-            final int x = (int) enPassant.getX();
-            final int y = (int) enPassant.getY();
-            final boolean canCaptureEnPassant = from.getY() == y + 1 && Math.abs(from.getX() - x) == 1;
+            final boolean canCaptureEnPassant = from.y == enPassant.y + 1
+                    && Math.abs(from.x - enPassant.x) == 1;
             if (canCaptureEnPassant && isEnPassantLegal(enPassant)) {
-                final Color usedColor = ((y + x) % 2 == 0) ? lightGreen : darkGreen;
-                chess.fillInSubSection(usedColor, x, y);
+                final Color usedColor = ((enPassant.y + enPassant.x) % 2 == 0) ? lightGreen : darkGreen;
+                chess.fillInSubSection(usedColor, enPassant.x, enPassant.y);
             }
         }
         chess.setPieces();
@@ -153,7 +150,7 @@ final class GameState {
             move(from, to, moving);
             final Point location = locateKing(isWhiteTurn);
             final King king = new King(isWhiteTurn);
-            if (!king.isCheck((int) location.getX(), (int) location.getY())) {
+            if (!king.isCheck(location.x, location.y)) {
                 isWhiteTurn = !isWhiteTurn;
                 flipBoard();
                 checkEndgame();
@@ -171,7 +168,7 @@ final class GameState {
      * @param to where to move to
      */
     private void doMove(Point to) {
-        if ((int) to.getY() == 0 && moving.getClass() == Pawn.class) {
+        if (to.y == 0 && moving.getClass() == Pawn.class) {
             final String text = "What would you like to promote your pawn to?";
             final String[] options = {"QUEEN", "KNIGHT", "ROOK", "BISHOP"};
             final int promotion = customText(text, options);
@@ -210,16 +207,16 @@ final class GameState {
      */
     private boolean isEnPassantLegal(Point to) {
         return enPassant != null && to.equals(enPassant) && moving.getClass() == Pawn.class
-                && moving.isWhite() != Chess.board[(int) to.getY() + 1][(int) to.getX()].isWhite();
+                && moving.isWhite() != Chess.board[to.y + 1][to.x].isWhite();
     }
 
     /**
-     * Perform en passant. En passant is a move which lets a pawn eat a pawn which just moved two squares as if it only
-     * moved one square immediately after it happens.
+     * Perform en passant. En passant is a move which lets a pawn capture a pawn which just moved two squares as if it
+     * only moved one square immediately after it happens.
      */
     private void doEnPassant() {
         move(from, enPassant, moving);
-        Chess.board[(int) enPassant.getY() + 1][(int) enPassant.getX()] = null;
+        Chess.board[enPassant.y + 1][enPassant.x] = null;
         enPassant = null;
         enPassantHistory.add(null);
         isWhiteTurn = !isWhiteTurn;
@@ -233,8 +230,8 @@ final class GameState {
      * @param to location to move to
      */
     private void checkEnPassant(Point to) {
-        if (moving.getClass() == Pawn.class && from.getY() - to.getY() == 2) {
-            final Point p = new Point((int) to.getX(), (int) to.getY() - 2);
+        if (moving.getClass() == Pawn.class && from.y - to.y == 2) {
+            final Point p = new Point(to.x, to.y - 2);
             enPassant = p;
             enPassantHistory.add(p);
         } else {
@@ -248,13 +245,12 @@ final class GameState {
      */
     private void checkEndgame() {
         final Point location = locateKing(isWhiteTurn);
-        final int x = (int) location.getX(), y = (int) location.getY();
         final King king = new King(isWhiteTurn);
-        if (isCheckmate(king, x, y)) {
+        if (isCheckmate(king, location.x, location.y)) {
             final String team = isWhiteTurn ? "Black" : "White";
             final String text = "Checkmate! " + team + " wins!";
             finishGame(text);
-        } else if (isStalemate(king, x, y)) {
+        } else if (isStalemate(king, location.x, location.y)) {
             final String text = "Draw! Because of stalemate!";
             finishGame(text);
         }
@@ -312,7 +308,7 @@ final class GameState {
                             if (me.isActionLegal(start, end)) {
                                 rawMove(start, end, me);
                                 final Point kingLocation = locateKing(isWhiteTurn);
-                                if (!king.isCheck((int) kingLocation.getX(), (int) kingLocation.getY())) {
+                                if (!king.isCheck(kingLocation.x, kingLocation.y)) {
                                     rawMove(end, start, me);
                                     Chess.board[l][k] = save;
                                     return false;
@@ -491,7 +487,7 @@ final class GameState {
      * @param location the location of the king in check
      */
     private void warnIfCheck(King king, Point location) {
-        if (king.isCheck((int) location.getX(), (int) location.getY())) {
+        if (king.isCheck(location.x, location.y)) {
             isInCheck = true;
             final String text = "Warning: you are in check.\nYou must get out of check.";
             final String[] options = {"OK"};
@@ -506,16 +502,14 @@ final class GameState {
      * @return if the king can castle
      */
     private boolean castleIfPossible(Point to) {
-        final int x2 = (int) to.getX();
-        final int y2 = (int) to.getY();
-        if (y2 != Chess.board.length - 1) {
+        if (to.y != Chess.board.length - 1) {
             return false;
         }
-        if (x2 == 0 && canQueenSideCastle()) {
+        if (to.x == 0 && canQueenSideCastle()) {
             moveCastle(4, 2);
             moveCastle(0, 3);
             return true;
-        } else if (x2 == 7 && canKingSideCastle()) {
+        } else if (to.x == 7 && canKingSideCastle()) {
             moveCastle(4, 6);
             moveCastle(7, 5);
             return true;
@@ -529,11 +523,9 @@ final class GameState {
      * @return If queen side castle is legal.
      */
     private boolean canQueenSideCastle() {
-        final int x1 = (int) from.getX();
-        final int y1 = (int) from.getY();
         final Piece[] slice = Chess.board[Chess.board.length - 1];
         final King king = new King(isWhiteTurn);
-        final boolean isLockedOnKing = x1 == 4 && y1 == 7;
+        final boolean isLockedOnKing = from.x == 4 && from.y == 7;
         final boolean isClearPath = hasMoved(slice[0]) && slice[1] == null && slice[2] == null
                 && slice[3] == null && hasMoved(slice[4]);
         final boolean isNotPassingThroughCheck = !king.isCheck(4, 7) && !king.isCheck(3, 7) && !king.isCheck(2, 7);
@@ -546,11 +538,9 @@ final class GameState {
      * @return If king side castle is legal.
      */
     private boolean canKingSideCastle() {
-        final int x1 = (int) from.getX();
-        final int y1 = (int) from.getY();
         final Piece[] slice = Chess.board[Chess.board.length - 1];
         final King king = new King(isWhiteTurn);
-        final boolean isLockedOnKing = x1 == 4 && y1 == 7;
+        final boolean isLockedOnKing = from.x == 4 && from.y == 7;
         final boolean isClearPath = hasMoved(slice[4]) && slice[5] == null && slice[6] == null && hasMoved(slice[7]);
         final boolean isNotPassingThroughCheck = !king.isCheck(4, 7) && !king.isCheck(5, 7) && !king.isCheck(6, 7);
         return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
@@ -587,7 +577,7 @@ final class GameState {
      * @param me    the piece to move
      */
     private void move(Point start, Point end, Piece me) {
-        if (Chess.board[(int) end.getY()][(int) end.getX()] != null || me.getClass() == Pawn.class) {
+        if (Chess.board[end.y][end.x] != null || me.getClass() == Pawn.class) {
             drawCounter = 0;
             boardHistory.clear();
             enPassantHistory.clear();
@@ -603,7 +593,7 @@ final class GameState {
             }
             boardHistory.add(boardCopy);
             final Point kingLocation = locateKing(isWhiteTurn);
-            canCastleHistory.add(Chess.board[(int) kingLocation.getY()][(int) kingLocation.getX()].hasMoved());
+            canCastleHistory.add(Chess.board[kingLocation.y][kingLocation.x].hasMoved());
         }
         rawMove(start, end, me);
         me.setMove();
@@ -617,8 +607,8 @@ final class GameState {
      * @param me    the piece to move
      */
     private void rawMove(Point start, Point end, Piece me) {
-        Chess.board[(int) start.getY()][(int) start.getX()] = null;
-        Chess.board[(int) end.getY()][(int) end.getX()] = me;
+        Chess.board[start.y][start.x] = null;
+        Chess.board[end.y][end.x] = me;
     }
 
     /**

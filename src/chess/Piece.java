@@ -42,17 +42,6 @@ abstract class Piece {
     }
 
     /**
-     * Determines the magnitude of the difference between two numbers.
-     *
-     * @param start the first number
-     * @param end   the second number
-     * @return the magnitude of the difference of the numbers
-     */
-    final int delta(double start, double end) {
-        return Math.abs((int) end - (int) start);
-    }
-
-    /**
      * Determines if a piece can move onto a grid location.
      *
      * @param x the x-coordinate
@@ -95,18 +84,14 @@ abstract class Piece {
      * @return if moving the piece would put the king in check
      */
     final boolean wouldNotPutKingIntoCheck(Point start, Point end) {
-        final int x1 = (int) start.getX(), x2 = (int) end.getX();
-        final int y1 = (int) start.getY(), y2 = (int) end.getY();
-        final Piece backup = Chess.board[y2][x2];
-        Chess.board[y2][x2] = this;
-        Chess.board[y1][x1] = null;
+        final Piece backup = Chess.board[end.y][end.x];
+        Chess.board[end.x][end.x] = this;
+        Chess.board[start.y][start.x] = null;
         final Point kingPoint = GameState.locateKing(isWhite());
-        final int kingX = (int) kingPoint.getX();
-        final int kingY = (int) kingPoint.getY();
-        final King king = (King) Chess.board[kingY][kingX];
-        final boolean isAllowed = !king.isCheck(kingX, kingY);
-        Chess.board[y1][x1] = this;
-        Chess.board[y2][x2] = backup;
+        final King king = (King) Chess.board[kingPoint.y][kingPoint.x];
+        final boolean isAllowed = !king.isCheck(kingPoint.x, kingPoint.y);
+        Chess.board[start.y][start.x] = this;
+        Chess.board[end.y][end.x] = backup;
         return isAllowed;
     }
 }

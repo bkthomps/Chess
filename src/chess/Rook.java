@@ -50,28 +50,26 @@ final class Rook extends Piece {
      * @return if rook action is legal
      */
     boolean isRookActionLegal(Point start, Point end) {
-        final int x1 = (int) start.getX(), x2 = (int) end.getX();
-        final int y1 = (int) start.getY(), y2 = (int) end.getY();
-        if ((x1 == x2 && y1 == y2) || (x1 != x2 && y1 != y2)) {
+        if ((start.x == end.x && start.y == end.y) || (start.x != end.x && start.y != end.y)) {
             return false;
         }
-        if (x1 == x2) {
-            final int min = Math.min(y1, y2);
-            final int max = Math.max(y1, y2);
+        if (start.x == end.x) {
+            final int min = Math.min(start.y, end.y);
+            final int max = Math.max(start.y, end.y);
             for (int i = min + 1; i < max; i++) {
-                if (Chess.board[i][x1] != null) {
+                if (Chess.board[i][start.x] != null) {
                     return false;
                 }
             }
         } else {
-            final int min = Math.min(x1, x2);
-            final int max = Math.max(x1, x2);
+            final int min = Math.min(start.x, end.x);
+            final int max = Math.max(start.x, end.x);
             for (int i = min + 1; i < max; i++) {
-                if (Chess.board[y1][i] != null) {
+                if (Chess.board[start.y][i] != null) {
                     return false;
                 }
             }
         }
-        return canMoveOnto(x2, y2);
+        return canMoveOnto(end.x, end.y);
     }
 }

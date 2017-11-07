@@ -40,23 +40,21 @@ final class King extends Piece {
      */
     @Override
     boolean isActionLegal(Point start, Point end) {
-        final int x1 = (int) start.getX(), x2 = (int) end.getX();
-        final int y1 = (int) start.getY(), y2 = (int) end.getY();
-        return delta(x2, x1) + delta(y2, y1) != 0 && delta(x2, x1) <= 1 && delta(y2, y1) <= 1
-                && canMoveOnto(x2, y2) && isNoAdjacentKing(x2, y2) && !isCheck(x2, y2);
+        return Math.abs(end.x - start.x) + Math.abs(end.y - start.y) != 0
+                && Math.abs(end.x - start.x) <= 1 && Math.abs(end.y - start.y) <= 1
+                && canMoveOnto(end.x, end.y) && isNoAdjacentKing(end) && !isCheck(end.x, end.y);
     }
 
     /**
      * Determines if there is no adjacent King.
      *
-     * @param x the x-coordinate
-     * @param y the y-coordinate
-     * @return if there is no adjacent King
+     * @param me the position to check for adjacent king
+     * @return if there is no adjacent king
      */
-    private boolean isNoAdjacentKing(int x, int y) {
-        return isKingNotAt(x - 1, y - 1) && isKingNotAt(x, y - 1) && isKingNotAt(x + 1, y - 1)
-                && isKingNotAt(x - 1, y) && isKingNotAt(x + 1, y)
-                && isKingNotAt(x - 1, y + 1) && isKingNotAt(x, y + 1) && isKingNotAt(x + 1, y + 1);
+    private boolean isNoAdjacentKing(Point me) {
+        return isKingNotAt(me.x - 1, me.y - 1) && isKingNotAt(me.x, me.y - 1) && isKingNotAt(me.x + 1, me.y - 1)
+                && isKingNotAt(me.x - 1, me.y) && isKingNotAt(me.x + 1, me.y)
+                && isKingNotAt(me.x - 1, me.y + 1) && isKingNotAt(me.x, me.y + 1) && isKingNotAt(me.x + 1, me.y + 1);
     }
 
     /**
@@ -163,11 +161,11 @@ final class King extends Piece {
     }
 
     /**
-     * Determines if the king is in check due to one side a pawn can eat from.
+     * Determines if the king is in check due to one side a pawn can capture from.
      *
      * @param x the x-coordinate
      * @param y the y-coordinate
-     * @return if the king is in check due to one side a pawn can eat from
+     * @return if the king is in check due to one side a pawn can capture from
      */
     private boolean isEnemyPawn(int x, int y) {
         return x > 0 && y > 0 && x < Chess.board.length - 1 && y < Chess.board.length - 1 && Chess.board[y][x] != null
@@ -189,11 +187,11 @@ final class King extends Piece {
     }
 
     /**
-     * Determine if the king is in check due to one spot a knight can eat from.
+     * Determine if the king is in check due to one spot a knight can capture from.
      *
      * @param x the x-coordinate
      * @param y the y-coordinate
-     * @return if the king is in check due to one spot a knight can eat from
+     * @return if the king is in check due to one spot a knight can capture from
      */
     private boolean isEnemyKnight(int x, int y) {
         return x > 0 && y > 0 && x < Chess.board.length - 1 && y < Chess.board.length - 1 && Chess.board[y][x] != null

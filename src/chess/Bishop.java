@@ -50,7 +50,7 @@ final class Bishop extends Piece {
      * @return if the change in x is the same as the change in y
      */
     boolean isEachCoordinateDeltaSame(Point start, Point end) {
-        return delta(end.getY(), start.getY()) == delta(end.getX(), start.getX());
+        return Math.abs(end.y - start.y) == Math.abs(end.x - start.x);
     }
 
     /**
@@ -61,19 +61,17 @@ final class Bishop extends Piece {
      * @return if bishop action is legal
      */
     boolean isBishopActionLegal(Point start, Point end) {
-        final int x1 = (int) start.getX(), x2 = (int) end.getX();
-        final int y1 = (int) start.getY(), y2 = (int) end.getY();
-        final int min = Math.min(x1, x2);
-        final int max = Math.max(x1, x2);
-        int x = x1;
-        int y = y1;
+        final int min = Math.min(start.x, end.x);
+        final int max = Math.max(start.x, end.x);
+        int x = start.x;
+        int y = start.y;
         for (int i = min + 1; i < max; i++) {
-            x += Math.signum(x2 - x1);
-            y += Math.signum(y2 - y1);
+            x += Math.signum(end.x - start.x);
+            y += Math.signum(end.y - start.y);
             if (Chess.board[y][x] != null) {
                 return false;
             }
         }
-        return canMoveOnto(x2, y2);
+        return canMoveOnto(end.x, end.y);
     }
 }
