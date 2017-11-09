@@ -24,6 +24,9 @@ final class GameState {
 
     GameState(Chess chess) {
         this.chess = chess;
+        final String text = "Click on a piece to move, and\nthen a location to move it to.";
+        final String[] options = {"OK"};
+        customText(text, options);
     }
 
     /**
@@ -105,9 +108,8 @@ final class GameState {
     private void letUserKnowLegalMoves() {
         final Color darkGreen = new Color(0, 100, 40);
         final Color lightGreen = new Color(0, 140, 50);
-        final int boardLength = Chess.BOARD_SIZE;
-        for (int i = 0; i < boardLength; i++) {
-            for (int j = 0; j < boardLength; j++) {
+        for (int i = 0; i < Chess.BOARD_SIZE; i++) {
+            for (int j = 0; j < Chess.BOARD_SIZE; j++) {
                 final Point checkAt = new Point(j, i);
                 final Color usedColor = ((i + j) % 2 == 0) ? lightGreen : darkGreen;
                 if (moving.getClass() == King.class) {
@@ -123,10 +125,10 @@ final class GameState {
             }
         }
         if (canQueenSideCastle()) {
-            chess.fillInSubSection(darkGreen, 0, boardLength - 1);
+            chess.fillInSubSection(darkGreen, 0, Chess.BOARD_SIZE - 1);
         }
         if (canKingSideCastle()) {
-            chess.fillInSubSection(lightGreen, boardLength - 1, boardLength - 1);
+            chess.fillInSubSection(lightGreen, Chess.BOARD_SIZE - 1, Chess.BOARD_SIZE - 1);
         }
         if (enPassant != null) {
             final boolean canCaptureEnPassant = from.y == enPassant.y + 1
@@ -292,14 +294,13 @@ final class GameState {
         if (Chess.getBoard(point).getClass() != King.class) {
             throw new IllegalStateException("King not where specified!");
         }
-        final int boardLength = Chess.BOARD_SIZE;
-        for (int i = 0; i < boardLength; i++) {
-            for (int j = 0; j < boardLength; j++) {
+        for (int i = 0; i < Chess.BOARD_SIZE; i++) {
+            for (int j = 0; j < Chess.BOARD_SIZE; j++) {
                 final Point start = new Point(j, i);
                 final Piece me = Chess.getBoard(start);
                 if (me != null && me.isWhite() == isWhiteTurn) {
-                    for (int k = 0; k < boardLength; k++) {
-                        for (int l = 0; l < boardLength; l++) {
+                    for (int k = 0; k < Chess.BOARD_SIZE; k++) {
+                        for (int l = 0; l < Chess.BOARD_SIZE; l++) {
                             final Point end = new Point(l, k);
                             final Piece save = Chess.getBoard(end);
                             if (me.isActionLegal(start, end)) {
@@ -406,7 +407,7 @@ final class GameState {
     private boolean isSameBoard(Piece[][] boardOne, Piece[][] boardTwo) {
         for (int i = 0; i < Chess.BOARD_SIZE; i++) {
             for (int j = 0; j < Chess.BOARD_SIZE; j++) {
-                if (boardOne[j][i] != boardTwo[j][i]) {
+                if (boardOne[i][j] != boardTwo[i][j]) {
                     return false;
                 }
             }
@@ -436,7 +437,7 @@ final class GameState {
     private void findPieces(List<Piece> ally, List<Piece> enemy) {
         for (int i = 0; i < Chess.BOARD_SIZE; i++) {
             for (int j = 0; j < Chess.BOARD_SIZE; j++) {
-                final Point point = new Point(i, j);
+                final Point point = new Point(j, i);
                 final Piece me = Chess.getBoard(point);
                 if (me != null && me.getClass() != King.class) {
                     if (me.isWhite() == isWhiteTurn) {
@@ -585,8 +586,8 @@ final class GameState {
             final Piece[][] boardCopy = new Piece[Chess.BOARD_SIZE][Chess.BOARD_SIZE];
             for (int i = 0; i < Chess.BOARD_SIZE; i++) {
                 for (int j = 0; j < Chess.BOARD_SIZE; j++) {
-                    final Point point = new Point(i, j);
-                    boardCopy[j][i] = Chess.getBoard(point);
+                    final Point point = new Point(j, i);
+                    boardCopy[i][j] = Chess.getBoard(point);
                 }
             }
             boardHistory.add(boardCopy);

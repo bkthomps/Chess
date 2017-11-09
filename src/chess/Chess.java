@@ -179,9 +179,11 @@ final class Chess {
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    final int horizontalClickPosition = (e.getX()) / (getWidth() / PIXELS_PER_SQUARE);
-                    final int verticalClickPosition = (e.getY()) / (getHeight() / PIXELS_PER_SQUARE);
-                    state.clicked(horizontalClickPosition, verticalClickPosition);
+                    if (state != null) {
+                        final int horizontalClickPosition = (e.getX()) / (getWidth() / PIXELS_PER_SQUARE);
+                        final int verticalClickPosition = (e.getY()) / (getHeight() / PIXELS_PER_SQUARE);
+                        state.clicked(horizontalClickPosition, verticalClickPosition);
+                    }
                 }
             });
         }
