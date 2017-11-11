@@ -60,9 +60,10 @@ final class GameState {
     }
 
     /**
-     * Determine location of king.
+     * Determines the location of the allied king.
      *
-     * @return location of king
+     * @param isWhiteTurn the color of the allied king
+     * @return location of the allied king
      * @throws IllegalStateException if there is no allied king or more than one allied king
      */
     static Point locateKing(boolean isWhiteTurn) {
@@ -86,7 +87,7 @@ final class GameState {
     }
 
     /**
-     * Determine the piece which was clicked to operate on.
+     * Determines the piece which was clicked to operate on.
      *
      * @param point the location to lock on to
      */
@@ -142,7 +143,7 @@ final class GameState {
     }
 
     /**
-     * Determine if the move is legal to make when the king is in check.
+     * Determines if the move to make when the king is in check is legal.
      *
      * @param to where to move the king to
      */
@@ -164,7 +165,7 @@ final class GameState {
     }
 
     /**
-     * Move the piece. If it is a pawn moving into a promotion square, ask the user what to promote the pawn to and
+     * Moves the piece. If it is a pawn moving into a promotion square, ask the user what to promote the pawn to and
      * promote the pawn based on user input.
      *
      * @param to where to move to
@@ -202,7 +203,7 @@ final class GameState {
     }
 
     /**
-     * Determine if en passant may be used.
+     * Determines if en passant may be used.
      *
      * @param to where to move the piece to
      * @return if en passant is legal
@@ -214,7 +215,7 @@ final class GameState {
     }
 
     /**
-     * Perform en passant. En passant is a move which lets a pawn capture a pawn which just moved two squares as if it
+     * Performs en passant. En passant is a move which lets a pawn capture a pawn which just moved two squares as if it
      * only moved one square immediately after it happens.
      */
     private void doEnPassant() {
@@ -229,7 +230,7 @@ final class GameState {
     }
 
     /**
-     * Keep a record that en passant may be used at this location.
+     * Keeps a record that en passant may be used at this location.
      *
      * @param to location to move to
      */
@@ -243,7 +244,12 @@ final class GameState {
     }
 
     /**
-     * Check if game is over. It may be over by checkmate or by draw. The are 4 types of draws.
+     * Checks if the game is over. It may be over by checkmate or by draw.
+     * <p> There are 4 types of draws:
+     * <p> 1. Stalemate
+     * <p> 2. 50 moves without pawn move or piece capture
+     * <p> 3. Board repeated 3 times
+     * <p> 4. Insufficient mating material
      */
     private void checkEndgame() {
         final Point location = locateKing(isWhiteTurn);
@@ -261,7 +267,7 @@ final class GameState {
     }
 
     /**
-     * Determine if the game is over by checkmate.
+     * Determines if the game is over by checkmate.
      *
      * @param king  the king
      * @param point the location of the king
@@ -272,7 +278,7 @@ final class GameState {
     }
 
     /**
-     * Determine if the game is over by stalemate.
+     * Determines if the game is over by stalemate.
      *
      * @param king  the king
      * @param point the location of the king
@@ -283,7 +289,7 @@ final class GameState {
     }
 
     /**
-     * Determine if any move can be done which results in king not being in check.
+     * Determines if any move can be done which results in king not being in check.
      *
      * @param king  the king
      * @param point the location of the king
@@ -322,11 +328,7 @@ final class GameState {
     }
 
     /**
-     * There are 4 types of draws:
-     * 1. Stalemate
-     * 2. 50 moves without pawn move or piece capture
-     * 3. Board repeated 3 times
-     * 4. Insufficient mating material
+     * Determines if there is a non-stalemate draw.
      */
     private void otherDraw() {
         determineIfTooManyMoves();
@@ -361,7 +363,7 @@ final class GameState {
     }
 
     /**
-     * Determine if the board has repeated 3 times.
+     * Determines if the board has repeated 3 times.
      *
      * @return if the board has repeated 3 times
      * @throws IllegalStateException if castle or en passant history size is invalid
@@ -398,7 +400,7 @@ final class GameState {
     }
 
     /**
-     * Determine if two boards are the same.
+     * Determines if two specified boards are the same.
      *
      * @param boardOne the first board
      * @param boardTwo the second board
@@ -429,7 +431,7 @@ final class GameState {
     }
 
     /**
-     * Find pieces on the board.
+     * Finds pieces on the board.
      *
      * @param ally  the ally pieces
      * @param enemy the enemy pieces
@@ -494,7 +496,7 @@ final class GameState {
     }
 
     /**
-     * Determine if the king can castle, and if so, castle.
+     * Determines if the king can castle, and if so, castle.
      *
      * @param to the location to move to
      * @return if the king can castle
@@ -547,7 +549,7 @@ final class GameState {
     }
 
     /**
-     * Determine if the piece has moved.
+     * Determines if the piece has moved.
      *
      * @param me the piece
      * @return if the piece has moved
@@ -557,7 +559,7 @@ final class GameState {
     }
 
     /**
-     * Move the piece when castling.
+     * Moves the piece when castling.
      *
      * @param from location to move from
      * @param to   location to move to
@@ -569,7 +571,7 @@ final class GameState {
     }
 
     /**
-     * Move the piece.
+     * Moves the piece.
      *
      * @param me    the piece to move
      * @param start the location to move from
@@ -599,7 +601,8 @@ final class GameState {
     }
 
     /**
-     * Move the piece without setting the piece to moved state. Used when checking the board and not actually moving it.
+     * Moves the piece without setting the piece to moved state. Used when checking the board and not actually moving
+     * pieces on it.
      *
      * @param me    the piece to move
      * @param start the location to move from
@@ -611,11 +614,11 @@ final class GameState {
     }
 
     /**
-     * Display text to the user using a dialog box.
+     * Displays text to the user using a dialog box.
      *
      * @param text    what to display
      * @param options the options the user can click
-     * @return the option choice the user picked
+     * @return the option the user picked
      */
     private int customText(String text, String[] options) {
         return JOptionPane.showOptionDialog(null, text, Chess.GAME_TITLE, JOptionPane.DEFAULT_OPTION,

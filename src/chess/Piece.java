@@ -12,8 +12,20 @@ abstract class Piece {
     private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private boolean hasMoved;
 
+    /**
+     * Determines whether the piece is white or not.
+     *
+     * @return if the piece is white
+     */
     abstract boolean isWhite();
 
+    /**
+     * Determines if the action is legal.
+     *
+     * @param start the original position
+     * @param end   the final position
+     * @return if the action is legal
+     */
     abstract boolean isActionLegal(Point start, Point end);
 
     /**
@@ -52,8 +64,8 @@ abstract class Piece {
     }
 
     /**
-     * Set the color of each piece displayed on the board based on which squares contain pieces and if they are white or
-     * black.
+     * Sets the color of each piece displayed on the board based on which squares contain pieces and if they are white
+     * or black.
      *
      * @param pixels the pixels on the board
      * @throws IllegalStateException if invalid pixel value on the pixel board

@@ -31,13 +31,6 @@ final class King extends Piece {
         return isWhite;
     }
 
-    /**
-     * Determines if the action is legal. It is legal if it moves only one square, and it does not move into check.
-     *
-     * @param start the beginning position
-     * @param end   the final position
-     * @return if the action is legal
-     */
     @Override
     boolean isActionLegal(Point start, Point end) {
         return Math.abs(end.x - start.x) + Math.abs(end.y - start.y) != 0
@@ -192,7 +185,7 @@ final class King extends Piece {
     }
 
     /**
-     * Determine if the king is in check due to one spot a knight can capture from.
+     * Determines if the king is in check due to one spot a knight can capture from.
      *
      * @param x the x-coordinate
      * @param y the y-coordinate

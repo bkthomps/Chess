@@ -3,7 +3,7 @@ package chess;
 import java.awt.Point;
 
 /**
- * The pawn can only move one square forward, but can move two on its first move. It eats on a diagonal.
+ * The pawn can only move one square forward, but can move two on its first move. The pawn captures diagonally.
  */
 final class Pawn extends Piece {
 
@@ -28,14 +28,6 @@ final class Pawn extends Piece {
         return isWhite;
     }
 
-    /**
-     * Determines if the action is legal. It is legal is it moves one square or two squares on its first turn to move.
-     * To eat, it moves one square diagonally.
-     *
-     * @param start the beginning position
-     * @param end   the final position
-     * @return if the action is legal
-     */
     @Override
     boolean isActionLegal(Point start, Point end) {
         final boolean isForward = Chess.getBoard(end) == null && end.x == start.x;

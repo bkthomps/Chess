@@ -4,7 +4,7 @@ import java.awt.Point;
 
 /**
  * The bishop is the chess piece which can travel as many squares as it wants diagonally, as long as it does not travel
- * through anything.
+ * through anything. The bishop may capture the piece it moves to.
  */
 final class Bishop extends Piece {
 
@@ -29,13 +29,6 @@ final class Bishop extends Piece {
         return isWhite;
     }
 
-    /**
-     * Determine if the action is legal.
-     *
-     * @param start the original position
-     * @param end   the final position
-     * @return if the action is legal
-     */
     @Override
     boolean isActionLegal(Point start, Point end) {
         return isEachCoordinateDeltaSame(start, end) && isBishopActionLegal(start, end)

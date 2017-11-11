@@ -49,7 +49,7 @@ final class Chess {
     }
 
     /**
-     * Flip the board so that the opposite player can play with the correct orientation.
+     * Flips the board so that the opposite player can play with the correct orientation.
      */
     void flipBoard() {
         for (int i = 0; i < BOARD_SIZE / 2; i++) {
@@ -100,7 +100,7 @@ final class Chess {
     }
 
     /**
-     * Refresh the display on the graphical user interface.
+     * Refreshes the display on the graphical user interface.
      */
     void refreshPixels() {
         setBackGround();
@@ -108,7 +108,7 @@ final class Chess {
     }
 
     /**
-     * Set the checkerboard pattern for the board on the graphical user interface.
+     * Sets the checkerboard pattern for the board on the graphical user interface.
      */
     private void setBackGround() {
         final Color darkBrown = new Color(160, 80, 0);
@@ -122,7 +122,7 @@ final class Chess {
     }
 
     /**
-     * Add the pieces to the chess board on the graphical user interface.
+     * Adds the pieces to the chess board on the graphical user interface.
      */
     void setPieces() {
         for (int i = 0; i < BOARD_SIZE; i++) {
@@ -136,7 +136,7 @@ final class Chess {
     }
 
     /**
-     * Determine the color of the piece on the chess board.
+     * Determines the color of the piece on the chess board.
      *
      * @param x     the x-coordinate
      * @param y     the y-coordinate

@@ -4,7 +4,7 @@ import java.awt.Point;
 
 /**
  * The rook, sometimes called the castle, may move any amount of squares horizontally or vertically, but must not pass
- * through other pieces.
+ * through other pieces. The rook may capture the piece it moves to.
  */
 final class Rook extends Piece {
 
@@ -29,14 +29,6 @@ final class Rook extends Piece {
         return isWhite;
     }
 
-    /**
-     * Determines if the action is legal. It is legal if it moves without passing through other pieces, and eats just
-     * as it would move normally.
-     *
-     * @param start the beginning position
-     * @param end   the final position
-     * @return if the action is legal
-     */
     @Override
     boolean isActionLegal(Point start, Point end) {
         return isRookActionLegal(start, end) && wouldNotPutKingIntoCheck(start, end);
