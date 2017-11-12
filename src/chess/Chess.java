@@ -30,14 +30,18 @@ final class Chess {
 
     private static final Piece[][] board = new Piece[BOARD_SIZE][BOARD_SIZE];
     private final Color[][] pixels = new Color[PIXELS_ON_BOARD][PIXELS_ON_BOARD];
-    private GameState state;
+    private final GameState state;
+    private boolean isWhiteTurn = true;
 
     public static void main(String[] args) {
-        final Chess chess = new Chess();
-        chess.configureGUI();
-        chess.resetBoard();
-        chess.refreshPixels();
-        chess.state = new GameState(chess);
+        new Chess();
+    }
+
+    private Chess() {
+        configureGUI();
+        resetBoard();
+        refreshPixels();
+        state = new GameState(this, isWhiteTurn);
     }
 
     static void setBoard(Point point, Piece piece) {
@@ -52,6 +56,7 @@ final class Chess {
      * Flips the board so that the opposite player can play with the correct orientation.
      */
     void flipBoard() {
+        isWhiteTurn = !isWhiteTurn;
         for (int i = 0; i < BOARD_SIZE / 2; i++) {
             final Piece[] tempSlice = board[BOARD_SIZE - i - 1];
             board[BOARD_SIZE - i - 1] = board[i];
@@ -77,26 +82,26 @@ final class Chess {
      * Sets up the chess pieces on the chess board.
      */
     private void resetBoard() {
-        board[0][0] = new Rook(false);
-        board[0][1] = new Knight(false);
-        board[0][2] = new Bishop(false);
-        board[0][3] = new Queen(false);
-        board[0][4] = new King(false);
-        board[0][5] = new Bishop(false);
-        board[0][6] = new Knight(false);
-        board[0][7] = new Rook(false);
+        board[0][0] = new Rook(!isWhiteTurn);
+        board[0][1] = new Knight(!isWhiteTurn);
+        board[0][2] = new Bishop(!isWhiteTurn);
+        board[0][3] = new Queen(!isWhiteTurn);
+        board[0][4] = new King(!isWhiteTurn);
+        board[0][5] = new Bishop(!isWhiteTurn);
+        board[0][6] = new Knight(!isWhiteTurn);
+        board[0][7] = new Rook(!isWhiteTurn);
         for (int i = 0; i < BOARD_SIZE; i++) {
-            board[1][i] = new Pawn(false);
-            board[6][i] = new Pawn(true);
+            board[1][i] = new Pawn(!isWhiteTurn);
+            board[6][i] = new Pawn(isWhiteTurn);
         }
-        board[7][0] = new Rook(true);
-        board[7][1] = new Knight(true);
-        board[7][2] = new Bishop(true);
-        board[7][3] = new Queen(true);
-        board[7][4] = new King(true);
-        board[7][5] = new Bishop(true);
-        board[7][6] = new Knight(true);
-        board[7][7] = new Rook(true);
+        board[7][0] = new Rook(isWhiteTurn);
+        board[7][1] = new Knight(isWhiteTurn);
+        board[7][2] = new Bishop(isWhiteTurn);
+        board[7][3] = new Queen(isWhiteTurn);
+        board[7][4] = new King(isWhiteTurn);
+        board[7][5] = new Bishop(isWhiteTurn);
+        board[7][6] = new Knight(isWhiteTurn);
+        board[7][7] = new Rook(isWhiteTurn);
     }
 
     /**
@@ -115,7 +120,7 @@ final class Chess {
         final Color lightBrown = new Color(200, 100, 0);
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                final Color usedColor = ((i + j) % 2 == 0) ? lightBrown : darkBrown;
+                final Color usedColor = ((i + j) % 2 == 0 ^ !isWhiteTurn) ? lightBrown : darkBrown;
                 fillInSubSection(usedColor, j, i);
             }
         }

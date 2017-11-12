@@ -12,7 +12,7 @@ import java.util.List;
 final class GameState {
 
     private final Chess chess;
-    private boolean isWhiteTurn = true;
+    private boolean isWhiteTurn;
     private Piece moving;
     private Point from;
     private boolean isInCheck;
@@ -22,8 +22,9 @@ final class GameState {
     private final List<Point> enPassantHistory = new ArrayList<>();
     private final List<Boolean> canCastleHistory = new ArrayList<>();
 
-    GameState(Chess chess) {
+    GameState(Chess chess, boolean isWhiteTurn) {
         this.chess = chess;
+        this.isWhiteTurn = isWhiteTurn;
         final String text = "Click on a piece to move, and\nthen a location to move it to.";
         final String[] options = {"OK"};
         customText(text, options);
@@ -112,7 +113,7 @@ final class GameState {
         for (int i = 0; i < Chess.BOARD_SIZE; i++) {
             for (int j = 0; j < Chess.BOARD_SIZE; j++) {
                 final Point checkAt = new Point(j, i);
-                final Color usedColor = ((i + j) % 2 == 0) ? lightGreen : darkGreen;
+                final Color usedColor = ((i + j) % 2 == 0 ^ !isWhiteTurn) ? lightGreen : darkGreen;
                 if (moving.getClass() == King.class) {
                     final Piece backup = Chess.getBoard(from);
                     Chess.setBoard(from, null);
@@ -135,7 +136,7 @@ final class GameState {
             final boolean canCaptureEnPassant = from.y == enPassant.y + 1
                     && Math.abs(from.x - enPassant.x) == 1;
             if (canCaptureEnPassant && isEnPassantLegal(enPassant)) {
-                final Color usedColor = ((enPassant.y + enPassant.x) % 2 == 0) ? lightGreen : darkGreen;
+                final Color usedColor = ((enPassant.y + enPassant.x) % 2 == 0 ^ !isWhiteTurn) ? lightGreen : darkGreen;
                 chess.fillInSubSection(usedColor, enPassant.x, enPassant.y);
             }
         }
