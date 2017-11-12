@@ -127,10 +127,10 @@ final class GameState {
             }
         }
         if (canQueenSideCastle()) {
-            chess.fillInSubSection(darkGreen, 0, Chess.BOARD_SIZE - 1);
+            chess.fillInSubSection(isWhiteTurn ? darkGreen : lightGreen, 0, Chess.BOARD_SIZE - 1);
         }
         if (canKingSideCastle()) {
-            chess.fillInSubSection(lightGreen, Chess.BOARD_SIZE - 1, Chess.BOARD_SIZE - 1);
+            chess.fillInSubSection(isWhiteTurn ? lightGreen : darkGreen, Chess.BOARD_SIZE - 1, Chess.BOARD_SIZE - 1);
         }
         if (enPassant != null) {
             final boolean canCaptureEnPassant = from.y == enPassant.y + 1
