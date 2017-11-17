@@ -40,7 +40,7 @@ final class Bishop extends Piece {
      *
      * @param start the original position
      * @param end   the final position
-     * @return if the change in x is the same as the change in y
+     * @return true if the change in x is the same as the change in y
      */
     boolean isEachCoordinateDeltaSame(Point start, Point end) {
         return Math.abs(end.y - start.y) == Math.abs(end.x - start.x);
@@ -51,7 +51,7 @@ final class Bishop extends Piece {
      *
      * @param start the original position
      * @param end   the final position
-     * @return if bishop action is legal
+     * @return true if bishop action is legal
      */
     boolean isBishopActionLegal(Point start, Point end) {
         final int min = Math.min(start.x, end.x);

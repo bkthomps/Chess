@@ -73,7 +73,7 @@ final class GameState {
             for (int j = 0; j < Chess.BOARD_SIZE; j++) {
                 final Point point = new Point(j, i);
                 final Piece item = Chess.getBoard(point);
-                if (item != null && item.getClass() == King.class && item.isWhite() == isWhiteTurn) {
+                if (item instanceof King && item.isWhite() == isWhiteTurn) {
                     if (king != null) {
                         throw new IllegalStateException("Multiple Kings!");
                     }
@@ -114,7 +114,7 @@ final class GameState {
             for (int j = 0; j < Chess.BOARD_SIZE; j++) {
                 final Point checkAt = new Point(j, i);
                 final Color usedColor = ((i + j) % 2 == 0 ^ !isWhiteTurn) ? lightGreen : darkGreen;
-                if (moving.getClass() == King.class) {
+                if (moving instanceof King) {
                     final Piece backup = Chess.getBoard(from);
                     Chess.setBoard(from, null);
                     if (moving.isActionLegal(from, checkAt)) {
@@ -172,7 +172,7 @@ final class GameState {
      * @param to where to move to
      */
     private void doMove(Point to) {
-        if (to.y == 0 && moving.getClass() == Pawn.class) {
+        if (to.y == 0 && moving instanceof Pawn) {
             final String text = "What would you like to promote your pawn to?";
             final String[] options = {"QUEEN", "KNIGHT", "ROOK", "BISHOP"};
             final int promotion = customText(text, options);
@@ -207,11 +207,11 @@ final class GameState {
      * Determines if en passant may be used.
      *
      * @param to where to move the piece to
-     * @return if en passant is legal
+     * @return true if en passant is legal
      */
     private boolean isEnPassantLegal(Point to) {
         final Point squareAboveEnemy = new Point(to.x, to.y + 1);
-        return enPassant != null && to.equals(enPassant) && moving.getClass() == Pawn.class
+        return to.equals(enPassant) && moving instanceof Pawn
                 && moving.isWhite() != Chess.getBoard(squareAboveEnemy).isWhite();
     }
 
@@ -236,7 +236,7 @@ final class GameState {
      * @param to location to move to
      */
     private void checkEnPassant(Point to) {
-        if (moving.getClass() == Pawn.class && from.y - to.y == 2) {
+        if (moving instanceof Pawn && from.y - to.y == 2) {
             enPassant = new Point(to.x, to.y - 2);
         } else {
             enPassant = null;
@@ -272,7 +272,7 @@ final class GameState {
      *
      * @param king  the king
      * @param point the location of the king
-     * @return if the game is over by checkmate
+     * @return true if the game is over by checkmate
      */
     private boolean isCheckmate(King king, Point point) {
         return king.isCheck(point) && isMoveImpossible(king, point);
@@ -283,7 +283,7 @@ final class GameState {
      *
      * @param king  the king
      * @param point the location of the king
-     * @return if the game is over by stalemate
+     * @return true if the game is over by stalemate
      */
     private boolean isStalemate(King king, Point point) {
         return !king.isCheck(point) && isMoveImpossible(king, point);
@@ -294,11 +294,11 @@ final class GameState {
      *
      * @param king  the king
      * @param point the location of the king
-     * @return if any move can be done which results in king not being in check
+     * @return true if any move can be done which results in king not being in check
      * @throws IllegalStateException if king is not at the specified area
      */
     private boolean isMoveImpossible(King king, Point point) {
-        if (Chess.getBoard(point).getClass() != King.class) {
+        if (!(Chess.getBoard(point) instanceof King)) {
             throw new IllegalStateException("King not where specified!");
         }
         for (int i = 0; i < Chess.BOARD_SIZE; i++) {
@@ -366,7 +366,7 @@ final class GameState {
     /**
      * Determines if the board has repeated 3 times.
      *
-     * @return if the board has repeated 3 times
+     * @return true if the board has repeated 3 times
      * @throws IllegalStateException if castle or en passant history size is invalid
      */
     private boolean isTooManyBoardRepetitions() {
@@ -405,7 +405,7 @@ final class GameState {
      *
      * @param boardOne the first board
      * @param boardTwo the second board
-     * @return if two boards are the same
+     * @return true if two boards are the same
      */
     private boolean isSameBoard(Piece[][] boardOne, Piece[][] boardTwo) {
         for (int i = 0; i < Chess.BOARD_SIZE; i++) {
@@ -442,7 +442,7 @@ final class GameState {
             for (int j = 0; j < Chess.BOARD_SIZE; j++) {
                 final Point point = new Point(j, i);
                 final Piece me = Chess.getBoard(point);
-                if (me != null && me.getClass() != King.class) {
+                if (me != null && !(me instanceof King)) {
                     if (me.isWhite() == isWhiteTurn) {
                         ally.add(me);
                     } else {
@@ -465,9 +465,9 @@ final class GameState {
             return false;
         }
         final List<Piece> group = (ally.size() == 0) ? enemy : ally;
-        return (group.size() == 0) || (group.size() == 1 && (group.get(0).getClass() == Knight.class
-                || group.get(0).getClass() == Bishop.class)) || (group.size() == 2
-                && group.get(0).getClass() == Knight.class && group.get(1).getClass() == Knight.class);
+        return group.size() == 0
+                || (group.size() == 1 && (group.get(0) instanceof Knight || group.get(0) instanceof Bishop))
+                || (group.size() == 2 && group.get(0) instanceof Knight && group.get(1) instanceof Knight);
     }
 
     /**
@@ -500,7 +500,7 @@ final class GameState {
      * Determines if the king can castle, and if so, castle.
      *
      * @param to the location to move to
-     * @return if the king can castle
+     * @return true if the king can castle
      */
     private boolean castleIfPossible(Point to) {
         if (to.y != Chess.BOARD_SIZE - 1) {
@@ -521,7 +521,7 @@ final class GameState {
     /**
      * Determines if can queen side castle.
      *
-     * @return If queen side castle is legal.
+     * @return true if queen side castle is legal
      */
     private boolean canQueenSideCastle() {
         final King king = new King(isWhiteTurn);
@@ -537,7 +537,7 @@ final class GameState {
     /**
      * Determines if can king side castle.
      *
-     * @return If king side castle is legal.
+     * @return true if king side castle is legal
      */
     private boolean canKingSideCastle() {
         final King king = new King(isWhiteTurn);
@@ -553,7 +553,7 @@ final class GameState {
      * Determines if the piece has moved.
      *
      * @param me the piece
-     * @return if the piece has moved
+     * @return true if the piece has moved
      */
     private boolean hasMoved(Piece me) {
         return me != null && !me.hasMoved();
@@ -579,7 +579,7 @@ final class GameState {
      * @param end   the location to move to
      */
     private void move(Piece me, Point start, Point end) {
-        if (Chess.getBoard(end) != null || me.getClass() == Pawn.class) {
+        if (Chess.getBoard(end) != null || me instanceof Pawn) {
             drawCounter = 0;
             boardHistory.clear();
             enPassantHistory.clear();

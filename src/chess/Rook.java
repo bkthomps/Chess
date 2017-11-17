@@ -39,7 +39,7 @@ final class Rook extends Piece {
      *
      * @param start the original position
      * @param end   the final position
-     * @return if rook action is legal
+     * @return true if rook action is legal
      */
     boolean isRookActionLegal(Point start, Point end) {
         if ((start.x == end.x && start.y == end.y) || (start.x != end.x && start.y != end.y)) {

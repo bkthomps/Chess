@@ -15,7 +15,7 @@ abstract class Piece {
     /**
      * Determines whether the piece is white or not.
      *
-     * @return if the piece is white
+     * @return true if the piece is white
      */
     abstract boolean isWhite();
 
@@ -24,14 +24,14 @@ abstract class Piece {
      *
      * @param start the original position
      * @param end   the final position
-     * @return if the action is legal
+     * @return true if the action is legal
      */
     abstract boolean isActionLegal(Point start, Point end);
 
     /**
      * Determines if the piece has moved.
      *
-     * @return if the piece has moved
+     * @return true if the piece has moved
      */
     final boolean hasMoved() {
         return hasMoved;
@@ -57,7 +57,7 @@ abstract class Piece {
      * Determines if a piece can move onto a grid location.
      *
      * @param point location to check
-     * @return if the piece can move onto the location
+     * @return true if the piece can move onto the location
      */
     final boolean canMoveOnto(Point point) {
         return Chess.getBoard(point) == null || Chess.getBoard(point).isWhite() != isWhite();
@@ -92,7 +92,7 @@ abstract class Piece {
      *
      * @param start the start position
      * @param end   the end position
-     * @return if moving the piece would put the king in check
+     * @return true if moving the piece would put the king in check
      */
     final boolean wouldNotPutKingIntoCheck(Point start, Point end) {
         final Piece backup = Chess.getBoard(end);

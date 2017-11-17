@@ -42,7 +42,7 @@ final class King extends Piece {
      * Determines if there is no adjacent King.
      *
      * @param me the position to check for adjacent king
-     * @return if there is no adjacent king
+     * @return true if there is no adjacent king
      */
     private boolean isNoAdjacentKing(Point me) {
         return isKingNotAt(me.x - 1, me.y - 1) && isKingNotAt(me.x, me.y - 1) && isKingNotAt(me.x + 1, me.y - 1)
@@ -55,7 +55,7 @@ final class King extends Piece {
      *
      * @param x the x-coordinate
      * @param y the y-coordinate
-     * @return if there is no King at the specified location
+     * @return true if there is no King at the specified location
      */
     private boolean isKingNotAt(int x, int y) {
         if (x < 0 || x >= Chess.BOARD_SIZE || y < 0 || y >= Chess.BOARD_SIZE) {
@@ -63,7 +63,7 @@ final class King extends Piece {
         }
         final Point point = new Point(x, y);
         final Piece item = Chess.getBoard(point);
-        final boolean isEnemyKing = item != null && item.getClass() == King.class && item.isWhite() != isWhite;
+        final boolean isEnemyKing = item instanceof King && item.isWhite() != isWhite;
         return !isEnemyKing;
     }
 
@@ -71,7 +71,7 @@ final class King extends Piece {
      * Determines if the king is in check.
      *
      * @param point the location to check
-     * @return if the king is in check
+     * @return true if the king is in check
      */
     boolean isCheck(Point point) {
         return isCheckDiagonal(point, -1, -1) || isCheckDiagonal(point, -1, 1)
@@ -87,7 +87,7 @@ final class King extends Piece {
      * @param point  the location to check
      * @param xScale the side to check on for the x-coordinate
      * @param yScale the side to check on for the y-coordinate
-     * @return if the king is in check due to a diagonal opponent
+     * @return true if the king is in check due to a diagonal opponent
      */
     private boolean isCheckDiagonal(Point point, int xScale, int yScale) {
         final Point mutatingPoint = new Point(point);
@@ -95,8 +95,7 @@ final class King extends Piece {
         mutatingPoint.y += yScale;
         while (isInGridBounds(mutatingPoint)) {
             final Piece me = Chess.getBoard(mutatingPoint);
-            if (me != null && (me.getClass() == Bishop.class || me.getClass() == Queen.class)
-                    && me.isWhite() != isWhite) {
+            if ((me instanceof Bishop || me instanceof Queen) && me.isWhite() != isWhite) {
                 return true;
             }
             if (me != null) {
@@ -114,7 +113,7 @@ final class King extends Piece {
      * @param point  the location to check
      * @param xScale the side to check on for the x-coordinate
      * @param yScale the side to check on for the y-coordinate
-     * @return if the king is in check due to a straight opponent
+     * @return true if the king is in check due to a straight opponent
      */
     private boolean isCheckStraight(Point point, int xScale, int yScale) {
         final Point mutatingPoint = new Point(point);
@@ -122,8 +121,7 @@ final class King extends Piece {
         mutatingPoint.y += yScale;
         while (isInGridBounds(mutatingPoint)) {
             final Piece me = Chess.getBoard(mutatingPoint);
-            if (me != null && (me.getClass() == Rook.class || me.getClass() == Queen.class)
-                    && me.isWhite() != isWhite) {
+            if ((me instanceof Rook || me instanceof Queen) && me.isWhite() != isWhite) {
                 return true;
             }
             if (me != null) {
@@ -139,7 +137,7 @@ final class King extends Piece {
      * Determines if the coordinates are in bounds.
      *
      * @param point the location to check
-     * @return if the coordinates are in bounds
+     * @return true if the coordinates are in bounds
      */
     private boolean isInGridBounds(Point point) {
         return point.x >= 0 && point.y >= 0 && point.x < Chess.BOARD_SIZE && point.y < Chess.BOARD_SIZE;
@@ -149,7 +147,7 @@ final class King extends Piece {
      * Determines if the king is in check due to a pawn.
      *
      * @param point the location to check
-     * @return if the king is in check due to a pawn
+     * @return true if the king is in check due to a pawn
      */
     private boolean isCheckPawn(Point point) {
         return isEnemyPawn(point.x - 1, point.y - 1) || isEnemyPawn(point.x + 1, point.y - 1);
@@ -160,7 +158,7 @@ final class King extends Piece {
      *
      * @param x the x-coordinate
      * @param y the y-coordinate
-     * @return if the king is in check due to one side a pawn can capture from
+     * @return true if the king is in check due to one side a pawn can capture from
      */
     private boolean isEnemyPawn(int x, int y) {
         if (isNotInInnerGridBounds(x, y)) {
@@ -168,14 +166,14 @@ final class King extends Piece {
         }
         final Point point = new Point(x, y);
         final Piece me = Chess.getBoard(point);
-        return me != null && me.getClass() == Pawn.class && me.isWhite() != isWhite;
+        return me instanceof Pawn && me.isWhite() != isWhite;
     }
 
     /**
      * Determines if the king is in check due to a knight.
      *
      * @param point the location to check
-     * @return if the king is in check due to a knight
+     * @return true if the king is in check due to a knight
      */
     private boolean isCheckKnight(Point point) {
         return (isEnemyKnight(point.x - 2, point.y - 1)) || (isEnemyKnight(point.x - 1, point.y - 2))
@@ -189,7 +187,7 @@ final class King extends Piece {
      *
      * @param x the x-coordinate
      * @param y the y-coordinate
-     * @return if the king is in check due to one spot a knight can capture from
+     * @return true if the king is in check due to one spot a knight can capture from
      */
     private boolean isEnemyKnight(int x, int y) {
         if (isNotInInnerGridBounds(x, y)) {
@@ -197,7 +195,7 @@ final class King extends Piece {
         }
         final Point point = new Point(x, y);
         final Piece me = Chess.getBoard(point);
-        return me != null && me.getClass() == Knight.class && me.isWhite() != isWhite;
+        return me instanceof Knight && me.isWhite() != isWhite;
     }
 
     /**
@@ -206,7 +204,7 @@ final class King extends Piece {
      *
      * @param x the x-coordinate
      * @param y the y-coordinate
-     * @return if the location is outside the inner grid
+     * @return true if the location is outside the inner grid
      */
     private boolean isNotInInnerGridBounds(int x, int y) {
         return x <= 0 || y <= 0 || x >= Chess.BOARD_SIZE - 1 || y >= Chess.BOARD_SIZE - 1;
