@@ -57,9 +57,11 @@ final class Bishop extends Piece {
         final int min = Math.min(start.x, end.x);
         final int max = Math.max(start.x, end.x);
         final Point mutatingPoint = new Point(start);
+        final int xScale = Integer.signum(end.x - start.x);
+        final int yScale = Integer.signum(end.y - start.y);
         for (int i = min + 1; i < max; i++) {
-            mutatingPoint.x += Math.signum(end.x - start.x);
-            mutatingPoint.y += Math.signum(end.y - start.y);
+            mutatingPoint.x += xScale;
+            mutatingPoint.y += yScale;
             if (Chess.getBoard(mutatingPoint) != null) {
                 return false;
             }
