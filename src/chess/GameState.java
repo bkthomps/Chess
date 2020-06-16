@@ -180,7 +180,10 @@ final class GameState {
                     Chess.resource.getString("rook"),
                     Chess.resource.getString("bishop"),
             };
-            final int promotion = customText(text, options);
+            int promotion = -1;
+            while (promotion < 0) {
+                promotion = customText(text, options);
+            }
             final Piece piece;
             switch (promotion) {
                 case 0:
@@ -196,8 +199,7 @@ final class GameState {
                     piece = new Bishop(moving.isWhite());
                     break;
                 default:
-                    piece = moving;
-                    break;
+                    throw new IllegalStateException("Pawn promotion is mandatory.");
             }
             move(piece, from, to);
         } else {
