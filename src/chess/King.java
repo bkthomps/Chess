@@ -134,16 +134,6 @@ final class King extends Piece {
     }
 
     /**
-     * Determines if the coordinates are in bounds.
-     *
-     * @param point the location to check
-     * @return true if the coordinates are in bounds
-     */
-    private boolean isInGridBounds(Point point) {
-        return point.x >= 0 && point.y >= 0 && point.x < Chess.BOARD_SIZE && point.y < Chess.BOARD_SIZE;
-    }
-
-    /**
      * Determines if the king is in check due to a pawn.
      *
      * @param point the location to check
@@ -161,7 +151,7 @@ final class King extends Piece {
      * @return true if the king is in check due to one side a pawn can capture from
      */
     private boolean isEnemyPawn(int x, int y) {
-        if (isNotInInnerGridBounds(x, y)) {
+        if (!isInGridBounds(x, y)) {
             return false;
         }
         final Point point = new Point(x, y);
@@ -190,7 +180,7 @@ final class King extends Piece {
      * @return true if the king is in check due to one spot a knight can capture from
      */
     private boolean isEnemyKnight(int x, int y) {
-        if (isNotInInnerGridBounds(x, y)) {
+        if (!isInGridBounds(x, y)) {
             return false;
         }
         final Point point = new Point(x, y);
@@ -199,14 +189,23 @@ final class King extends Piece {
     }
 
     /**
-     * Determines if the location is outside the inner grid. The inner grid being one smaller on each side than the
-     * total grid.
+     * Determines if the point is in bounds.
+     *
+     * @param p the point
+     * @return true if the point is in bounds
+     */
+    private boolean isInGridBounds(Point p) {
+        return isInGridBounds(p.x, p.y);
+    }
+
+    /**
+     * Determines if the coordinates are in bounds.
      *
      * @param x the x-coordinate
      * @param y the y-coordinate
-     * @return true if the location is outside the inner grid
+     * @return true if the coordinates are in bounds
      */
-    private boolean isNotInInnerGridBounds(int x, int y) {
-        return x <= 0 || y <= 0 || x >= Chess.BOARD_SIZE - 1 || y >= Chess.BOARD_SIZE - 1;
+    private boolean isInGridBounds(int x, int y) {
+        return x >= 0 && y >= 0 && x < Chess.BOARD_SIZE && y < Chess.BOARD_SIZE;
     }
 }
