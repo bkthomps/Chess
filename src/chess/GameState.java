@@ -25,8 +25,8 @@ final class GameState {
     GameState(Chess chess, boolean isWhiteTurn) {
         this.chess = chess;
         this.isWhiteTurn = isWhiteTurn;
-        final String text = "Click on a piece to move, and\nthen a location to move it to.";
-        final String[] options = {"OK"};
+        final String text = Chess.resource.getString("startupInformation");
+        final String[] options = {Chess.resource.getString("acknowledge")};
         customText(text, options);
     }
 
@@ -173,8 +173,13 @@ final class GameState {
      */
     private void doMove(Point to) {
         if (to.y == 0 && moving instanceof Pawn) {
-            final String text = "What would you like to promote your pawn to?";
-            final String[] options = {"QUEEN", "KNIGHT", "ROOK", "BISHOP"};
+            final String text = Chess.resource.getString("pawnPromotionOption");
+            final String[] options = {
+                    Chess.resource.getString("queen"),
+                    Chess.resource.getString("knight"),
+                    Chess.resource.getString("rook"),
+                    Chess.resource.getString("bishop"),
+            };
             final int promotion = customText(text, options);
             final Piece piece;
             switch (promotion) {
@@ -256,11 +261,10 @@ final class GameState {
         final Point location = locateKing(isWhiteTurn);
         final King king = new King(isWhiteTurn);
         if (isCheckmate(king, location)) {
-            final String team = isWhiteTurn ? "Black" : "White";
-            final String text = "Checkmate! " + team + " wins!";
+            final String text = Chess.resource.getString(isWhiteTurn ? "blackWins" : "whiteWins");
             finishGame(text);
         } else if (isStalemate(king, location)) {
-            final String text = "Draw! Because of stalemate!";
+            final String text = Chess.resource.getString("stalemate");
             finishGame(text);
         }
         otherDraw();
@@ -346,7 +350,8 @@ final class GameState {
         final int MAX_MOVE_PER_SIDE = 50;
         final int MAX_UNPRODUCTIVE_MOVES = 2 * MAX_MOVE_PER_SIDE;
         if (drawCounter == MAX_UNPRODUCTIVE_MOVES) {
-            final String text = "Draw! " + MAX_MOVE_PER_SIDE + " moves without pawn move or piece capture!";
+            final String text = Chess.resource.getString("draw") + ' '
+                    + MAX_MOVE_PER_SIDE + ' ' + Chess.resource.getString("noCapture");
             finishGame(text);
         } else if (drawCounter > MAX_UNPRODUCTIVE_MOVES) {
             throw new IllegalStateException("drawCounter > " + MAX_UNPRODUCTIVE_MOVES);
@@ -358,7 +363,7 @@ final class GameState {
      */
     private void determineIfTooManyBoardRepetitions() {
         if (isTooManyBoardRepetitions()) {
-            final String text = "Draw! Board repeated 3 times!";
+            final String text = Chess.resource.getString("boardRepeat");
             finishGame(text);
         }
     }
@@ -426,7 +431,7 @@ final class GameState {
         final List<Piece> enemy = new ArrayList<>();
         findPieces(ally, enemy);
         if (isInsufficientMating(ally, enemy)) {
-            final String text = "Draw! Not enough pieces to cause a checkmate!";
+            final String text = Chess.resource.getString("insufficientPieces");
             finishGame(text);
         }
     }
@@ -490,8 +495,8 @@ final class GameState {
     private void warnIfCheck(King king, Point location) {
         if (king.isCheck(location)) {
             isInCheck = true;
-            final String text = "Warning: you are in check.\nYou must get out of check.";
-            final String[] options = {"OK"};
+            final String text = Chess.resource.getString("inCheck");
+            final String[] options = {Chess.resource.getString("acknowledge")};
             customText(text, options);
         }
     }

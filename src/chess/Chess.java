@@ -15,13 +15,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * The main class, which is the starting point of the program. Initializes all chess logic.
  */
 final class Chess {
 
-    static final String GAME_TITLE = "Chess";
+    static final ResourceBundle resource = ResourceBundle.getBundle("chess.i18n", Locale.getDefault());
+    static final String GAME_TITLE = resource.getString("gameTitle");
     private final JFrame frame = new JFrame(GAME_TITLE);
 
     static final int BOARD_SIZE = 8;
