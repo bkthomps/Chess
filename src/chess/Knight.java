@@ -21,7 +21,7 @@ final class Knight extends Piece {
                 {0, 1, 1, 1, 1, 1},
                 {1, 1, 1, 1, 1, 1}
         };
-        getColor(pixels);
+        setPieceImage(pixels);
     }
 
     @Override
@@ -33,6 +33,6 @@ final class Knight extends Piece {
     boolean isActionLegal(Point start, Point end) {
         final boolean isMoveL = (Math.abs(end.x - start.x) == 2 && Math.abs(end.y - start.y) == 1)
                 || (Math.abs(end.x - start.x) == 1 && Math.abs(end.y - start.y) == 2);
-        return isMoveL && canMoveOnto(end) && wouldNotPutKingIntoCheck(start, end);
+        return isMoveL && canMoveToLocation(end) && wouldNotPutAlliedKingIntoCheck(start, end);
     }
 }

@@ -19,7 +19,7 @@ final class Pawn extends Piece {
                 {0, 1, 1, 1, 1, 0},
                 {1, 1, 1, 1, 1, 1}
         };
-        getColor(pixels);
+        setPieceImage(pixels);
     }
 
     @Override
@@ -37,6 +37,6 @@ final class Pawn extends Piece {
         final boolean isCapture = Chess.getBoard(end) != null
                 && Chess.getBoard(end).isWhite() != isWhite
                 && end.y == start.y - 1 && Math.abs(end.x - start.x) == 1;
-        return (isForwardAllowed || isCapture) && wouldNotPutKingIntoCheck(start, end);
+        return (isForwardAllowed || isCapture) && wouldNotPutAlliedKingIntoCheck(start, end);
     }
 }

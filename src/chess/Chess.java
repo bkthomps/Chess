@@ -135,7 +135,7 @@ final class Chess {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 if (board[i][j] != null) {
-                    final Color[][] image = board[i][j].getImage();
+                    final Color[][] image = board[i][j].getPieceImage();
                     setPieceColor(j * PIXELS_PER_SQUARE, i * PIXELS_PER_SQUARE, image);
                 }
             }

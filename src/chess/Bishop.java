@@ -21,7 +21,7 @@ final class Bishop extends Piece {
                 {0, 0, 1, 1, 0, 0},
                 {1, 1, 1, 1, 1, 1}
         };
-        getColor(pixels);
+        setPieceImage(pixels);
     }
 
     @Override
@@ -32,7 +32,7 @@ final class Bishop extends Piece {
     @Override
     boolean isActionLegal(Point start, Point end) {
         return isEachCoordinateDeltaSame(start, end) && isBishopActionLegal(start, end)
-                && wouldNotPutKingIntoCheck(start, end);
+                && wouldNotPutAlliedKingIntoCheck(start, end);
     }
 
     /**
@@ -66,6 +66,6 @@ final class Bishop extends Piece {
                 return false;
             }
         }
-        return canMoveOnto(end);
+        return canMoveToLocation(end);
     }
 }

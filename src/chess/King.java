@@ -25,7 +25,7 @@ final class King extends Piece {
                 {0, 1, 1, 1, 1, 0},
                 {0, 1, 1, 1, 1, 0}
         };
-        getColor(pixels);
+        setPieceImage(pixels);
     }
 
     @Override
@@ -37,7 +37,7 @@ final class King extends Piece {
     boolean isActionLegal(Point start, Point end) {
         return Math.abs(end.x - start.x) + Math.abs(end.y - start.y) != 0
                 && Math.abs(end.x - start.x) <= 1 && Math.abs(end.y - start.y) <= 1
-                && canMoveOnto(end) && isNoAdjacentKing(end) && !isCheck(end);
+                && canMoveToLocation(end) && isNoAdjacentKing(end) && !isCheck(end);
     }
 
     /**

@@ -20,7 +20,7 @@ final class Rook extends Piece {
                 {0, 1, 1, 1, 1, 0},
                 {1, 1, 1, 1, 1, 1}
         };
-        getColor(pixels);
+        setPieceImage(pixels);
     }
 
     @Override
@@ -30,7 +30,7 @@ final class Rook extends Piece {
 
     @Override
     boolean isActionLegal(Point start, Point end) {
-        return isRookActionLegal(start, end) && wouldNotPutKingIntoCheck(start, end);
+        return isRookActionLegal(start, end) && wouldNotPutAlliedKingIntoCheck(start, end);
     }
 
     /**
@@ -63,6 +63,6 @@ final class Rook extends Piece {
                 }
             }
         }
-        return canMoveOnto(end);
+        return canMoveToLocation(end);
     }
 }

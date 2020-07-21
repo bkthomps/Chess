@@ -21,7 +21,7 @@ final class Queen extends Piece {
                 {0, 1, 1, 1, 1, 0},
                 {1, 1, 1, 1, 1, 1}
         };
-        getColor(pixels);
+        setPieceImage(pixels);
     }
 
     @Override
@@ -33,9 +33,9 @@ final class Queen extends Piece {
     boolean isActionLegal(Point start, Point end) {
         final Bishop bishop = new Bishop(isWhite);
         if (bishop.isEachCoordinateDeltaSame(start, end)) {
-            return bishop.isBishopActionLegal(start, end) && wouldNotPutKingIntoCheck(start, end);
+            return bishop.isBishopActionLegal(start, end) && wouldNotPutAlliedKingIntoCheck(start, end);
         }
         final Rook rook = new Rook(isWhite);
-        return rook.isRookActionLegal(start, end) && wouldNotPutKingIntoCheck(start, end);
+        return rook.isRookActionLegal(start, end) && wouldNotPutAlliedKingIntoCheck(start, end);
     }
 }
