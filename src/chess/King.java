@@ -37,28 +37,15 @@ final class King extends Piece {
     boolean isActionLegal(Point start, Point end) {
         return Math.abs(end.x - start.x) + Math.abs(end.y - start.y) != 0
                 && Math.abs(end.x - start.x) <= 1 && Math.abs(end.y - start.y) <= 1
-                && canMoveToLocation(end) && isNoAdjacentKing(end) && !isCheck(end);
+                && canMoveToLocation(end) && isNoAdjacentKing(end) && !isKingInCheck(end);
     }
 
-    /**
-     * Determines if there is no adjacent King.
-     *
-     * @param me the position to check for adjacent king
-     * @return true if there is no adjacent king
-     */
     private boolean isNoAdjacentKing(Point me) {
         return isKingNotAt(me.x - 1, me.y - 1) && isKingNotAt(me.x, me.y - 1) && isKingNotAt(me.x + 1, me.y - 1)
                 && isKingNotAt(me.x - 1, me.y) && isKingNotAt(me.x + 1, me.y)
                 && isKingNotAt(me.x - 1, me.y + 1) && isKingNotAt(me.x, me.y + 1) && isKingNotAt(me.x + 1, me.y + 1);
     }
 
-    /**
-     * Determines if there is no King at the specified location.
-     *
-     * @param x the x-coordinate
-     * @param y the y-coordinate
-     * @return true if there is no King at the specified location
-     */
     private boolean isKingNotAt(int x, int y) {
         if (x < 0 || x >= Chess.BOARD_SIZE || y < 0 || y >= Chess.BOARD_SIZE) {
             return true;
@@ -69,29 +56,15 @@ final class King extends Piece {
         return !isEnemyKing;
     }
 
-    /**
-     * Determines if the king is in check.
-     *
-     * @param point the location to check
-     * @return true if the king is in check
-     */
-    boolean isCheck(Point point) {
-        return isCheckDiagonal(point, -1, -1) || isCheckDiagonal(point, -1, 1)
-                || isCheckDiagonal(point, 1, -1) || isCheckDiagonal(point, 1, 1)
-                || isCheckStraight(point, 0, -1) || isCheckStraight(point, 0, 1)
-                || isCheckStraight(point, -1, 0) || isCheckStraight(point, 1, 0)
-                || isCheckPawn(point) || isCheckKnight(point);
+    boolean isKingInCheck(Point point) {
+        return isCheckFromDiagonalLine(point, -1, -1) || isCheckFromDiagonalLine(point, -1, 1)
+                || isCheckFromDiagonalLine(point, 1, -1) || isCheckFromDiagonalLine(point, 1, 1)
+                || isCheckFromStraightLine(point, 0, -1) || isCheckFromStraightLine(point, 0, 1)
+                || isCheckFromStraightLine(point, -1, 0) || isCheckFromStraightLine(point, 1, 0)
+                || isCheckDueToPawn(point) || isCheckDueToKnight(point);
     }
 
-    /**
-     * Determines if the king is in check due to a diagonal opponent, such as a bishop or a queen.
-     *
-     * @param point  the location to check
-     * @param xScale the side to check on for the x-coordinate
-     * @param yScale the side to check on for the y-coordinate
-     * @return true if the king is in check due to a diagonal opponent
-     */
-    private boolean isCheckDiagonal(Point point, int xScale, int yScale) {
+    private boolean isCheckFromDiagonalLine(Point point, int xScale, int yScale) {
         final Point mutatingPoint = new Point(point);
         mutatingPoint.x += xScale;
         mutatingPoint.y += yScale;
@@ -109,15 +82,7 @@ final class King extends Piece {
         return false;
     }
 
-    /**
-     * Determines if the king is in check due to a straight opponent, such as a rook or a queen.
-     *
-     * @param point  the location to check
-     * @param xScale the side to check on for the x-coordinate
-     * @param yScale the side to check on for the y-coordinate
-     * @return true if the king is in check due to a straight opponent
-     */
-    private boolean isCheckStraight(Point point, int xScale, int yScale) {
+    private boolean isCheckFromStraightLine(Point point, int xScale, int yScale) {
         final Point mutatingPoint = new Point(point);
         mutatingPoint.x += xScale;
         mutatingPoint.y += yScale;
@@ -135,24 +100,11 @@ final class King extends Piece {
         return false;
     }
 
-    /**
-     * Determines if the king is in check due to a pawn.
-     *
-     * @param point the location to check
-     * @return true if the king is in check due to a pawn
-     */
-    private boolean isCheckPawn(Point point) {
-        return isEnemyPawn(point.x - 1, point.y - 1) || isEnemyPawn(point.x + 1, point.y - 1);
+    private boolean isCheckDueToPawn(Point point) {
+        return isEnemyPawnAt(point.x - 1, point.y - 1) || isEnemyPawnAt(point.x + 1, point.y - 1);
     }
 
-    /**
-     * Determines if the king is in check due to one side a pawn can capture from.
-     *
-     * @param x the x-coordinate
-     * @param y the y-coordinate
-     * @return true if the king is in check due to one side a pawn can capture from
-     */
-    private boolean isEnemyPawn(int x, int y) {
+    private boolean isEnemyPawnAt(int x, int y) {
         if (!isInGridBounds(x, y)) {
             return false;
         }
@@ -161,27 +113,14 @@ final class King extends Piece {
         return me instanceof Pawn && me.isWhite() != isWhite;
     }
 
-    /**
-     * Determines if the king is in check due to a knight.
-     *
-     * @param point the location to check
-     * @return true if the king is in check due to a knight
-     */
-    private boolean isCheckKnight(Point point) {
-        return (isEnemyKnight(point.x - 2, point.y - 1)) || (isEnemyKnight(point.x - 1, point.y - 2))
-                || (isEnemyKnight(point.x - 2, point.y + 1)) || (isEnemyKnight(point.x - 1, point.y + 2))
-                || (isEnemyKnight(point.x + 2, point.y - 1)) || (isEnemyKnight(point.x + 1, point.y - 2))
-                || (isEnemyKnight(point.x + 2, point.y + 1)) || (isEnemyKnight(point.x + 1, point.y + 2));
+    private boolean isCheckDueToKnight(Point point) {
+        return (isEnemyKnightAt(point.x - 2, point.y - 1)) || (isEnemyKnightAt(point.x - 1, point.y - 2))
+                || (isEnemyKnightAt(point.x - 2, point.y + 1)) || (isEnemyKnightAt(point.x - 1, point.y + 2))
+                || (isEnemyKnightAt(point.x + 2, point.y - 1)) || (isEnemyKnightAt(point.x + 1, point.y - 2))
+                || (isEnemyKnightAt(point.x + 2, point.y + 1)) || (isEnemyKnightAt(point.x + 1, point.y + 2));
     }
 
-    /**
-     * Determines if the king is in check due to one spot a knight can capture from.
-     *
-     * @param x the x-coordinate
-     * @param y the y-coordinate
-     * @return true if the king is in check due to one spot a knight can capture from
-     */
-    private boolean isEnemyKnight(int x, int y) {
+    private boolean isEnemyKnightAt(int x, int y) {
         if (!isInGridBounds(x, y)) {
             return false;
         }
@@ -190,23 +129,10 @@ final class King extends Piece {
         return me instanceof Knight && me.isWhite() != isWhite;
     }
 
-    /**
-     * Determines if the point is in bounds.
-     *
-     * @param p the point
-     * @return true if the point is in bounds
-     */
     private boolean isInGridBounds(Point p) {
         return isInGridBounds(p.x, p.y);
     }
 
-    /**
-     * Determines if the coordinates are in bounds.
-     *
-     * @param x the x-coordinate
-     * @param y the y-coordinate
-     * @return true if the coordinates are in bounds
-     */
     private boolean isInGridBounds(int x, int y) {
         return x >= 0 && y >= 0 && x < Chess.BOARD_SIZE && y < Chess.BOARD_SIZE;
     }

@@ -153,7 +153,7 @@ final class GameState {
             move(moving, from, to);
             final Point location = locateKing(isWhiteTurn);
             final King king = new King(isWhiteTurn);
-            if (!king.isCheck(location)) {
+            if (!king.isKingInCheck(location)) {
                 isWhiteTurn = !isWhiteTurn;
                 chess.flipBoard();
                 checkEndgame();
@@ -280,7 +280,7 @@ final class GameState {
      * @return true if the game is over by checkmate
      */
     private boolean isCheckmate(King king, Point point) {
-        return king.isCheck(point) && isMoveImpossible(king, point);
+        return king.isKingInCheck(point) && isMoveImpossible(king, point);
     }
 
     /**
@@ -291,7 +291,7 @@ final class GameState {
      * @return true if the game is over by stalemate
      */
     private boolean isStalemate(King king, Point point) {
-        return !king.isCheck(point) && isMoveImpossible(king, point);
+        return !king.isKingInCheck(point) && isMoveImpossible(king, point);
     }
 
     /**
@@ -318,7 +318,7 @@ final class GameState {
                             if (me.isActionLegal(start, end)) {
                                 rawMove(me, start, end);
                                 final Point kingLocation = locateKing(isWhiteTurn);
-                                final boolean isNotInCheck = !king.isCheck(kingLocation);
+                                final boolean isNotInCheck = !king.isKingInCheck(kingLocation);
                                 rawMove(me, end, start);
                                 Chess.setBoard(end, save);
                                 if (isNotInCheck) {
@@ -494,7 +494,7 @@ final class GameState {
      * @param location the location of the king in check
      */
     private void warnIfCheck(King king, Point location) {
-        if (king.isCheck(location)) {
+        if (king.isKingInCheck(location)) {
             isInCheck = true;
             final String text = Chess.resource.getString("inCheck");
             final String[] options = {Chess.resource.getString("acknowledge")};
@@ -535,8 +535,8 @@ final class GameState {
         final boolean isClearPath = hasMoved(Chess.getBoard(new Point(0, 7)))
                 && Chess.getBoard(new Point(1, 7)) == null && Chess.getBoard(new Point(2, 7)) == null
                 && Chess.getBoard(new Point(3, 7)) == null && hasMoved(Chess.getBoard(new Point(4, 7)));
-        final boolean isNotPassingThroughCheck = !king.isCheck(new Point(4, 7))
-                && !king.isCheck(new Point(3, 7)) && !king.isCheck(new Point(2, 7));
+        final boolean isNotPassingThroughCheck = !king.isKingInCheck(new Point(4, 7))
+                && !king.isKingInCheck(new Point(3, 7)) && !king.isKingInCheck(new Point(2, 7));
         return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
     }
 
@@ -550,8 +550,8 @@ final class GameState {
         final boolean isLockedOnKing = from.x == 4 && from.y == 7;
         final boolean isClearPath = hasMoved(Chess.getBoard(new Point(4, 7))) && Chess.getBoard(new Point(5, 7)) == null
                 && Chess.getBoard(new Point(6, 7)) == null && hasMoved(Chess.getBoard(new Point(7, 7)));
-        final boolean isNotPassingThroughCheck = !king.isCheck(new Point(4, 7))
-                && !king.isCheck(new Point(5, 7)) && !king.isCheck(new Point(6, 7));
+        final boolean isNotPassingThroughCheck = !king.isKingInCheck(new Point(4, 7))
+                && !king.isKingInCheck(new Point(5, 7)) && !king.isKingInCheck(new Point(6, 7));
         return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
     }
 
