@@ -33,13 +33,6 @@ final class Rook extends Piece {
         return isRookActionLegal(start, end) && wouldNotPutAlliedKingIntoCheck(start, end);
     }
 
-    /**
-     * Rook can capture enemy and can travel as long as nothing is in its way.
-     *
-     * @param start the original position
-     * @param end   the final position
-     * @return true if rook action is legal
-     */
     boolean isRookActionLegal(Point start, Point end) {
         if ((start.x == end.x && start.y == end.y) || (start.x != end.x && start.y != end.y)) {
             return false;
