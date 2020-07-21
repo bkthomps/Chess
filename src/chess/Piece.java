@@ -7,7 +7,6 @@ import java.awt.Point;
  * The chess board contains pieces which may be moved, and have their own abilities.
  */
 abstract class Piece {
-
     private static final int PIECE_SIZE = 6;
     private final Color[][] image = new Color[PIECE_SIZE][PIECE_SIZE];
     private boolean hasMoved;

@@ -7,20 +7,18 @@ import java.awt.Point;
  * move forward if there is a piece in the way. The pawn captures one tile diagonally.
  */
 final class Pawn extends Piece {
-
     private final boolean isWhite;
 
     Pawn(boolean isWhite) {
         this.isWhite = isWhite;
-        final int[][] pixels =
-                {
-                        {0, 0, 1, 1, 0, 0},
-                        {0, 1, 1, 1, 1, 0},
-                        {0, 1, 1, 1, 1, 0},
-                        {0, 0, 1, 1, 0, 0},
-                        {0, 1, 1, 1, 1, 0},
-                        {1, 1, 1, 1, 1, 1}
-                };
+        final int[][] pixels = {
+                {0, 0, 1, 1, 0, 0},
+                {0, 1, 1, 1, 1, 0},
+                {0, 1, 1, 1, 1, 0},
+                {0, 0, 1, 1, 0, 0},
+                {0, 1, 1, 1, 1, 0},
+                {1, 1, 1, 1, 1, 1}
+        };
         getColor(pixels);
     }
 

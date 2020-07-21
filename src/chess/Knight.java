@@ -9,20 +9,18 @@ import java.awt.Point;
  * perform the move.
  */
 final class Knight extends Piece {
-
     private final boolean isWhite;
 
     Knight(boolean isWhite) {
         this.isWhite = isWhite;
-        final int[][] pixels =
-                {
-                        {0, 1, 0, 0, 0, 0},
-                        {1, 1, 1, 0, 0, 0},
-                        {1, 1, 1, 1, 0, 0},
-                        {0, 0, 1, 1, 1, 0},
-                        {0, 1, 1, 1, 1, 1},
-                        {1, 1, 1, 1, 1, 1}
-                };
+        final int[][] pixels = {
+                {0, 1, 0, 0, 0, 0},
+                {1, 1, 1, 0, 0, 0},
+                {1, 1, 1, 1, 0, 0},
+                {0, 0, 1, 1, 1, 0},
+                {0, 1, 1, 1, 1, 1},
+                {1, 1, 1, 1, 1, 1}
+        };
         getColor(pixels);
     }
 

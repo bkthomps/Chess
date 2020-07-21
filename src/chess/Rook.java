@@ -8,20 +8,18 @@ import java.awt.Point;
  * but may not move if the destination tile contains a friendly piece.
  */
 final class Rook extends Piece {
-
     private final boolean isWhite;
 
     Rook(boolean isWhite) {
         this.isWhite = isWhite;
-        final int[][] pixels =
-                {
-                        {1, 0, 1, 1, 0, 1},
-                        {1, 1, 1, 1, 1, 1},
-                        {0, 1, 1, 1, 1, 0},
-                        {0, 1, 1, 1, 1, 0},
-                        {0, 1, 1, 1, 1, 0},
-                        {1, 1, 1, 1, 1, 1}
-                };
+        final int[][] pixels = {
+                {1, 0, 1, 1, 0, 1},
+                {1, 1, 1, 1, 1, 1},
+                {0, 1, 1, 1, 1, 0},
+                {0, 1, 1, 1, 1, 0},
+                {0, 1, 1, 1, 1, 0},
+                {1, 1, 1, 1, 1, 1}
+        };
         getColor(pixels);
     }
 

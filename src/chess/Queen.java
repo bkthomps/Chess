@@ -9,20 +9,18 @@ import java.awt.Point;
  * not move if it is a friendly piece.
  */
 final class Queen extends Piece {
-
     private final boolean isWhite;
 
     Queen(boolean isWhite) {
         this.isWhite = isWhite;
-        final int[][] pixels =
-                {
-                        {0, 1, 0, 0, 1, 0},
-                        {0, 0, 1, 1, 0, 0},
-                        {1, 0, 1, 1, 0, 1},
-                        {1, 0, 1, 1, 0, 1},
-                        {0, 1, 1, 1, 1, 0},
-                        {1, 1, 1, 1, 1, 1}
-                };
+        final int[][] pixels = {
+                {0, 1, 0, 0, 1, 0},
+                {0, 0, 1, 1, 0, 0},
+                {1, 0, 1, 1, 0, 1},
+                {1, 0, 1, 1, 0, 1},
+                {0, 1, 1, 1, 1, 0},
+                {1, 1, 1, 1, 1, 1}
+        };
         getColor(pixels);
     }
 

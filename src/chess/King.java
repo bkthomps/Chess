@@ -13,20 +13,18 @@ import java.awt.Point;
  * there are no winners.
  */
 final class King extends Piece {
-
     private final boolean isWhite;
 
     King(boolean isWhite) {
         this.isWhite = isWhite;
-        final int[][] pixels =
-                {
-                        {0, 0, 1, 1, 0, 0},
-                        {1, 0, 1, 1, 0, 1},
-                        {1, 1, 1, 1, 1, 1},
-                        {1, 1, 1, 1, 1, 1},
-                        {0, 1, 1, 1, 1, 0},
-                        {0, 1, 1, 1, 1, 0}
-                };
+        final int[][] pixels = {
+                {0, 0, 1, 1, 0, 0},
+                {1, 0, 1, 1, 0, 1},
+                {1, 1, 1, 1, 1, 1},
+                {1, 1, 1, 1, 1, 1},
+                {0, 1, 1, 1, 1, 0},
+                {0, 1, 1, 1, 1, 0}
+        };
         getColor(pixels);
     }
 

@@ -22,7 +22,6 @@ import java.util.ResourceBundle;
  * The starting point of the program which contains the front end component.
  */
 final class Chess {
-
     static final ResourceBundle resource = ResourceBundle.getBundle("chess.i18n", Locale.getDefault());
     static final String GAME_TITLE = resource.getString("gameTitle");
     private final JFrame frame = new JFrame(GAME_TITLE);
@@ -179,7 +178,6 @@ final class Chess {
      * Manages the square graphics on the graphical user interface.
      */
     private class GridPane extends JPanel {
-
         private final List<Rectangle> cells;
 
         GridPane() {

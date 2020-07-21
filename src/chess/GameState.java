@@ -10,7 +10,6 @@ import java.util.List;
  * Keeps track of the chess board and the pieces which exist on it.
  */
 final class GameState {
-
     private final Chess chess;
     private boolean isWhiteTurn;
     private Piece moving;
@@ -483,7 +482,7 @@ final class GameState {
      * @param text the text to display to the user
      */
     private void finishGame(String text) {
-        final String[] options = {"OK"};
+        final String[] options = {Chess.resource.getString("acknowledge")};
         customText(text, options);
         System.exit(0);
     }
