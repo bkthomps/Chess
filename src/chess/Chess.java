@@ -57,7 +57,7 @@ final class Chess {
     void flipBoard() {
         isWhiteTurn = !isWhiteTurn;
         for (int i = 0; i < BOARD_SIZE / 2; i++) {
-            final Piece[] tempSlice = board[BOARD_SIZE - i - 1];
+            var tempSlice = board[BOARD_SIZE - i - 1];
             board[BOARD_SIZE - i - 1] = board[i];
             board[i] = tempSlice;
         }
@@ -103,11 +103,11 @@ final class Chess {
     }
 
     private void drawBackgroundGUI() {
-        final Color darkBrown = new Color(160, 80, 0);
-        final Color lightBrown = new Color(200, 100, 0);
+        var darkBrown = new Color(160, 80, 0);
+        var lightBrown = new Color(200, 100, 0);
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                final Color usedColor = ((i + j) % 2 == 0 ^ !isWhiteTurn) ? lightBrown : darkBrown;
+                var usedColor = ((i + j) % 2 == 0 ^ !isWhiteTurn) ? lightBrown : darkBrown;
                 drawTileBackgroundGUI(usedColor, j, i);
             }
         }
@@ -117,14 +117,14 @@ final class Chess {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 if (board[i][j] != null) {
-                    final Color[][] image = board[i][j].getPieceImage();
-                    drawPiecGUI(j * PIXELS_PER_SQUARE, i * PIXELS_PER_SQUARE, image);
+                    var image = board[i][j].getPieceImage();
+                    drawPieceGUI(j * PIXELS_PER_SQUARE, i * PIXELS_PER_SQUARE, image);
                 }
             }
         }
     }
 
-    private void drawPiecGUI(int x, int y, Color[][] image) {
+    private void drawPieceGUI(int x, int y, Color[][] image) {
         for (int i = 1; i < PIXELS_PER_SQUARE - 1; i++) {
             for (int j = 1; j < PIXELS_PER_SQUARE - 1; j++) {
                 if (image[i - 1][j - 1] != null) {
@@ -154,8 +154,8 @@ final class Chess {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (state != null) {
-                        final int horizontalClickPosition = (e.getX()) / (getWidth() / PIXELS_PER_SQUARE);
-                        final int verticalClickPosition = (e.getY()) / (getHeight() / PIXELS_PER_SQUARE);
+                        int horizontalClickPosition = (e.getX()) / (getWidth() / PIXELS_PER_SQUARE);
+                        int verticalClickPosition = (e.getY()) / (getHeight() / PIXELS_PER_SQUARE);
                         state.handleClick(horizontalClickPosition, verticalClickPosition);
                     }
                 }
@@ -164,27 +164,27 @@ final class Chess {
 
         @Override
         public Dimension getPreferredSize() {
-            final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            final int guiDisplay;
+            var screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            int guiDisplay;
             if (screenSize.getWidth() < screenSize.getHeight()) {
                 guiDisplay = (int) (screenSize.getWidth() * 0.8);
             } else {
                 guiDisplay = (int) (screenSize.getHeight() * 0.8);
             }
-            final int multiplier = guiDisplay / PIXELS_ON_BOARD;
+            int multiplier = guiDisplay / PIXELS_ON_BOARD;
             return new Dimension(multiplier * PIXELS_ON_BOARD, multiplier * PIXELS_ON_BOARD);
         }
 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            final Graphics2D g2d = (Graphics2D) g.create();
-            final int cellWidth = getWidth() / PIXELS_ON_BOARD;
-            final int cellHeight = getHeight() / PIXELS_ON_BOARD;
+            var g2d = (Graphics2D) g.create();
+            int cellWidth = getWidth() / PIXELS_ON_BOARD;
+            int cellHeight = getHeight() / PIXELS_ON_BOARD;
             if (cells.isEmpty()) {
                 for (int row = 0; row < PIXELS_ON_BOARD; row++) {
                     for (int col = 0; col < PIXELS_ON_BOARD; col++) {
-                        Rectangle cell = new Rectangle(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
+                        var cell = new Rectangle(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
                         cells.add(cell);
                     }
                 }
@@ -193,7 +193,7 @@ final class Chess {
             for (int i = 0; i < PIXELS_ON_BOARD; i++) {
                 for (int j = 0; j < PIXELS_ON_BOARD; j++) {
                     g2d.setColor(pixels[i][j]);
-                    final Rectangle cell = cells.get(j + i * PIXELS_ON_BOARD);
+                    var cell = cells.get(j + i * PIXELS_ON_BOARD);
                     g2d.fill(cell);
                     repaint();
                 }

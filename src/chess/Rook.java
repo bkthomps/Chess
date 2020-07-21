@@ -12,7 +12,7 @@ final class Rook extends Piece {
 
     Rook(boolean isWhite) {
         this.isWhite = isWhite;
-        final int[][] pixels = {
+        int[][] pixels = {
                 {1, 0, 1, 1, 0, 1},
                 {1, 1, 1, 1, 1, 1},
                 {0, 1, 1, 1, 1, 0},
@@ -38,19 +38,19 @@ final class Rook extends Piece {
             return false;
         }
         if (start.x == end.x) {
-            final int min = Math.min(start.y, end.y);
-            final int max = Math.max(start.y, end.y);
+            int min = Math.min(start.y, end.y);
+            int max = Math.max(start.y, end.y);
             for (int i = min + 1; i < max; i++) {
-                final Point point = new Point(start.x, i);
+                var point = new Point(start.x, i);
                 if (Chess.getBoard(point) != null) {
                     return false;
                 }
             }
         } else {
-            final int min = Math.min(start.x, end.x);
-            final int max = Math.max(start.x, end.x);
+            int min = Math.min(start.x, end.x);
+            int max = Math.max(start.x, end.x);
             for (int i = min + 1; i < max; i++) {
-                final Point point = new Point(i, start.y);
+                var point = new Point(i, start.y);
                 if (Chess.getBoard(point) != null) {
                     return false;
                 }

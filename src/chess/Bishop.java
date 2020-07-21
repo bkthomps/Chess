@@ -13,7 +13,7 @@ final class Bishop extends Piece {
 
     Bishop(boolean isWhite) {
         this.isWhite = isWhite;
-        final int[][] pixels = {
+        int[][] pixels = {
                 {0, 0, 1, 1, 0, 0},
                 {0, 0, 1, 1, 0, 0},
                 {0, 1, 1, 1, 1, 0},
@@ -40,11 +40,11 @@ final class Bishop extends Piece {
     }
 
     boolean isBishopActionLegal(Point start, Point end) {
-        final int min = Math.min(start.x, end.x);
-        final int max = Math.max(start.x, end.x);
-        final Point mutatingPoint = new Point(start);
-        final int xScale = Integer.signum(end.x - start.x);
-        final int yScale = Integer.signum(end.y - start.y);
+        int min = Math.min(start.x, end.x);
+        int max = Math.max(start.x, end.x);
+        Point mutatingPoint = new Point(start);
+        int xScale = Integer.signum(end.x - start.x);
+        int yScale = Integer.signum(end.y - start.y);
         for (int i = min + 1; i < max; i++) {
             mutatingPoint.x += xScale;
             mutatingPoint.y += yScale;

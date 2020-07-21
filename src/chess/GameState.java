@@ -24,8 +24,8 @@ final class GameState {
     GameState(Chess chess, boolean isWhiteTurn) {
         this.chess = chess;
         this.isWhiteTurn = isWhiteTurn;
-        final String text = Chess.resource.getString("startupInformation");
-        final String[] options = {Chess.resource.getString("acknowledge")};
+        var text = Chess.resource.getString("startupInformation");
+        String[] options = {Chess.resource.getString("acknowledge")};
         displayDialogText(text, options);
     }
 
@@ -35,7 +35,7 @@ final class GameState {
             return;
         }
         chess.refreshPixels();
-        final Point to = new Point(x, y);
+        var to = new Point(x, y);
         if (isInCheck) {
             doMoveInCheckIfLegal(to);
         } else if (castleIfPossible(to)) {
@@ -57,8 +57,8 @@ final class GameState {
         Point king = null;
         for (int i = 0; i < Chess.BOARD_SIZE; i++) {
             for (int j = 0; j < Chess.BOARD_SIZE; j++) {
-                final Point point = new Point(j, i);
-                final Piece item = Chess.getBoard(point);
+                var point = new Point(j, i);
+                var item = Chess.getBoard(point);
                 if (item instanceof King && item.isWhite() == isWhiteTurn) {
                     if (king != null) {
                         throw new IllegalStateException("Multiple Kings!");
@@ -74,7 +74,7 @@ final class GameState {
     }
 
     private void lockOntoPiece(Point point) {
-        final Piece toMove = Chess.getBoard(point);
+        var toMove = Chess.getBoard(point);
         if (toMove != null && toMove.isWhite() == isWhiteTurn) {
             moving = toMove;
             from = point;
@@ -86,14 +86,14 @@ final class GameState {
     }
 
     private void highlightLegalMoves() {
-        final Color darkGreen = new Color(0, 100, 40);
-        final Color lightGreen = new Color(0, 140, 50);
+        var darkGreen = new Color(0, 100, 40);
+        var lightGreen = new Color(0, 140, 50);
         for (int i = 0; i < Chess.BOARD_SIZE; i++) {
             for (int j = 0; j < Chess.BOARD_SIZE; j++) {
-                final Point checkAt = new Point(j, i);
-                final Color usedColor = ((i + j) % 2 == 0 ^ !isWhiteTurn) ? lightGreen : darkGreen;
+                var checkAt = new Point(j, i);
+                var usedColor = ((i + j) % 2 == 0 ^ !isWhiteTurn) ? lightGreen : darkGreen;
                 if (moving instanceof King) {
-                    final Piece backup = Chess.getBoard(from);
+                    var backup = Chess.getBoard(from);
                     Chess.setBoard(from, null);
                     if (moving.isActionLegal(from, checkAt)) {
                         chess.drawTileBackgroundGUI(usedColor, j, i);
@@ -111,10 +111,10 @@ final class GameState {
             chess.drawTileBackgroundGUI(isWhiteTurn ? lightGreen : darkGreen, Chess.BOARD_SIZE - 1, Chess.BOARD_SIZE - 1);
         }
         if (enPassant != null) {
-            final boolean canCaptureEnPassant = from.y == enPassant.y + 1
+            boolean canCaptureEnPassant = from.y == enPassant.y + 1
                     && Math.abs(from.x - enPassant.x) == 1;
             if (canCaptureEnPassant && canPerformEnPassant(enPassant)) {
-                final Color usedColor = ((enPassant.y + enPassant.x) % 2 == 0 ^ !isWhiteTurn) ? lightGreen : darkGreen;
+                var usedColor = ((enPassant.y + enPassant.x) % 2 == 0 ^ !isWhiteTurn) ? lightGreen : darkGreen;
                 chess.drawTileBackgroundGUI(usedColor, enPassant.x, enPassant.y);
             }
         }
@@ -125,8 +125,8 @@ final class GameState {
         if (moving.isActionLegal(from, to)) {
             recordEnPassantHistory(to);
             movePiece(moving, from, to);
-            final Point location = locateAlliedKing(isWhiteTurn);
-            final King king = new King(isWhiteTurn);
+            var location = locateAlliedKing(isWhiteTurn);
+            var king = new King(isWhiteTurn);
             if (!king.isKingInCheck(location)) {
                 isWhiteTurn = !isWhiteTurn;
                 chess.flipBoard();
@@ -146,8 +146,8 @@ final class GameState {
      */
     private void doMove(Point to) {
         if (to.y == 0 && moving instanceof Pawn) {
-            final String text = Chess.resource.getString("pawnPromotionOption");
-            final String[] options = {
+            var text = Chess.resource.getString("pawnPromotionOption");
+            String[] options = {
                     Chess.resource.getString("queen"),
                     Chess.resource.getString("knight"),
                     Chess.resource.getString("rook"),
@@ -157,7 +157,7 @@ final class GameState {
             while (promotion < 0) {
                 promotion = displayDialogText(text, options);
             }
-            final Piece piece;
+            Piece piece;
             switch (promotion) {
                 case 0:
                     piece = new Queen(moving.isWhite());
@@ -184,7 +184,7 @@ final class GameState {
     }
 
     private boolean canPerformEnPassant(Point to) {
-        final Point squareAboveEnemy = new Point(to.x, to.y + 1);
+        var squareAboveEnemy = new Point(to.x, to.y + 1);
         return to.equals(enPassant) && moving instanceof Pawn
                 && moving.isWhite() != Chess.getBoard(squareAboveEnemy).isWhite();
     }
@@ -194,7 +194,7 @@ final class GameState {
      * two squares as if it only moved one square immediately after it happens.
      */
     private void doEnPassant() {
-        final Point squareAboveEnemy = new Point(enPassant.x, enPassant.y + 1);
+        var squareAboveEnemy = new Point(enPassant.x, enPassant.y + 1);
         movePiece(moving, from, enPassant);
         Chess.setBoard(squareAboveEnemy, null);
         enPassant = null;
@@ -221,13 +221,13 @@ final class GameState {
      * <p> 4. Insufficient mating material
      */
     private void checkIfGameOver() {
-        final Point location = locateAlliedKing(isWhiteTurn);
-        final King king = new King(isWhiteTurn);
+        var location = locateAlliedKing(isWhiteTurn);
+        var king = new King(isWhiteTurn);
         if (isGameOverDueToCheckmate(king, location)) {
-            final String text = Chess.resource.getString(isWhiteTurn ? "blackWins" : "whiteWins");
+            var text = Chess.resource.getString(isWhiteTurn ? "blackWins" : "whiteWins");
             endGameWithNotification(text);
         } else if (isGameOverDueToStalemate(king, location)) {
-            final String text = Chess.resource.getString("stalemate");
+            var text = Chess.resource.getString("stalemate");
             endGameWithNotification(text);
         }
         endGameIfNonStalemateDraw();
@@ -288,14 +288,14 @@ final class GameState {
      * @throws IllegalStateException if somehow went over the draw counter
      */
     private void endGameIfTooManyMoves() {
-        final int MAX_MOVE_PER_SIDE = 50;
-        final int MAX_UNPRODUCTIVE_MOVES = 2 * MAX_MOVE_PER_SIDE;
-        if (drawCounter == MAX_UNPRODUCTIVE_MOVES) {
-            final String text = Chess.resource.getString("draw") + ' '
-                    + MAX_MOVE_PER_SIDE + ' ' + Chess.resource.getString("noCapture");
+        int maxMovePerSide = 50;
+        int maxUnproductiveMoves = 2 * maxMovePerSide;
+        if (drawCounter == maxUnproductiveMoves) {
+            var text = Chess.resource.getString("draw") + ' '
+                    + maxMovePerSide + ' ' + Chess.resource.getString("noCapture");
             endGameWithNotification(text);
-        } else if (drawCounter > MAX_UNPRODUCTIVE_MOVES) {
-            throw new IllegalStateException("drawCounter > " + MAX_UNPRODUCTIVE_MOVES);
+        } else if (drawCounter > maxUnproductiveMoves) {
+            throw new IllegalStateException("drawCounter > " + maxUnproductiveMoves);
         }
     }
 
@@ -304,7 +304,7 @@ final class GameState {
      */
     private void endGameIfTooManyBoardRepetitions() {
         if (isTooManyBoardRepetitions()) {
-            final String text = Chess.resource.getString("boardRepeat");
+            var text = Chess.resource.getString("boardRepeat");
             endGameWithNotification(text);
         }
     }
@@ -314,7 +314,7 @@ final class GameState {
      * @throws IllegalStateException if castle or en passant history size is invalid
      */
     private boolean isTooManyBoardRepetitions() {
-        final int historySize = boardHistory.size();
+        int historySize = boardHistory.size();
         Point enPassantBackup = null;
         if (historySize == enPassantHistory.size() - 1) {
             enPassantBackup = enPassantHistory.get(enPassantHistory.size() - 1);
@@ -359,11 +359,11 @@ final class GameState {
      * Mating material is any pieces which could force a checkmate.
      */
     private void endGameIfInsufficientMatingMaterial() {
-        final List<Piece> ally = new ArrayList<>();
-        final List<Piece> enemy = new ArrayList<>();
+        var ally = new ArrayList<Piece>();
+        var enemy = new ArrayList<Piece>();
         findPieces(ally, enemy);
         if (isInsufficientMatingMaterial(ally, enemy)) {
-            final String text = Chess.resource.getString("insufficientPieces");
+            var text = Chess.resource.getString("insufficientPieces");
             endGameWithNotification(text);
         }
     }
@@ -371,8 +371,8 @@ final class GameState {
     private void findPieces(List<Piece> ally, List<Piece> enemy) {
         for (int i = 0; i < Chess.BOARD_SIZE; i++) {
             for (int j = 0; j < Chess.BOARD_SIZE; j++) {
-                final Point point = new Point(j, i);
-                final Piece me = Chess.getBoard(point);
+                var point = new Point(j, i);
+                var me = Chess.getBoard(point);
                 if (me != null && !(me instanceof King)) {
                     if (me.isWhite() == isWhiteTurn) {
                         ally.add(me);
@@ -392,14 +392,14 @@ final class GameState {
         if (ally.size() != 0 && enemy.size() != 0) {
             return false;
         }
-        final List<Piece> group = (ally.size() == 0) ? enemy : ally;
+        var group = (ally.size() == 0) ? enemy : ally;
         return group.size() == 0
                 || (group.size() == 1 && (group.get(0) instanceof Knight || group.get(0) instanceof Bishop))
                 || (group.size() == 2 && group.get(0) instanceof Knight && group.get(1) instanceof Knight);
     }
 
     private void endGameWithNotification(String text) {
-        final String[] options = {Chess.resource.getString("acknowledge")};
+        String[] options = {Chess.resource.getString("acknowledge")};
         displayDialogText(text, options);
         System.exit(0);
     }
@@ -407,8 +407,8 @@ final class GameState {
     private void warnIfKingInCheck(King king, Point location) {
         if (king.isKingInCheck(location)) {
             isInCheck = true;
-            final String text = Chess.resource.getString("inCheck");
-            final String[] options = {Chess.resource.getString("acknowledge")};
+            var text = Chess.resource.getString("inCheck");
+            String[] options = {Chess.resource.getString("acknowledge")};
             displayDialogText(text, options);
         }
     }
@@ -430,22 +430,22 @@ final class GameState {
     }
 
     private boolean canQueenSideCastle() {
-        final King king = new King(isWhiteTurn);
-        final boolean isLockedOnKing = from.x == 4 && from.y == 7;
-        final boolean isClearPath = hasPieceMoved(Chess.getBoard(new Point(0, 7)))
+        var king = new King(isWhiteTurn);
+        boolean isLockedOnKing = from.x == 4 && from.y == 7;
+        boolean isClearPath = hasPieceMoved(Chess.getBoard(new Point(0, 7)))
                 && Chess.getBoard(new Point(1, 7)) == null && Chess.getBoard(new Point(2, 7)) == null
                 && Chess.getBoard(new Point(3, 7)) == null && hasPieceMoved(Chess.getBoard(new Point(4, 7)));
-        final boolean isNotPassingThroughCheck = !king.isKingInCheck(new Point(4, 7))
+        boolean isNotPassingThroughCheck = !king.isKingInCheck(new Point(4, 7))
                 && !king.isKingInCheck(new Point(3, 7)) && !king.isKingInCheck(new Point(2, 7));
         return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
     }
 
     private boolean canKingSideCastle() {
-        final King king = new King(isWhiteTurn);
-        final boolean isLockedOnKing = from.x == 4 && from.y == 7;
-        final boolean isClearPath = hasPieceMoved(Chess.getBoard(new Point(4, 7))) && Chess.getBoard(new Point(5, 7)) == null
+        var king = new King(isWhiteTurn);
+        boolean isLockedOnKing = from.x == 4 && from.y == 7;
+        boolean isClearPath = hasPieceMoved(Chess.getBoard(new Point(4, 7))) && Chess.getBoard(new Point(5, 7)) == null
                 && Chess.getBoard(new Point(6, 7)) == null && hasPieceMoved(Chess.getBoard(new Point(7, 7)));
-        final boolean isNotPassingThroughCheck = !king.isKingInCheck(new Point(4, 7))
+        boolean isNotPassingThroughCheck = !king.isKingInCheck(new Point(4, 7))
                 && !king.isKingInCheck(new Point(5, 7)) && !king.isKingInCheck(new Point(6, 7));
         return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
     }
@@ -468,15 +468,15 @@ final class GameState {
             canCastleHistory.clear();
         } else {
             drawCounter++;
-            final Piece[][] boardCopy = new Piece[Chess.BOARD_SIZE][Chess.BOARD_SIZE];
+            var boardCopy = new Piece[Chess.BOARD_SIZE][Chess.BOARD_SIZE];
             for (int i = 0; i < Chess.BOARD_SIZE; i++) {
                 for (int j = 0; j < Chess.BOARD_SIZE; j++) {
-                    final Point point = new Point(j, i);
+                    var point = new Point(j, i);
                     boardCopy[i][j] = Chess.getBoard(point);
                 }
             }
             boardHistory.add(boardCopy);
-            final Point kingLocation = locateAlliedKing(isWhiteTurn);
+            var kingLocation = locateAlliedKing(isWhiteTurn);
             canCastleHistory.add(Chess.getBoard(kingLocation).hasMoved());
         }
         rawMove(me, start, end);

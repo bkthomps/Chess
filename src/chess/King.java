@@ -17,7 +17,7 @@ final class King extends Piece {
 
     King(boolean isWhite) {
         this.isWhite = isWhite;
-        final int[][] pixels = {
+        int[][] pixels = {
                 {0, 0, 1, 1, 0, 0},
                 {1, 0, 1, 1, 0, 1},
                 {1, 1, 1, 1, 1, 1},
@@ -50,10 +50,9 @@ final class King extends Piece {
         if (x < 0 || x >= Chess.BOARD_SIZE || y < 0 || y >= Chess.BOARD_SIZE) {
             return true;
         }
-        final Point point = new Point(x, y);
-        final Piece item = Chess.getBoard(point);
-        final boolean isEnemyKing = item instanceof King && item.isWhite() != isWhite;
-        return !isEnemyKing;
+        var point = new Point(x, y);
+        var item = Chess.getBoard(point);
+        return !(item instanceof King && item.isWhite() != isWhite);
     }
 
     boolean isKingInCheck(Point point) {
@@ -65,11 +64,11 @@ final class King extends Piece {
     }
 
     private boolean isCheckFromDiagonalLine(Point point, int xScale, int yScale) {
-        final Point mutatingPoint = new Point(point);
+        var mutatingPoint = new Point(point);
         mutatingPoint.x += xScale;
         mutatingPoint.y += yScale;
         while (isInGridBounds(mutatingPoint)) {
-            final Piece me = Chess.getBoard(mutatingPoint);
+            var me = Chess.getBoard(mutatingPoint);
             if ((me instanceof Bishop || me instanceof Queen) && me.isWhite() != isWhite) {
                 return true;
             }
@@ -83,11 +82,11 @@ final class King extends Piece {
     }
 
     private boolean isCheckFromStraightLine(Point point, int xScale, int yScale) {
-        final Point mutatingPoint = new Point(point);
+        var mutatingPoint = new Point(point);
         mutatingPoint.x += xScale;
         mutatingPoint.y += yScale;
         while (isInGridBounds(mutatingPoint)) {
-            final Piece me = Chess.getBoard(mutatingPoint);
+            var me = Chess.getBoard(mutatingPoint);
             if ((me instanceof Rook || me instanceof Queen) && me.isWhite() != isWhite) {
                 return true;
             }
@@ -108,8 +107,8 @@ final class King extends Piece {
         if (!isInGridBounds(x, y)) {
             return false;
         }
-        final Point point = new Point(x, y);
-        final Piece me = Chess.getBoard(point);
+        var point = new Point(x, y);
+        var me = Chess.getBoard(point);
         return me instanceof Pawn && me.isWhite() != isWhite;
     }
 
@@ -124,8 +123,8 @@ final class King extends Piece {
         if (!isInGridBounds(x, y)) {
             return false;
         }
-        final Point point = new Point(x, y);
-        final Piece me = Chess.getBoard(point);
+        var point = new Point(x, y);
+        var me = Chess.getBoard(point);
         return me instanceof Knight && me.isWhite() != isWhite;
     }
 
