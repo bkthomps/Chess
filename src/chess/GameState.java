@@ -117,29 +117,29 @@ final class GameState {
                     final Piece backup = Chess.getBoard(from);
                     Chess.setBoard(from, null);
                     if (moving.isActionLegal(from, checkAt)) {
-                        chess.fillInSubSection(usedColor, j, i);
+                        chess.drawTileBackgroundGUI(usedColor, j, i);
                     }
                     Chess.setBoard(from, backup);
                 } else if (moving.isActionLegal(from, checkAt)) {
-                    chess.fillInSubSection(usedColor, j, i);
+                    chess.drawTileBackgroundGUI(usedColor, j, i);
                 }
             }
         }
         if (canQueenSideCastle()) {
-            chess.fillInSubSection(isWhiteTurn ? darkGreen : lightGreen, 0, Chess.BOARD_SIZE - 1);
+            chess.drawTileBackgroundGUI(isWhiteTurn ? darkGreen : lightGreen, 0, Chess.BOARD_SIZE - 1);
         }
         if (canKingSideCastle()) {
-            chess.fillInSubSection(isWhiteTurn ? lightGreen : darkGreen, Chess.BOARD_SIZE - 1, Chess.BOARD_SIZE - 1);
+            chess.drawTileBackgroundGUI(isWhiteTurn ? lightGreen : darkGreen, Chess.BOARD_SIZE - 1, Chess.BOARD_SIZE - 1);
         }
         if (enPassant != null) {
             final boolean canCaptureEnPassant = from.y == enPassant.y + 1
                     && Math.abs(from.x - enPassant.x) == 1;
             if (canCaptureEnPassant && isEnPassantLegal(enPassant)) {
                 final Color usedColor = ((enPassant.y + enPassant.x) % 2 == 0 ^ !isWhiteTurn) ? lightGreen : darkGreen;
-                chess.fillInSubSection(usedColor, enPassant.x, enPassant.y);
+                chess.drawTileBackgroundGUI(usedColor, enPassant.x, enPassant.y);
             }
         }
-        chess.setPieces();
+        chess.drawAllPiecesGUI();
     }
 
     /**
