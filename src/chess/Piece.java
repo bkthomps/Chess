@@ -55,7 +55,7 @@ abstract class Piece {
         final Piece backup = Chess.getBoard(end);
         Chess.setBoard(end, this);
         Chess.setBoard(start, null);
-        final Point kingPoint = GameState.locateKing(isWhite());
+        final Point kingPoint = GameState.locateAlliedKing(isWhite());
         final King king = (King) Chess.getBoard(kingPoint);
         final boolean isAllowed = !king.isKingInCheck(kingPoint);
         Chess.setBoard(start, this);
