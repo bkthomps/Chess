@@ -13,24 +13,17 @@ import java.awt.Point;
  * there are no winners.
  */
 final class King extends Piece {
-    private final boolean isWhite;
+    private static final int[][] pixels = {
+            {0, 0, 1, 1, 0, 0},
+            {1, 0, 1, 1, 0, 1},
+            {1, 1, 1, 1, 1, 1},
+            {1, 1, 1, 1, 1, 1},
+            {0, 1, 1, 1, 1, 0},
+            {0, 1, 1, 1, 1, 0}
+    };
 
     King(boolean isWhite) {
-        this.isWhite = isWhite;
-        int[][] pixels = {
-                {0, 0, 1, 1, 0, 0},
-                {1, 0, 1, 1, 0, 1},
-                {1, 1, 1, 1, 1, 1},
-                {1, 1, 1, 1, 1, 1},
-                {0, 1, 1, 1, 1, 0},
-                {0, 1, 1, 1, 1, 0}
-        };
-        setPieceImage(pixels);
-    }
-
-    @Override
-    boolean isWhite() {
-        return isWhite;
+        super(isWhite, pixels);
     }
 
     @Override
@@ -52,7 +45,7 @@ final class King extends Piece {
         }
         var point = new Point(x, y);
         var item = Chess.getBoard(point);
-        return !(item instanceof King && item.isWhite() != isWhite);
+        return !(item instanceof King && item.isWhite() != isWhite());
     }
 
     boolean isKingInCheck(Point point) {
@@ -69,7 +62,7 @@ final class King extends Piece {
         mutatingPoint.y += yScale;
         while (isInGridBounds(mutatingPoint)) {
             var piece = Chess.getBoard(mutatingPoint);
-            if ((piece instanceof Bishop || piece instanceof Queen) && piece.isWhite() != isWhite) {
+            if ((piece instanceof Bishop || piece instanceof Queen) && piece.isWhite() != isWhite()) {
                 return true;
             }
             if (piece != null) {
@@ -87,7 +80,7 @@ final class King extends Piece {
         mutatingPoint.y += yScale;
         while (isInGridBounds(mutatingPoint)) {
             var piece = Chess.getBoard(mutatingPoint);
-            if ((piece instanceof Rook || piece instanceof Queen) && piece.isWhite() != isWhite) {
+            if ((piece instanceof Rook || piece instanceof Queen) && piece.isWhite() != isWhite()) {
                 return true;
             }
             if (piece != null) {
@@ -109,7 +102,7 @@ final class King extends Piece {
         }
         var point = new Point(x, y);
         var piece = Chess.getBoard(point);
-        return piece instanceof Pawn && piece.isWhite() != isWhite;
+        return piece instanceof Pawn && piece.isWhite() != isWhite();
     }
 
     private boolean isCheckDueToKnight(Point point) {
@@ -125,7 +118,7 @@ final class King extends Piece {
         }
         var point = new Point(x, y);
         var piece = Chess.getBoard(point);
-        return piece instanceof Knight && piece.isWhite() != isWhite;
+        return piece instanceof Knight && piece.isWhite() != isWhite();
     }
 
     private boolean isInGridBounds(Point p) {

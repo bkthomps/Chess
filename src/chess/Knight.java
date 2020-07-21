@@ -9,24 +9,17 @@ import java.awt.Point;
  * perform the move.
  */
 final class Knight extends Piece {
-    private final boolean isWhite;
+    private static final int[][] pixels = {
+            {0, 1, 0, 0, 0, 0},
+            {1, 1, 1, 0, 0, 0},
+            {1, 1, 1, 1, 0, 0},
+            {0, 0, 1, 1, 1, 0},
+            {0, 1, 1, 1, 1, 1},
+            {1, 1, 1, 1, 1, 1}
+    };
 
     Knight(boolean isWhite) {
-        this.isWhite = isWhite;
-        int[][] pixels = {
-                {0, 1, 0, 0, 0, 0},
-                {1, 1, 1, 0, 0, 0},
-                {1, 1, 1, 1, 0, 0},
-                {0, 0, 1, 1, 1, 0},
-                {0, 1, 1, 1, 1, 1},
-                {1, 1, 1, 1, 1, 1}
-        };
-        setPieceImage(pixels);
-    }
-
-    @Override
-    boolean isWhite() {
-        return isWhite;
+        super(isWhite, pixels);
     }
 
     @Override
