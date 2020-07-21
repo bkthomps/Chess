@@ -40,10 +40,10 @@ final class King extends Piece {
                 && canMoveToLocation(end) && isNoAdjacentKing(end) && !isKingInCheck(end);
     }
 
-    private boolean isNoAdjacentKing(Point me) {
-        return isKingNotAt(me.x - 1, me.y - 1) && isKingNotAt(me.x, me.y - 1) && isKingNotAt(me.x + 1, me.y - 1)
-                && isKingNotAt(me.x - 1, me.y) && isKingNotAt(me.x + 1, me.y)
-                && isKingNotAt(me.x - 1, me.y + 1) && isKingNotAt(me.x, me.y + 1) && isKingNotAt(me.x + 1, me.y + 1);
+    private boolean isNoAdjacentKing(Point point) {
+        return isKingNotAt(point.x - 1, point.y - 1) && isKingNotAt(point.x, point.y - 1) && isKingNotAt(point.x + 1, point.y - 1)
+                && isKingNotAt(point.x - 1, point.y) && isKingNotAt(point.x + 1, point.y)
+                && isKingNotAt(point.x - 1, point.y + 1) && isKingNotAt(point.x, point.y + 1) && isKingNotAt(point.x + 1, point.y + 1);
     }
 
     private boolean isKingNotAt(int x, int y) {
@@ -68,11 +68,11 @@ final class King extends Piece {
         mutatingPoint.x += xScale;
         mutatingPoint.y += yScale;
         while (isInGridBounds(mutatingPoint)) {
-            var me = Chess.getBoard(mutatingPoint);
-            if ((me instanceof Bishop || me instanceof Queen) && me.isWhite() != isWhite) {
+            var piece = Chess.getBoard(mutatingPoint);
+            if ((piece instanceof Bishop || piece instanceof Queen) && piece.isWhite() != isWhite) {
                 return true;
             }
-            if (me != null) {
+            if (piece != null) {
                 return false;
             }
             mutatingPoint.x += xScale;
@@ -86,11 +86,11 @@ final class King extends Piece {
         mutatingPoint.x += xScale;
         mutatingPoint.y += yScale;
         while (isInGridBounds(mutatingPoint)) {
-            var me = Chess.getBoard(mutatingPoint);
-            if ((me instanceof Rook || me instanceof Queen) && me.isWhite() != isWhite) {
+            var piece = Chess.getBoard(mutatingPoint);
+            if ((piece instanceof Rook || piece instanceof Queen) && piece.isWhite() != isWhite) {
                 return true;
             }
-            if (me != null) {
+            if (piece != null) {
                 return false;
             }
             mutatingPoint.x += xScale;
@@ -108,8 +108,8 @@ final class King extends Piece {
             return false;
         }
         var point = new Point(x, y);
-        var me = Chess.getBoard(point);
-        return me instanceof Pawn && me.isWhite() != isWhite;
+        var piece = Chess.getBoard(point);
+        return piece instanceof Pawn && piece.isWhite() != isWhite;
     }
 
     private boolean isCheckDueToKnight(Point point) {
@@ -124,8 +124,8 @@ final class King extends Piece {
             return false;
         }
         var point = new Point(x, y);
-        var me = Chess.getBoard(point);
-        return me instanceof Knight && me.isWhite() != isWhite;
+        var piece = Chess.getBoard(point);
+        return piece instanceof Knight && piece.isWhite() != isWhite;
     }
 
     private boolean isInGridBounds(Point p) {

@@ -251,18 +251,18 @@ final class GameState {
         }
         for (int i = 0; i < Chess.BOARD_SIZE; i++) {
             for (int j = 0; j < Chess.BOARD_SIZE; j++) {
-                final Point start = new Point(j, i);
-                final Piece me = Chess.getBoard(start);
-                if (me != null && me.isWhite() == isWhiteTurn) {
+                var start = new Point(j, i);
+                var piece = Chess.getBoard(start);
+                if (piece != null && piece.isWhite() == isWhiteTurn) {
                     for (int k = 0; k < Chess.BOARD_SIZE; k++) {
                         for (int l = 0; l < Chess.BOARD_SIZE; l++) {
-                            final Point end = new Point(l, k);
-                            final Piece save = Chess.getBoard(end);
-                            if (me.isActionLegal(start, end)) {
-                                rawMove(me, start, end);
-                                final Point kingLocation = locateAlliedKing(isWhiteTurn);
-                                final boolean isNotInCheck = !king.isKingInCheck(kingLocation);
-                                rawMove(me, end, start);
+                            var end = new Point(l, k);
+                            var save = Chess.getBoard(end);
+                            if (piece.isActionLegal(start, end)) {
+                                rawMove(piece, start, end);
+                                var kingLocation = locateAlliedKing(isWhiteTurn);
+                                boolean isNotInCheck = !king.isKingInCheck(kingLocation);
+                                rawMove(piece, end, start);
                                 Chess.setBoard(end, save);
                                 if (isNotInCheck) {
                                     return false;
@@ -372,12 +372,12 @@ final class GameState {
         for (int i = 0; i < Chess.BOARD_SIZE; i++) {
             for (int j = 0; j < Chess.BOARD_SIZE; j++) {
                 var point = new Point(j, i);
-                var me = Chess.getBoard(point);
-                if (me != null && !(me instanceof King)) {
-                    if (me.isWhite() == isWhiteTurn) {
-                        ally.add(me);
+                var piece = Chess.getBoard(point);
+                if (piece != null && !(piece instanceof King)) {
+                    if (piece.isWhite() == isWhiteTurn) {
+                        ally.add(piece);
                     } else {
-                        enemy.add(me);
+                        enemy.add(piece);
                     }
                 }
             }
@@ -450,8 +450,8 @@ final class GameState {
         return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
     }
 
-    private boolean hasPieceMoved(Piece me) {
-        return me != null && !me.hasMoved();
+    private boolean hasPieceMoved(Piece piece) {
+        return piece != null && !piece.hasMoved();
     }
 
     private void performCastling(Point from, Point to) {
@@ -460,8 +460,8 @@ final class GameState {
         Chess.getBoard(to).setMove();
     }
 
-    private void movePiece(Piece me, Point start, Point end) {
-        if (Chess.getBoard(end) != null || me instanceof Pawn) {
+    private void movePiece(Piece piece, Point start, Point end) {
+        if (Chess.getBoard(end) != null || piece instanceof Pawn) {
             drawCounter = 0;
             boardHistory.clear();
             enPassantHistory.clear();
@@ -479,17 +479,17 @@ final class GameState {
             var kingLocation = locateAlliedKing(isWhiteTurn);
             canCastleHistory.add(Chess.getBoard(kingLocation).hasMoved());
         }
-        rawMove(me, start, end);
-        me.setMove();
+        rawMove(piece, start, end);
+        piece.setMove();
     }
 
     /**
      * Moves the piece without setting the piece to moved state. Used
      * when checking the board and not actually moving pieces on it.
      */
-    private void rawMove(Piece me, Point start, Point end) {
+    private void rawMove(Piece piece, Point start, Point end) {
         Chess.setBoard(start, null);
-        Chess.setBoard(end, me);
+        Chess.setBoard(end, piece);
     }
 
     private int displayDialogText(String text, String[] options) {
