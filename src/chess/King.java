@@ -3,10 +3,14 @@ package chess;
 import java.awt.Point;
 
 /**
- * The king may move only one square which surrounds it. Meaning it can move into any of its eight neighbors. If the
- * king is threatened, it must be moved. This is called a check. If the king cannot move without going into check and is
- * currently in check, it is a checkmate, and the opponent wins. If the king cannot move without going into check and is
- * not currently in check, it is a stalemate, and is a draw. The king cannot move into check.
+ * The king may only move to any of the eight adjacent squares, unless there is a friendly piece. If
+ * the tile which it moves to is an enemy piece, it captures it. If the king is in check, it must
+ * move, or another piece must move in such a way that the check is no longer in effect. If the king
+ * is in check without the possibility of another piece moving to prevent the check, and the king
+ * can only move to other squares which are also in check, it is a checkmate and the opponent wins.
+ * If a similar situation occurs, except that the king is not in check on the current square, but
+ * would be in check in any adjacent squares, then this is a stalemate, and it is a draw, meaning
+ * there are no winners.
  */
 final class King extends Piece {
 

@@ -19,7 +19,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * The main class, which is the starting point of the program. Initializes all chess logic.
+ * The starting point of the program which contains the front end component.
  */
 final class Chess {
 

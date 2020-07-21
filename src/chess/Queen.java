@@ -3,8 +3,10 @@ package chess;
 import java.awt.Point;
 
 /**
- * The queen may move as if it were a rook and a bishop. Meaning it can move horizontally, vertically, or diagonally any
- * amount of squares, as long as it does not pass through any other pieces. The queen may capture the piece it moves to.
+ * The queen may move as if it were a rook and a bishop. Meaning it can move horizontally,
+ * vertically, or diagonally any amount of squares, as long as it does not pass through any other
+ * pieces. The queen captures the piece on the destination tile if it is an enemy piece, but may
+ * not move if it is a friendly piece.
  */
 final class Queen extends Piece {
 

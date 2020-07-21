@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Keeps track of the state of the chess board and the pieces on it.
+ * Keeps track of the chess board and the pieces which exist on it.
  */
 final class GameState {
 

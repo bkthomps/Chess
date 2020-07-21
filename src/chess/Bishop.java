@@ -3,8 +3,10 @@ package chess;
 import java.awt.Point;
 
 /**
- * The bishop is the chess piece which can travel as many squares as it wants diagonally, as long as it does not travel
- * through anything. The bishop may capture the piece it moves to.
+ * The bishop is a chess piece which may travel as many squares as it wants diagonally, with the
+ * only rule being that it does not travel through another piece. If the destination tile has an
+ * enemy piece, it will capture it. If the destination tile has a friendly piece, it may not move
+ * to it.
  */
 final class Bishop extends Piece {
 

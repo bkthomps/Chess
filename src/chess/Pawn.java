@@ -3,7 +3,8 @@ package chess;
 import java.awt.Point;
 
 /**
- * The pawn can only move one square forward, but can move two on its first move. The pawn captures diagonally.
+ * The pawn can only move one square forward, but can move two on its first move. The pawn may not
+ * move forward if there is a piece in the way. The pawn captures one tile diagonally.
  */
 final class Pawn extends Piece {
 

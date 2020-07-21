@@ -3,8 +3,9 @@ package chess;
 import java.awt.Point;
 
 /**
- * The rook, sometimes called the castle, may move any amount of squares horizontally or vertically, but must not pass
- * through other pieces. The rook may capture the piece it moves to.
+ * The rook may move any amount of squares horizontally or vertically, but must not pass through
+ * other pieces. The rook captures the piece it moves to if the destination tile has an enemy piece,
+ * but may not move if the destination tile contains a friendly piece.
  */
 final class Rook extends Piece {
 
