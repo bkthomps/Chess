@@ -7,24 +7,17 @@ import java.awt.Point;
  * move forward if there is a piece in the way. The pawn captures one tile diagonally.
  */
 final class Pawn extends Piece {
-    private final boolean isWhite;
+    private static final int[][] pixels = {
+            {0, 0, 1, 1, 0, 0},
+            {0, 1, 1, 1, 1, 0},
+            {0, 1, 1, 1, 1, 0},
+            {0, 0, 1, 1, 0, 0},
+            {0, 1, 1, 1, 1, 0},
+            {1, 1, 1, 1, 1, 1}
+    };
 
     Pawn(boolean isWhite) {
-        this.isWhite = isWhite;
-        int[][] pixels = {
-                {0, 0, 1, 1, 0, 0},
-                {0, 1, 1, 1, 1, 0},
-                {0, 1, 1, 1, 1, 0},
-                {0, 0, 1, 1, 0, 0},
-                {0, 1, 1, 1, 1, 0},
-                {1, 1, 1, 1, 1, 1}
-        };
-        setPieceImage(pixels);
-    }
-
-    @Override
-    boolean isWhite() {
-        return isWhite;
+        super(isWhite, pixels);
     }
 
     @Override
@@ -35,7 +28,7 @@ final class Pawn extends Piece {
         boolean isJump = end.y == start.y - 2 && Chess.getBoard(oneBelowStart) == null && !hasMoved();
         boolean isForwardAllowed = isForward && (isOneBlock || isJump);
         boolean isCapture = Chess.getBoard(end) != null
-                && Chess.getBoard(end).isWhite() != isWhite
+                && Chess.getBoard(end).isWhite() != isWhite()
                 && end.y == start.y - 1 && Math.abs(end.x - start.x) == 1;
         return (isForwardAllowed || isCapture) && wouldNotPutAlliedKingIntoCheck(start, end);
     }

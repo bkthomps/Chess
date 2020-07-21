@@ -9,24 +9,17 @@ import java.awt.Point;
  * to it.
  */
 final class Bishop extends Piece {
-    private final boolean isWhite;
+    private static final int[][] pixels = {
+            {0, 0, 1, 1, 0, 0},
+            {0, 0, 1, 1, 0, 0},
+            {0, 1, 1, 1, 1, 0},
+            {0, 1, 1, 1, 1, 0},
+            {0, 0, 1, 1, 0, 0},
+            {1, 1, 1, 1, 1, 1}
+    };
 
     Bishop(boolean isWhite) {
-        this.isWhite = isWhite;
-        int[][] pixels = {
-                {0, 0, 1, 1, 0, 0},
-                {0, 0, 1, 1, 0, 0},
-                {0, 1, 1, 1, 1, 0},
-                {0, 1, 1, 1, 1, 0},
-                {0, 0, 1, 1, 0, 0},
-                {1, 1, 1, 1, 1, 1}
-        };
-        setPieceImage(pixels);
-    }
-
-    @Override
-    boolean isWhite() {
-        return isWhite;
+        super(isWhite, pixels);
     }
 
     @Override

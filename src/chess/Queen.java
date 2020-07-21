@@ -9,33 +9,26 @@ import java.awt.Point;
  * not move if it is a friendly piece.
  */
 final class Queen extends Piece {
-    private final boolean isWhite;
+    private static final int[][] pixels = {
+            {0, 1, 0, 0, 1, 0},
+            {0, 0, 1, 1, 0, 0},
+            {1, 0, 1, 1, 0, 1},
+            {1, 0, 1, 1, 0, 1},
+            {0, 1, 1, 1, 1, 0},
+            {1, 1, 1, 1, 1, 1}
+    };
 
     Queen(boolean isWhite) {
-        this.isWhite = isWhite;
-        int[][] pixels = {
-                {0, 1, 0, 0, 1, 0},
-                {0, 0, 1, 1, 0, 0},
-                {1, 0, 1, 1, 0, 1},
-                {1, 0, 1, 1, 0, 1},
-                {0, 1, 1, 1, 1, 0},
-                {1, 1, 1, 1, 1, 1}
-        };
-        setPieceImage(pixels);
-    }
-
-    @Override
-    boolean isWhite() {
-        return isWhite;
+        super(isWhite, pixels);
     }
 
     @Override
     boolean isActionLegal(Point start, Point end) {
-        var bishop = new Bishop(isWhite);
+        var bishop = new Bishop(isWhite());
         if (bishop.isDiagonalLine(start, end)) {
             return bishop.isBishopActionLegal(start, end) && wouldNotPutAlliedKingIntoCheck(start, end);
         }
-        var rook = new Rook(isWhite);
+        var rook = new Rook(isWhite());
         return rook.isRookActionLegal(start, end) && wouldNotPutAlliedKingIntoCheck(start, end);
     }
 }
