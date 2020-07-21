@@ -40,8 +40,8 @@ final class Chess {
     }
 
     private Chess() {
-        configureGUI();
-        resetBoard();
+        initializeGUI();
+        setupPiecesOnBoard();
         refreshPixels();
         state = new GameState(this, isWhiteTurn);
     }
@@ -54,9 +54,6 @@ final class Chess {
         return board[point.y][point.x];
     }
 
-    /**
-     * Flips the board so that the opposite player can play with the correct orientation.
-     */
     void flipBoard() {
         isWhiteTurn = !isWhiteTurn;
         for (int i = 0; i < BOARD_SIZE / 2; i++) {
@@ -67,10 +64,7 @@ final class Chess {
         refreshPixels();
     }
 
-    /**
-     * Initializes the graphical user interface.
-     */
-    private void configureGUI() {
+    private void initializeGUI() {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setResizable(false);
         frame.setLayout(new BorderLayout());
@@ -80,10 +74,7 @@ final class Chess {
         frame.setVisible(true);
     }
 
-    /**
-     * Sets up the chess pieces on the chess board.
-     */
-    private void resetBoard() {
+    private void setupPiecesOnBoard() {
         board[0][0] = new Rook(!isWhiteTurn);
         board[0][1] = new Knight(!isWhiteTurn);
         board[0][2] = new Bishop(!isWhiteTurn);
@@ -106,50 +97,34 @@ final class Chess {
         board[7][7] = new Rook(isWhiteTurn);
     }
 
-    /**
-     * Refreshes the display on the graphical user interface.
-     */
     void refreshPixels() {
-        setBackGround();
-        setPieces();
+        drawBackgroundGUI();
+        drawAllPiecesGUI();
     }
 
-    /**
-     * Sets the checkerboard pattern for the board on the graphical user interface.
-     */
-    private void setBackGround() {
+    private void drawBackgroundGUI() {
         final Color darkBrown = new Color(160, 80, 0);
         final Color lightBrown = new Color(200, 100, 0);
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 final Color usedColor = ((i + j) % 2 == 0 ^ !isWhiteTurn) ? lightBrown : darkBrown;
-                fillInSubSection(usedColor, j, i);
+                drawTileBackgroundGUI(usedColor, j, i);
             }
         }
     }
 
-    /**
-     * Adds the pieces to the chess board on the graphical user interface.
-     */
-    void setPieces() {
+    void drawAllPiecesGUI() {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 if (board[i][j] != null) {
-                    final Color[][] image = board[i][j].getImage();
-                    setPieceColor(j * PIXELS_PER_SQUARE, i * PIXELS_PER_SQUARE, image);
+                    final Color[][] image = board[i][j].getPieceImage();
+                    drawPiecGUI(j * PIXELS_PER_SQUARE, i * PIXELS_PER_SQUARE, image);
                 }
             }
         }
     }
 
-    /**
-     * Determines the color of the piece on the chess board.
-     *
-     * @param x     the x-coordinate
-     * @param y     the y-coordinate
-     * @param image the image of the chess piece
-     */
-    private void setPieceColor(int x, int y, Color[][] image) {
+    private void drawPiecGUI(int x, int y, Color[][] image) {
         for (int i = 1; i < PIXELS_PER_SQUARE - 1; i++) {
             for (int j = 1; j < PIXELS_PER_SQUARE - 1; j++) {
                 if (image[i - 1][j - 1] != null) {
@@ -159,14 +134,7 @@ final class Chess {
         }
     }
 
-    /**
-     * Fills in the specified square for the checkerboard pattern.
-     *
-     * @param color the color to fill in
-     * @param x     the x-coordinate
-     * @param y     the y-coordinate
-     */
-    void fillInSubSection(Color color, int x, int y) {
+    void drawTileBackgroundGUI(Color color, int x, int y) {
         for (int i = 0; i < PIXELS_PER_SQUARE; i++) {
             for (int j = 0; j < PIXELS_PER_SQUARE; j++) {
                 pixels[i + y * PIXELS_PER_SQUARE][j + x * PIXELS_PER_SQUARE] = color;
@@ -188,7 +156,7 @@ final class Chess {
                     if (state != null) {
                         final int horizontalClickPosition = (e.getX()) / (getWidth() / PIXELS_PER_SQUARE);
                         final int verticalClickPosition = (e.getY()) / (getHeight() / PIXELS_PER_SQUARE);
-                        state.clicked(horizontalClickPosition, verticalClickPosition);
+                        state.handleClick(horizontalClickPosition, verticalClickPosition);
                     }
                 }
             });

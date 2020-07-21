@@ -20,7 +20,7 @@ final class Rook extends Piece {
                 {0, 1, 1, 1, 1, 0},
                 {1, 1, 1, 1, 1, 1}
         };
-        getColor(pixels);
+        setPieceImage(pixels);
     }
 
     @Override
@@ -30,16 +30,9 @@ final class Rook extends Piece {
 
     @Override
     boolean isActionLegal(Point start, Point end) {
-        return isRookActionLegal(start, end) && wouldNotPutKingIntoCheck(start, end);
+        return isRookActionLegal(start, end) && wouldNotPutAlliedKingIntoCheck(start, end);
     }
 
-    /**
-     * Rook can capture enemy and can travel as long as nothing is in its way.
-     *
-     * @param start the original position
-     * @param end   the final position
-     * @return true if rook action is legal
-     */
     boolean isRookActionLegal(Point start, Point end) {
         if ((start.x == end.x && start.y == end.y) || (start.x != end.x && start.y != end.y)) {
             return false;
@@ -63,6 +56,6 @@ final class Rook extends Piece {
                 }
             }
         }
-        return canMoveOnto(end);
+        return canMoveToLocation(end);
     }
 }

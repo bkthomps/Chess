@@ -26,16 +26,10 @@ final class GameState {
         this.isWhiteTurn = isWhiteTurn;
         final String text = Chess.resource.getString("startupInformation");
         final String[] options = {Chess.resource.getString("acknowledge")};
-        customText(text, options);
+        displayDialogText(text, options);
     }
 
-    /**
-     * Handles a click event.
-     *
-     * @param x the x-coordinate of the click
-     * @param y the y-coordinate of the click
-     */
-    void clicked(int x, int y) {
+    void handleClick(int x, int y) {
         if (moving == null) {
             lockOntoPiece(new Point(x, y));
             return;
@@ -43,30 +37,23 @@ final class GameState {
         chess.refreshPixels();
         final Point to = new Point(x, y);
         if (isInCheck) {
-            doMoveInCheck(to);
+            doMoveInCheckIfLegal(to);
         } else if (castleIfPossible(to)) {
             isWhiteTurn = !isWhiteTurn;
             chess.flipBoard();
             enPassant = null;
             enPassantHistory.add(null);
-        } else if (isEnPassantLegal(to)) {
+        } else if (canPerformEnPassant(to)) {
             doEnPassant();
         } else if (moving.isActionLegal(from, to)) {
-            checkEnPassant(to);
+            recordEnPassantHistory(to);
             doMove(to);
         }
         moving = null;
         from = null;
     }
 
-    /**
-     * Determines the location of the allied king.
-     *
-     * @param isWhiteTurn the color of the allied king
-     * @return location of the allied king
-     * @throws IllegalStateException if there is no allied king or more than one allied king
-     */
-    static Point locateKing(boolean isWhiteTurn) {
+    static Point locateAlliedKing(boolean isWhiteTurn) {
         Point king = null;
         for (int i = 0; i < Chess.BOARD_SIZE; i++) {
             for (int j = 0; j < Chess.BOARD_SIZE; j++) {
@@ -86,27 +73,19 @@ final class GameState {
         throw new IllegalStateException("No King!");
     }
 
-    /**
-     * Determines the piece which was clicked to operate on.
-     *
-     * @param point the location to lock on to
-     */
     private void lockOntoPiece(Point point) {
         final Piece toMove = Chess.getBoard(point);
         if (toMove != null && toMove.isWhite() == isWhiteTurn) {
             moving = toMove;
             from = point;
-            letUserKnowLegalMoves();
+            highlightLegalMoves();
             return;
         }
         moving = null;
         from = null;
     }
 
-    /**
-     * Creates marks on the board letting the user know where the piece can be moved.
-     */
-    private void letUserKnowLegalMoves() {
+    private void highlightLegalMoves() {
         final Color darkGreen = new Color(0, 100, 40);
         final Color lightGreen = new Color(0, 140, 50);
         for (int i = 0; i < Chess.BOARD_SIZE; i++) {
@@ -117,58 +96,53 @@ final class GameState {
                     final Piece backup = Chess.getBoard(from);
                     Chess.setBoard(from, null);
                     if (moving.isActionLegal(from, checkAt)) {
-                        chess.fillInSubSection(usedColor, j, i);
+                        chess.drawTileBackgroundGUI(usedColor, j, i);
                     }
                     Chess.setBoard(from, backup);
                 } else if (moving.isActionLegal(from, checkAt)) {
-                    chess.fillInSubSection(usedColor, j, i);
+                    chess.drawTileBackgroundGUI(usedColor, j, i);
                 }
             }
         }
         if (canQueenSideCastle()) {
-            chess.fillInSubSection(isWhiteTurn ? darkGreen : lightGreen, 0, Chess.BOARD_SIZE - 1);
+            chess.drawTileBackgroundGUI(isWhiteTurn ? darkGreen : lightGreen, 0, Chess.BOARD_SIZE - 1);
         }
         if (canKingSideCastle()) {
-            chess.fillInSubSection(isWhiteTurn ? lightGreen : darkGreen, Chess.BOARD_SIZE - 1, Chess.BOARD_SIZE - 1);
+            chess.drawTileBackgroundGUI(isWhiteTurn ? lightGreen : darkGreen, Chess.BOARD_SIZE - 1, Chess.BOARD_SIZE - 1);
         }
         if (enPassant != null) {
             final boolean canCaptureEnPassant = from.y == enPassant.y + 1
                     && Math.abs(from.x - enPassant.x) == 1;
-            if (canCaptureEnPassant && isEnPassantLegal(enPassant)) {
+            if (canCaptureEnPassant && canPerformEnPassant(enPassant)) {
                 final Color usedColor = ((enPassant.y + enPassant.x) % 2 == 0 ^ !isWhiteTurn) ? lightGreen : darkGreen;
-                chess.fillInSubSection(usedColor, enPassant.x, enPassant.y);
+                chess.drawTileBackgroundGUI(usedColor, enPassant.x, enPassant.y);
             }
         }
-        chess.setPieces();
+        chess.drawAllPiecesGUI();
     }
 
-    /**
-     * Determines if the move to make when the king is in check is legal.
-     *
-     * @param to where to move the king to
-     */
-    private void doMoveInCheck(Point to) {
+    private void doMoveInCheckIfLegal(Point to) {
         if (moving.isActionLegal(from, to)) {
-            checkEnPassant(to);
-            move(moving, from, to);
-            final Point location = locateKing(isWhiteTurn);
+            recordEnPassantHistory(to);
+            movePiece(moving, from, to);
+            final Point location = locateAlliedKing(isWhiteTurn);
             final King king = new King(isWhiteTurn);
-            if (!king.isCheck(location)) {
+            if (!king.isKingInCheck(location)) {
                 isWhiteTurn = !isWhiteTurn;
                 chess.flipBoard();
-                checkEndgame();
+                checkIfGameOver();
                 isInCheck = false;
             } else {
-                move(moving, to, from);
+                movePiece(moving, to, from);
             }
         }
     }
 
     /**
-     * Moves the piece. If it is a pawn moving into a promotion square, ask the user what to promote the pawn to and
-     * promote the pawn based on user input.
+     * Moves the piece. If it is a pawn moving into a promotion square, ask the
+     * user what to promote the pawn to and promote the pawn based on user input.
      *
-     * @param to where to move to
+     * @throws IllegalStateException if somehow the user ignored piece promotion
      */
     private void doMove(Point to) {
         if (to.y == 0 && moving instanceof Pawn) {
@@ -181,7 +155,7 @@ final class GameState {
             };
             int promotion = -1;
             while (promotion < 0) {
-                promotion = customText(text, options);
+                promotion = displayDialogText(text, options);
             }
             final Piece piece;
             switch (promotion) {
@@ -200,48 +174,37 @@ final class GameState {
                 default:
                     throw new IllegalStateException("Pawn promotion is mandatory.");
             }
-            move(piece, from, to);
+            movePiece(piece, from, to);
         } else {
-            move(moving, from, to);
+            movePiece(moving, from, to);
         }
         isWhiteTurn = !isWhiteTurn;
         chess.flipBoard();
-        checkEndgame();
+        checkIfGameOver();
     }
 
-    /**
-     * Determines if en passant may be used.
-     *
-     * @param to where to move the piece to
-     * @return true if en passant is legal
-     */
-    private boolean isEnPassantLegal(Point to) {
+    private boolean canPerformEnPassant(Point to) {
         final Point squareAboveEnemy = new Point(to.x, to.y + 1);
         return to.equals(enPassant) && moving instanceof Pawn
                 && moving.isWhite() != Chess.getBoard(squareAboveEnemy).isWhite();
     }
 
     /**
-     * Performs en passant. En passant is a move which lets a pawn capture a pawn which just moved two squares as if it
-     * only moved one square immediately after it happens.
+     * En passant is a move which lets a pawn capture a pawn which just moved
+     * two squares as if it only moved one square immediately after it happens.
      */
     private void doEnPassant() {
         final Point squareAboveEnemy = new Point(enPassant.x, enPassant.y + 1);
-        move(moving, from, enPassant);
+        movePiece(moving, from, enPassant);
         Chess.setBoard(squareAboveEnemy, null);
         enPassant = null;
         enPassantHistory.add(null);
         isWhiteTurn = !isWhiteTurn;
         chess.flipBoard();
-        checkEndgame();
+        checkIfGameOver();
     }
 
-    /**
-     * Keeps a record that en passant may be used at this location.
-     *
-     * @param to location to move to
-     */
-    private void checkEnPassant(Point to) {
+    private void recordEnPassantHistory(Point to) {
         if (moving instanceof Pawn && from.y - to.y == 2) {
             enPassant = new Point(to.x, to.y - 2);
         } else {
@@ -251,55 +214,35 @@ final class GameState {
     }
 
     /**
-     * Checks if the game is over. It may be over by checkmate or by draw.
-     * <p> There are 4 types of draws:
+     * The game may be over by checkmate or by draw. There are 4 types of draws:
      * <p> 1. Stalemate
      * <p> 2. 50 moves without pawn move or piece capture
      * <p> 3. Board repeated 3 times
      * <p> 4. Insufficient mating material
      */
-    private void checkEndgame() {
-        final Point location = locateKing(isWhiteTurn);
+    private void checkIfGameOver() {
+        final Point location = locateAlliedKing(isWhiteTurn);
         final King king = new King(isWhiteTurn);
-        if (isCheckmate(king, location)) {
+        if (isGameOverDueToCheckmate(king, location)) {
             final String text = Chess.resource.getString(isWhiteTurn ? "blackWins" : "whiteWins");
-            finishGame(text);
-        } else if (isStalemate(king, location)) {
+            endGameWithNotification(text);
+        } else if (isGameOverDueToStalemate(king, location)) {
             final String text = Chess.resource.getString("stalemate");
-            finishGame(text);
+            endGameWithNotification(text);
         }
-        otherDraw();
-        warnIfCheck(king, location);
+        endGameIfNonStalemateDraw();
+        warnIfKingInCheck(king, location);
+    }
+
+    private boolean isGameOverDueToCheckmate(King king, Point point) {
+        return king.isKingInCheck(point) && isMoveImpossible(king, point);
+    }
+
+    private boolean isGameOverDueToStalemate(King king, Point point) {
+        return !king.isKingInCheck(point) && isMoveImpossible(king, point);
     }
 
     /**
-     * Determines if the game is over by checkmate.
-     *
-     * @param king  the king
-     * @param point the location of the king
-     * @return true if the game is over by checkmate
-     */
-    private boolean isCheckmate(King king, Point point) {
-        return king.isCheck(point) && isMoveImpossible(king, point);
-    }
-
-    /**
-     * Determines if the game is over by stalemate.
-     *
-     * @param king  the king
-     * @param point the location of the king
-     * @return true if the game is over by stalemate
-     */
-    private boolean isStalemate(King king, Point point) {
-        return !king.isCheck(point) && isMoveImpossible(king, point);
-    }
-
-    /**
-     * Determines if any move can be done which results in king not being in check.
-     *
-     * @param king  the king
-     * @param point the location of the king
-     * @return true if any move can be done which results in king not being in check
      * @throws IllegalStateException if king is not at the specified area
      */
     private boolean isMoveImpossible(King king, Point point) {
@@ -317,8 +260,8 @@ final class GameState {
                             final Piece save = Chess.getBoard(end);
                             if (me.isActionLegal(start, end)) {
                                 rawMove(me, start, end);
-                                final Point kingLocation = locateKing(isWhiteTurn);
-                                final boolean isNotInCheck = !king.isCheck(kingLocation);
+                                final Point kingLocation = locateAlliedKing(isWhiteTurn);
+                                final boolean isNotInCheck = !king.isKingInCheck(kingLocation);
                                 rawMove(me, end, start);
                                 Chess.setBoard(end, save);
                                 if (isNotInCheck) {
@@ -333,13 +276,10 @@ final class GameState {
         return true;
     }
 
-    /**
-     * Determines if there is a non-stalemate draw.
-     */
-    private void otherDraw() {
-        determineIfTooManyMoves();
-        determineIfTooManyBoardRepetitions();
-        determineIfInsufficientMatingMaterial();
+    private void endGameIfNonStalemateDraw() {
+        endGameIfTooManyMoves();
+        endGameIfTooManyBoardRepetitions();
+        endGameIfInsufficientMatingMaterial();
     }
 
     /**
@@ -347,13 +287,13 @@ final class GameState {
      *
      * @throws IllegalStateException if somehow went over the draw counter
      */
-    private void determineIfTooManyMoves() {
+    private void endGameIfTooManyMoves() {
         final int MAX_MOVE_PER_SIDE = 50;
         final int MAX_UNPRODUCTIVE_MOVES = 2 * MAX_MOVE_PER_SIDE;
         if (drawCounter == MAX_UNPRODUCTIVE_MOVES) {
             final String text = Chess.resource.getString("draw") + ' '
                     + MAX_MOVE_PER_SIDE + ' ' + Chess.resource.getString("noCapture");
-            finishGame(text);
+            endGameWithNotification(text);
         } else if (drawCounter > MAX_UNPRODUCTIVE_MOVES) {
             throw new IllegalStateException("drawCounter > " + MAX_UNPRODUCTIVE_MOVES);
         }
@@ -362,16 +302,14 @@ final class GameState {
     /**
      * Draw if board repeated 3 times.
      */
-    private void determineIfTooManyBoardRepetitions() {
+    private void endGameIfTooManyBoardRepetitions() {
         if (isTooManyBoardRepetitions()) {
             final String text = Chess.resource.getString("boardRepeat");
-            finishGame(text);
+            endGameWithNotification(text);
         }
     }
 
     /**
-     * Determines if the board has repeated 3 times.
-     *
      * @return true if the board has repeated 3 times
      * @throws IllegalStateException if castle or en passant history size is invalid
      */
@@ -388,7 +326,7 @@ final class GameState {
         for (int i = 0; i < historySize; i++) {
             int count = 0;
             for (int j = 0; j < historySize; j++) {
-                if (isSameBoard(boardHistory.get(i), boardHistory.get(j))
+                if (areBoardEqual(boardHistory.get(i), boardHistory.get(j))
                         && canCastleHistory.get(i).equals(canCastleHistory.get(j))
                         && ((enPassantHistory.get(i) == null && enPassantHistory.get(j) == null)
                         || (enPassantHistory.get(i) != null && enPassantHistory.get(j) != null
@@ -406,14 +344,7 @@ final class GameState {
         return false;
     }
 
-    /**
-     * Determines if two specified boards are the same.
-     *
-     * @param boardOne the first board
-     * @param boardTwo the second board
-     * @return true if two boards are the same
-     */
-    private boolean isSameBoard(Piece[][] boardOne, Piece[][] boardTwo) {
+    private boolean areBoardEqual(Piece[][] boardOne, Piece[][] boardTwo) {
         for (int i = 0; i < Chess.BOARD_SIZE; i++) {
             for (int j = 0; j < Chess.BOARD_SIZE; j++) {
                 if (boardOne[i][j] != boardTwo[i][j]) {
@@ -425,24 +356,18 @@ final class GameState {
     }
 
     /**
-     * Draw if insufficient mating material. Mating material is any pieces which could force a checkmate.
+     * Mating material is any pieces which could force a checkmate.
      */
-    private void determineIfInsufficientMatingMaterial() {
+    private void endGameIfInsufficientMatingMaterial() {
         final List<Piece> ally = new ArrayList<>();
         final List<Piece> enemy = new ArrayList<>();
         findPieces(ally, enemy);
-        if (isInsufficientMating(ally, enemy)) {
+        if (isInsufficientMatingMaterial(ally, enemy)) {
             final String text = Chess.resource.getString("insufficientPieces");
-            finishGame(text);
+            endGameWithNotification(text);
         }
     }
 
-    /**
-     * Finds pieces on the board.
-     *
-     * @param ally  the ally pieces
-     * @param enemy the enemy pieces
-     */
     private void findPieces(List<Piece> ally, List<Piece> enemy) {
         for (int i = 0; i < Chess.BOARD_SIZE; i++) {
             for (int j = 0; j < Chess.BOARD_SIZE; j++) {
@@ -460,13 +385,10 @@ final class GameState {
     }
 
     /**
-     * Determines if insufficient mating material.
-     *
-     * @param ally  pieces allied with the King not including the King
-     * @param enemy pieces enemy to the King not including the King
-     * @return is lone King against: lone King, or King and Knight, or King and Bishop, or King and two Knights
+     * @return is lone King against:
+     * lone King, or King and Knight, or King and Bishop, or King and two Knights
      */
-    private boolean isInsufficientMating(List<Piece> ally, List<Piece> enemy) {
+    private boolean isInsufficientMatingMaterial(List<Piece> ally, List<Piece> enemy) {
         if (ally.size() != 0 && enemy.size() != 0) {
             return false;
         }
@@ -476,115 +398,69 @@ final class GameState {
                 || (group.size() == 2 && group.get(0) instanceof Knight && group.get(1) instanceof Knight);
     }
 
-    /**
-     * Gives a user a message and terminates the program.
-     *
-     * @param text the text to display to the user
-     */
-    private void finishGame(String text) {
+    private void endGameWithNotification(String text) {
         final String[] options = {Chess.resource.getString("acknowledge")};
-        customText(text, options);
+        displayDialogText(text, options);
         System.exit(0);
     }
 
-    /**
-     * Warns the user if the king is in check.
-     *
-     * @param king     the king which is in check
-     * @param location the location of the king in check
-     */
-    private void warnIfCheck(King king, Point location) {
-        if (king.isCheck(location)) {
+    private void warnIfKingInCheck(King king, Point location) {
+        if (king.isKingInCheck(location)) {
             isInCheck = true;
             final String text = Chess.resource.getString("inCheck");
             final String[] options = {Chess.resource.getString("acknowledge")};
-            customText(text, options);
+            displayDialogText(text, options);
         }
     }
 
-    /**
-     * Determines if the king can castle, and if so, castle.
-     *
-     * @param to the location to move to
-     * @return true if the king can castle
-     */
     private boolean castleIfPossible(Point to) {
         if (to.y != Chess.BOARD_SIZE - 1) {
             return false;
         }
         if (to.x == 0 && canQueenSideCastle()) {
-            moveCastle(new Point(4, 7), new Point(2, 7));
-            moveCastle(new Point(0, 7), new Point(3, 7));
+            performCastling(new Point(4, 7), new Point(2, 7));
+            performCastling(new Point(0, 7), new Point(3, 7));
             return true;
         } else if (to.x == 7 && canKingSideCastle()) {
-            moveCastle(new Point(4, 7), new Point(6, 7));
-            moveCastle(new Point(7, 7), new Point(5, 7));
+            performCastling(new Point(4, 7), new Point(6, 7));
+            performCastling(new Point(7, 7), new Point(5, 7));
             return true;
         }
         return false;
     }
 
-    /**
-     * Determines if can queen side castle.
-     *
-     * @return true if queen side castle is legal
-     */
     private boolean canQueenSideCastle() {
         final King king = new King(isWhiteTurn);
         final boolean isLockedOnKing = from.x == 4 && from.y == 7;
-        final boolean isClearPath = hasMoved(Chess.getBoard(new Point(0, 7)))
+        final boolean isClearPath = hasPieceMoved(Chess.getBoard(new Point(0, 7)))
                 && Chess.getBoard(new Point(1, 7)) == null && Chess.getBoard(new Point(2, 7)) == null
-                && Chess.getBoard(new Point(3, 7)) == null && hasMoved(Chess.getBoard(new Point(4, 7)));
-        final boolean isNotPassingThroughCheck = !king.isCheck(new Point(4, 7))
-                && !king.isCheck(new Point(3, 7)) && !king.isCheck(new Point(2, 7));
+                && Chess.getBoard(new Point(3, 7)) == null && hasPieceMoved(Chess.getBoard(new Point(4, 7)));
+        final boolean isNotPassingThroughCheck = !king.isKingInCheck(new Point(4, 7))
+                && !king.isKingInCheck(new Point(3, 7)) && !king.isKingInCheck(new Point(2, 7));
         return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
     }
 
-    /**
-     * Determines if can king side castle.
-     *
-     * @return true if king side castle is legal
-     */
     private boolean canKingSideCastle() {
         final King king = new King(isWhiteTurn);
         final boolean isLockedOnKing = from.x == 4 && from.y == 7;
-        final boolean isClearPath = hasMoved(Chess.getBoard(new Point(4, 7))) && Chess.getBoard(new Point(5, 7)) == null
-                && Chess.getBoard(new Point(6, 7)) == null && hasMoved(Chess.getBoard(new Point(7, 7)));
-        final boolean isNotPassingThroughCheck = !king.isCheck(new Point(4, 7))
-                && !king.isCheck(new Point(5, 7)) && !king.isCheck(new Point(6, 7));
+        final boolean isClearPath = hasPieceMoved(Chess.getBoard(new Point(4, 7))) && Chess.getBoard(new Point(5, 7)) == null
+                && Chess.getBoard(new Point(6, 7)) == null && hasPieceMoved(Chess.getBoard(new Point(7, 7)));
+        final boolean isNotPassingThroughCheck = !king.isKingInCheck(new Point(4, 7))
+                && !king.isKingInCheck(new Point(5, 7)) && !king.isKingInCheck(new Point(6, 7));
         return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
     }
 
-    /**
-     * Determines if the piece has moved.
-     *
-     * @param me the piece
-     * @return true if the piece has moved
-     */
-    private boolean hasMoved(Piece me) {
+    private boolean hasPieceMoved(Piece me) {
         return me != null && !me.hasMoved();
     }
 
-    /**
-     * Moves the piece when castling.
-     *
-     * @param from location to move from
-     * @param to   location to move to
-     */
-    private void moveCastle(Point from, Point to) {
+    private void performCastling(Point from, Point to) {
         Chess.setBoard(to, Chess.getBoard(from));
         Chess.setBoard(from, null);
         Chess.getBoard(to).setMove();
     }
 
-    /**
-     * Moves the piece.
-     *
-     * @param me    the piece to move
-     * @param start the location to move from
-     * @param end   the location to move to
-     */
-    private void move(Piece me, Point start, Point end) {
+    private void movePiece(Piece me, Point start, Point end) {
         if (Chess.getBoard(end) != null || me instanceof Pawn) {
             drawCounter = 0;
             boardHistory.clear();
@@ -600,7 +476,7 @@ final class GameState {
                 }
             }
             boardHistory.add(boardCopy);
-            final Point kingLocation = locateKing(isWhiteTurn);
+            final Point kingLocation = locateAlliedKing(isWhiteTurn);
             canCastleHistory.add(Chess.getBoard(kingLocation).hasMoved());
         }
         rawMove(me, start, end);
@@ -608,26 +484,15 @@ final class GameState {
     }
 
     /**
-     * Moves the piece without setting the piece to moved state. Used when checking the board and not actually moving
-     * pieces on it.
-     *
-     * @param me    the piece to move
-     * @param start the location to move from
-     * @param end   the location to move to
+     * Moves the piece without setting the piece to moved state. Used
+     * when checking the board and not actually moving pieces on it.
      */
     private void rawMove(Piece me, Point start, Point end) {
         Chess.setBoard(start, null);
         Chess.setBoard(end, me);
     }
 
-    /**
-     * Displays text to the user using a dialog box.
-     *
-     * @param text    what to display
-     * @param options the options the user can click
-     * @return the option the user picked
-     */
-    private int customText(String text, String[] options) {
+    private int displayDialogText(String text, String[] options) {
         return JOptionPane.showOptionDialog(null, text, Chess.GAME_TITLE, JOptionPane.DEFAULT_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
     }
