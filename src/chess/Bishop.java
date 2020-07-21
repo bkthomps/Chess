@@ -42,7 +42,7 @@ final class Bishop extends Piece {
     boolean isBishopActionLegal(Point start, Point end) {
         int min = Math.min(start.x, end.x);
         int max = Math.max(start.x, end.x);
-        Point mutatingPoint = new Point(start);
+        var mutatingPoint = new Point(start);
         int xScale = Integer.signum(end.x - start.x);
         int yScale = Integer.signum(end.y - start.y);
         for (int i = min + 1; i < max; i++) {
