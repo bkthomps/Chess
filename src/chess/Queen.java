@@ -32,7 +32,7 @@ final class Queen extends Piece {
     @Override
     boolean isActionLegal(Point start, Point end) {
         final Bishop bishop = new Bishop(isWhite);
-        if (bishop.isEachCoordinateDeltaSame(start, end)) {
+        if (bishop.isDiagonalLine(start, end)) {
             return bishop.isBishopActionLegal(start, end) && wouldNotPutAlliedKingIntoCheck(start, end);
         }
         final Rook rook = new Rook(isWhite);

@@ -31,28 +31,14 @@ final class Bishop extends Piece {
 
     @Override
     boolean isActionLegal(Point start, Point end) {
-        return isEachCoordinateDeltaSame(start, end) && isBishopActionLegal(start, end)
+        return isDiagonalLine(start, end) && isBishopActionLegal(start, end)
                 && wouldNotPutAlliedKingIntoCheck(start, end);
     }
 
-    /**
-     * Checks to see if the change in x is the same as the change in y.
-     *
-     * @param start the original position
-     * @param end   the final position
-     * @return true if the change in x is the same as the change in y
-     */
-    boolean isEachCoordinateDeltaSame(Point start, Point end) {
+    boolean isDiagonalLine(Point start, Point end) {
         return Math.abs(end.y - start.y) == Math.abs(end.x - start.x);
     }
 
-    /**
-     * Bishop can capture enemy and can travel as long as nothing is in its way.
-     *
-     * @param start the original position
-     * @param end   the final position
-     * @return true if bishop action is legal
-     */
     boolean isBishopActionLegal(Point start, Point end) {
         final int min = Math.min(start.x, end.x);
         final int max = Math.max(start.x, end.x);
