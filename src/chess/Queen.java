@@ -13,7 +13,7 @@ final class Queen extends Piece {
 
     Queen(boolean isWhite) {
         this.isWhite = isWhite;
-        final int[][] pixels = {
+        int[][] pixels = {
                 {0, 1, 0, 0, 1, 0},
                 {0, 0, 1, 1, 0, 0},
                 {1, 0, 1, 1, 0, 1},
@@ -31,11 +31,11 @@ final class Queen extends Piece {
 
     @Override
     boolean isActionLegal(Point start, Point end) {
-        final Bishop bishop = new Bishop(isWhite);
+        var bishop = new Bishop(isWhite);
         if (bishop.isDiagonalLine(start, end)) {
             return bishop.isBishopActionLegal(start, end) && wouldNotPutAlliedKingIntoCheck(start, end);
         }
-        final Rook rook = new Rook(isWhite);
+        var rook = new Rook(isWhite);
         return rook.isRookActionLegal(start, end) && wouldNotPutAlliedKingIntoCheck(start, end);
     }
 }

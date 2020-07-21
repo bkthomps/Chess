@@ -37,7 +37,7 @@ abstract class Piece {
     final void setPieceImage(int[][] pixels) {
         for (int i = 0; i < pixels.length; i++) {
             for (int j = 0; j < pixels.length; j++) {
-                final int pixel = pixels[i][j];
+                int pixel = pixels[i][j];
                 if (pixel == 0) {
                     image[i][j] = null;
                 } else if (pixel == 1 && isWhite()) {
@@ -52,12 +52,12 @@ abstract class Piece {
     }
 
     final boolean wouldNotPutAlliedKingIntoCheck(Point start, Point end) {
-        final Piece backup = Chess.getBoard(end);
+        var backup = Chess.getBoard(end);
         Chess.setBoard(end, this);
         Chess.setBoard(start, null);
-        final Point kingPoint = GameState.locateAlliedKing(isWhite());
-        final King king = (King) Chess.getBoard(kingPoint);
-        final boolean isAllowed = !king.isKingInCheck(kingPoint);
+        var kingPoint = GameState.locateAlliedKing(isWhite());
+        var king = (King) Chess.getBoard(kingPoint);
+        boolean isAllowed = !king.isKingInCheck(kingPoint);
         Chess.setBoard(start, this);
         Chess.setBoard(end, backup);
         return isAllowed;

@@ -13,7 +13,7 @@ final class Knight extends Piece {
 
     Knight(boolean isWhite) {
         this.isWhite = isWhite;
-        final int[][] pixels = {
+        int[][] pixels = {
                 {0, 1, 0, 0, 0, 0},
                 {1, 1, 1, 0, 0, 0},
                 {1, 1, 1, 1, 0, 0},
@@ -31,7 +31,7 @@ final class Knight extends Piece {
 
     @Override
     boolean isActionLegal(Point start, Point end) {
-        final boolean isMoveL = (Math.abs(end.x - start.x) == 2 && Math.abs(end.y - start.y) == 1)
+        boolean isMoveL = (Math.abs(end.x - start.x) == 2 && Math.abs(end.y - start.y) == 1)
                 || (Math.abs(end.x - start.x) == 1 && Math.abs(end.y - start.y) == 2);
         return isMoveL && canMoveToLocation(end) && wouldNotPutAlliedKingIntoCheck(start, end);
     }
