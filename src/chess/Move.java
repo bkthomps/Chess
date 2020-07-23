@@ -1,5 +1,8 @@
 package chess;
 
+/**
+ * Specifies the type of move.
+ */
 enum Move {
     NONE,
     QUEEN_SIDE_CASTLE,

@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/**
+ * Keeps track of all frontend components, including the main chess board, and user text displays.
+ */
 final class Frontend {
     static final ResourceBundle RESOURCE =
             ResourceBundle.getBundle("chess.i18n", Locale.getDefault());

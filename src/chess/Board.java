@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Keeps track of the logic of the board, which contains information associated with the pieces on
+ * the board, as well as historic information such as the history of moves which have been taken.
+ */
 final class Board {
     static final int BOARD_LENGTH = 8;
     static final int BOARD_WIDTH = 8;
