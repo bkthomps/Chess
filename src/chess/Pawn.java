@@ -22,13 +22,13 @@ final class Pawn extends Piece {
 
     @Override
     boolean isActionLegal(Point start, Point end) {
-        boolean isForward = Chess.getBoard(end) == null && end.x == start.x;
+        boolean isForward = Board.getBoard(end) == null && end.x == start.x;
         boolean isOneBlock = end.y == start.y - 1;
         var oneBelowStart = new Point(start.x, start.y - 1);
-        boolean isJump = end.y == start.y - 2 && Chess.getBoard(oneBelowStart) == null && !hasMoved();
+        boolean isJump = end.y == start.y - 2 && Board.getBoard(oneBelowStart) == null && !hasMoved();
         boolean isForwardAllowed = isForward && (isOneBlock || isJump);
-        boolean isCapture = Chess.getBoard(end) != null
-                && Chess.getBoard(end).isWhite() != isWhite()
+        boolean isCapture = Board.getBoard(end) != null
+                && Board.getBoard(end).isWhite() != isWhite()
                 && end.y == start.y - 1 && Math.abs(end.x - start.x) == 1;
         return (isForwardAllowed || isCapture) && wouldNotPutAlliedKingIntoCheck(start, end);
     }

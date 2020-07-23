@@ -40,11 +40,11 @@ final class King extends Piece {
     }
 
     private boolean isKingNotAt(int x, int y) {
-        if (x < 0 || x >= Chess.BOARD_SIZE || y < 0 || y >= Chess.BOARD_SIZE) {
+        if (x < 0 || x >= Board.BOARD_WIDTH || y < 0 || y >= Board.BOARD_LENGTH) {
             return true;
         }
         var point = new Point(x, y);
-        var item = Chess.getBoard(point);
+        var item = Board.getBoard(point);
         return !(item instanceof King && item.isWhite() != isWhite());
     }
 
@@ -61,7 +61,7 @@ final class King extends Piece {
         mutatingPoint.x += xScale;
         mutatingPoint.y += yScale;
         while (isInGridBounds(mutatingPoint)) {
-            var piece = Chess.getBoard(mutatingPoint);
+            var piece = Board.getBoard(mutatingPoint);
             if ((piece instanceof Bishop || piece instanceof Queen) && piece.isWhite() != isWhite()) {
                 return true;
             }
@@ -79,7 +79,7 @@ final class King extends Piece {
         mutatingPoint.x += xScale;
         mutatingPoint.y += yScale;
         while (isInGridBounds(mutatingPoint)) {
-            var piece = Chess.getBoard(mutatingPoint);
+            var piece = Board.getBoard(mutatingPoint);
             if ((piece instanceof Rook || piece instanceof Queen) && piece.isWhite() != isWhite()) {
                 return true;
             }
@@ -101,7 +101,7 @@ final class King extends Piece {
             return false;
         }
         var point = new Point(x, y);
-        var piece = Chess.getBoard(point);
+        var piece = Board.getBoard(point);
         return piece instanceof Pawn && piece.isWhite() != isWhite();
     }
 
@@ -117,7 +117,7 @@ final class King extends Piece {
             return false;
         }
         var point = new Point(x, y);
-        var piece = Chess.getBoard(point);
+        var piece = Board.getBoard(point);
         return piece instanceof Knight && piece.isWhite() != isWhite();
     }
 
@@ -126,6 +126,6 @@ final class King extends Piece {
     }
 
     private boolean isInGridBounds(int x, int y) {
-        return x >= 0 && y >= 0 && x < Chess.BOARD_SIZE && y < Chess.BOARD_SIZE;
+        return x >= 0 && y >= 0 && x < Board.BOARD_WIDTH && y < Board.BOARD_LENGTH;
     }
 }

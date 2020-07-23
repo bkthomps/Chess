@@ -41,7 +41,7 @@ final class Bishop extends Piece {
         for (int i = min + 1; i < max; i++) {
             mutatingPoint.x += xScale;
             mutatingPoint.y += yScale;
-            if (Chess.getBoard(mutatingPoint) != null) {
+            if (Board.getBoard(mutatingPoint) != null) {
                 return false;
             }
         }

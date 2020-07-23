@@ -42,18 +42,16 @@ abstract class Piece {
     }
 
     final boolean canMoveToLocation(Point point) {
-        return Chess.getBoard(point) == null || Chess.getBoard(point).isWhite() != isWhite();
+        return Board.getBoard(point) == null || Board.getBoard(point).isWhite() != isWhite();
     }
 
     final boolean wouldNotPutAlliedKingIntoCheck(Point start, Point end) {
-        var backup = Chess.getBoard(end);
-        Chess.setBoard(end, this);
-        Chess.setBoard(start, null);
-        var kingPoint = GameState.locateAlliedKing(isWhite());
-        var king = (King) Chess.getBoard(kingPoint);
-        boolean isAllowed = !king.isKingInCheck(kingPoint);
-        Chess.setBoard(start, this);
-        Chess.setBoard(end, backup);
+        var backup = Board.getBoard(end);
+        Board.setBoard(end, this);
+        Board.setBoard(start, null);
+        boolean isAllowed = !Board.getAlliedKing(isWhite()).isKingInCheck(Board.locateAlliedKing(isWhite()));
+        Board.setBoard(start, this);
+        Board.setBoard(end, backup);
         return isAllowed;
     }
 }
