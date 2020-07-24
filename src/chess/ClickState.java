@@ -1,5 +1,10 @@
 package chess;
 
+/**
+ * Keeps track of what the user has clicked on. There are two modes: the first one in which the user
+ * has not clicked on anything, and nothing is highlighted, and the second one where the cursor is
+ * fixed on a piece and its possible moves are highlighted.
+ */
 final class ClickState {
     private static final ClickState nullInstance = new ClickState(null, null, null);
     private final Piece moving;
