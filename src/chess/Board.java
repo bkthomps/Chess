@@ -78,6 +78,7 @@ final class Board {
         setBoard(from, null);
         getBoard(to).setMove();
         enPassant = null;
+        history.clear();
         flipBoard();
     }
 
@@ -85,7 +86,6 @@ final class Board {
         var squareAboveEnemy = Point.instance(enPassant.x(), enPassant.y() + 1);
         movePiece(moving, from, enPassant);
         setBoard(squareAboveEnemy, null);
-        enPassant = null;
         flipBoard();
         checkIfGameOver(0);
     }
@@ -98,11 +98,6 @@ final class Board {
                 blackKingLocation = to;
             }
         }
-        if (piece instanceof Pawn && from.y() - to.y() == 2) {
-            enPassant = Point.instance(to.x(), to.y() - 2);
-        } else {
-            enPassant = null;
-        }
         int repetitionCount = movePiece(piece, from, to);
         flipBoard();
         checkIfGameOver(repetitionCount);
@@ -110,12 +105,17 @@ final class Board {
 
     private int movePiece(Piece piece, Point start, Point end) {
         int count = 0;
+        if (piece instanceof Pawn && start.y() - end.y() == 2) {
+            enPassant = Point.instance(end.x(), end.y() - 2);
+        } else {
+            enPassant = null;
+        }
         if (getBoard(end) != null || piece instanceof Pawn) {
             drawCounter = 0;
             history.clear();
         } else {
             drawCounter++;
-            var gameState = new GameState(board, enPassant, getAlliedKing(isWhiteTurn).hasMoved());
+            var gameState = new GameState(board, enPassant);
             count = history.getOrDefault(gameState, 0) + 1;
             history.put(gameState, count);
         }
