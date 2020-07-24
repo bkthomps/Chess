@@ -1,6 +1,4 @@
-package chess;
-
-import java.awt.Point;
+package chess.backend;
 
 /**
  * The knight is a chess piece which must travel in an L-shape. It may move two spaces horizontally
@@ -18,14 +16,14 @@ final class Knight extends Piece {
             {1, 1, 1, 1, 1, 1}
     };
 
-    Knight(boolean isWhite) {
-        super(isWhite, pixels);
+    Knight(Board board, boolean isWhite) {
+        super(board, isWhite, pixels);
     }
 
     @Override
     boolean isActionLegal(Point start, Point end) {
-        boolean isMoveL = (Math.abs(end.x - start.x) == 2 && Math.abs(end.y - start.y) == 1)
-                || (Math.abs(end.x - start.x) == 1 && Math.abs(end.y - start.y) == 2);
+        boolean isMoveL = (Math.abs(end.x() - start.x()) == 2 && Math.abs(end.y() - start.y()) == 1)
+                || (Math.abs(end.x() - start.x()) == 1 && Math.abs(end.y() - start.y()) == 2);
         return isMoveL && canMoveToLocation(end) && wouldNotPutAlliedKingIntoCheck(start, end);
     }
 }

@@ -1,6 +1,4 @@
-package chess;
-
-import java.awt.Point;
+package chess.backend;
 
 /**
  * The bishop is a chess piece which may travel as many squares as it wants diagonally, with the
@@ -18,8 +16,8 @@ final class Bishop extends Piece {
             {1, 1, 1, 1, 1, 1}
     };
 
-    Bishop(boolean isWhite) {
-        super(isWhite, pixels);
+    Bishop(Board board, boolean isWhite) {
+        super(board, isWhite, pixels);
     }
 
     @Override
@@ -29,19 +27,17 @@ final class Bishop extends Piece {
     }
 
     boolean isDiagonalLine(Point start, Point end) {
-        return Math.abs(end.y - start.y) == Math.abs(end.x - start.x);
+        return Math.abs(end.y() - start.y()) == Math.abs(end.x() - start.x());
     }
 
     boolean isBishopActionLegal(Point start, Point end) {
-        int min = Math.min(start.x, end.x);
-        int max = Math.max(start.x, end.x);
-        var mutatingPoint = new Point(start);
-        int xScale = Integer.signum(end.x - start.x);
-        int yScale = Integer.signum(end.y - start.y);
+        int min = Math.min(start.x(), end.x());
+        int max = Math.max(start.x(), end.x());
+        int xScale = Integer.signum(end.x() - start.x());
+        int yScale = Integer.signum(end.y() - start.y());
         for (int i = min + 1; i < max; i++) {
-            mutatingPoint.x += xScale;
-            mutatingPoint.y += yScale;
-            if (Chess.getBoard(mutatingPoint) != null) {
+            start = Point.instance(start.x() + xScale, start.y() + yScale);
+            if (board().getBoard(start) != null) {
                 return false;
             }
         }

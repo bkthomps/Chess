@@ -1,6 +1,4 @@
-package chess;
-
-import java.awt.Point;
+package chess.backend;
 
 /**
  * The rook may move any amount of squares horizontally or vertically, but must not pass through
@@ -17,8 +15,8 @@ final class Rook extends Piece {
             {1, 1, 1, 1, 1, 1}
     };
 
-    Rook(boolean isWhite) {
-        super(isWhite, pixels);
+    Rook(Board board, boolean isWhite) {
+        super(board, isWhite, pixels);
     }
 
     @Override
@@ -27,24 +25,24 @@ final class Rook extends Piece {
     }
 
     boolean isRookActionLegal(Point start, Point end) {
-        if ((start.x == end.x && start.y == end.y) || (start.x != end.x && start.y != end.y)) {
+        if (start.equals(end) || (start.x() != end.x() && start.y() != end.y())) {
             return false;
         }
-        if (start.x == end.x) {
-            int min = Math.min(start.y, end.y);
-            int max = Math.max(start.y, end.y);
+        if (start.x() == end.x()) {
+            int min = Math.min(start.y(), end.y());
+            int max = Math.max(start.y(), end.y());
             for (int i = min + 1; i < max; i++) {
-                var point = new Point(start.x, i);
-                if (Chess.getBoard(point) != null) {
+                var point = Point.instance(start.x(), i);
+                if (board().getBoard(point) != null) {
                     return false;
                 }
             }
         } else {
-            int min = Math.min(start.x, end.x);
-            int max = Math.max(start.x, end.x);
+            int min = Math.min(start.x(), end.x());
+            int max = Math.max(start.x(), end.x());
             for (int i = min + 1; i < max; i++) {
-                var point = new Point(i, start.y);
-                if (Chess.getBoard(point) != null) {
+                var point = Point.instance(i, start.y());
+                if (board().getBoard(point) != null) {
                     return false;
                 }
             }
