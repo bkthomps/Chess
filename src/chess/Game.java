@@ -1,8 +1,11 @@
 package chess;
 
 import java.awt.Color;
-import java.util.*;
+import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Keeps track of the game, which means the board and its pieces, and the board history.
@@ -38,29 +41,29 @@ final class Game {
         board.flip();
     }
 
-    void enPassant(ClickState clickState) {
+    GameStatus enPassant(ClickState clickState) {
         var squareAboveEnemy = Point.instance(enPassant.x(), enPassant.y() + 1);
         movePiece(clickState.getMoving(), clickState.getFrom(), enPassant);
         board.setBoard(squareAboveEnemy, null);
         board.flip();
-        checkIfGameOver(0);
+        return gameOverState(0);
     }
 
-    void pawnPromotion(PromotionPiece promotion, ClickState clickState, Point to) {
-        doMove(board.getPromotionPiece(promotion), clickState.getFrom(), to);
+    GameStatus pawnPromotion(PromotionPiece promotion, ClickState clickState, Point to) {
+        return doMove(board.getPromotionPiece(promotion), clickState.getFrom(), to);
     }
 
-    void normalMove(ClickState clickState, Point to) {
-        doMove(clickState.getMoving(), clickState.getFrom(), to);
+    GameStatus normalMove(ClickState clickState, Point to) {
+        return doMove(clickState.getMoving(), clickState.getFrom(), to);
     }
 
-    private void doMove(Piece piece, Point from, Point to) {
+    private GameStatus doMove(Piece piece, Point from, Point to) {
         if (piece instanceof King) {
             board.moveKing(to);
         }
         int repetitionCount = movePiece(piece, from, to);
         board.flip();
-        checkIfGameOver(repetitionCount);
+        return gameOverState(repetitionCount);
     }
 
     private int movePiece(Piece piece, Point start, Point end) {
@@ -103,16 +106,26 @@ final class Game {
      * <p> 3. Board repeated 3 times
      * <p> 4. Insufficient mating material
      */
-    private void checkIfGameOver(int repetitionCount) {
+    private GameStatus gameOverState(int repetitionCount) {
         if (isGameOverDueToCheckmate(board.getAlliedKing(), board.locateAlliedKing())) {
-            var text = Frontend.RESOURCE.getString(board.getAlliedKing().isWhite() ? "blackWins" : "whiteWins");
-            endGameWithNotification(text);
-        } else if (isGameOverDueToStalemate(board.getAlliedKing(), board.locateAlliedKing())) {
-            var text = Frontend.RESOURCE.getString("stalemate");
-            endGameWithNotification(text);
+            return board.getAlliedKing().isWhite() ? GameStatus.BLACK_WINS : GameStatus.WHITE_WINS;
         }
-        endGameIfNonStalemateDraw(repetitionCount);
-        warnIfKingInCheck(board.getAlliedKing(), board.locateAlliedKing());
+        if (isGameOverDueToStalemate(board.getAlliedKing(), board.locateAlliedKing())) {
+            return GameStatus.STALEMATE;
+        }
+        if (isTooManyMoves()) {
+            return GameStatus.TOO_MANY_MOVES;
+        }
+        if (isTooManyBoardRepetitions(repetitionCount)) {
+            return GameStatus.TOO_MANY_REPETITIONS;
+        }
+        if (isInsufficientMatingMaterial()) {
+            return GameStatus.INSUFFICIENT_MATING;
+        }
+        if (board.getAlliedKing().isKingInCheck(board.locateAlliedKing())) {
+            return GameStatus.IN_CHECK;
+        }
+        return GameStatus.ONGOING;
     }
 
     private boolean isGameOverDueToCheckmate(King king, Point point) {
@@ -121,20 +134,6 @@ final class Game {
 
     private boolean isGameOverDueToStalemate(King king, Point point) {
         return !king.isKingInCheck(point) && isMoveImpossible(king, point);
-    }
-
-    private void endGameWithNotification(String text) {
-        String[] options = {Frontend.RESOURCE.getString("acknowledge")};
-        Frontend.displayDialogText(text, options);
-        System.exit(0);
-    }
-
-    private void warnIfKingInCheck(King king, Point location) {
-        if (king.isKingInCheck(location)) {
-            var text = Frontend.RESOURCE.getString("inCheck");
-            String[] options = {Frontend.RESOURCE.getString("acknowledge")};
-            Frontend.displayDialogText(text, options);
-        }
     }
 
     /**
@@ -180,51 +179,31 @@ final class Game {
         board.setBoard(end, piece);
     }
 
-    private void endGameIfNonStalemateDraw(int repetitionCount) {
-        endGameIfTooManyMoves();
-        endGameIfTooManyBoardRepetitions(repetitionCount);
-        endGameIfInsufficientMatingMaterial();
-    }
-
     /**
      * Draw if 50 moves without pawn move or piece capture.
-     *
-     * @throws IllegalStateException if somehow went over the draw counter
      */
-    private void endGameIfTooManyMoves() {
+    private boolean isTooManyMoves() {
         int maxMovePerSide = 50;
         int maxUnproductiveMoves = 2 * maxMovePerSide;
-        if (drawCounter == maxUnproductiveMoves) {
-            var text = Frontend.RESOURCE.getString("draw") + ' '
-                    + maxMovePerSide + ' ' + Frontend.RESOURCE.getString("noCapture");
-            endGameWithNotification(text);
-        } else if (drawCounter > maxUnproductiveMoves) {
-            throw new IllegalStateException("drawCounter > " + maxUnproductiveMoves);
-        }
+        return drawCounter >= maxUnproductiveMoves;
     }
 
     /**
      * Draw if board repeated 3 times.
      */
-    private void endGameIfTooManyBoardRepetitions(int repetitionCount) {
+    private boolean isTooManyBoardRepetitions(int repetitionCount) {
         int maxRepetitions = 3;
-        if (repetitionCount >= maxRepetitions) {
-            var text = Frontend.RESOURCE.getString("boardRepeat");
-            endGameWithNotification(text);
-        }
+        return repetitionCount >= maxRepetitions;
     }
 
     /**
      * Mating material is any pieces which could force a checkmate.
      */
-    private void endGameIfInsufficientMatingMaterial() {
+    private boolean isInsufficientMatingMaterial() {
         var ally = new ArrayList<Piece>();
         var enemy = new ArrayList<Piece>();
         findPieces(ally, enemy);
-        if (isInsufficientMatingMaterial(ally, enemy)) {
-            var text = Frontend.RESOURCE.getString("insufficientPieces");
-            endGameWithNotification(text);
-        }
+        return isInsufficientMatingMaterial(ally, enemy);
     }
 
     private void findPieces(List<Piece> ally, List<Piece> enemy) {

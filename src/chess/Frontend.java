@@ -13,7 +13,7 @@ import java.util.ResourceBundle;
  * Keeps track of all frontend components, including the main chess board, and user text displays.
  */
 final class Frontend {
-    static final ResourceBundle RESOURCE =
+    private static final ResourceBundle RESOURCE =
             ResourceBundle.getBundle("chess.i18n", Locale.getDefault());
     private static final String GAME_TITLE = RESOURCE.getString("gameTitle");
     private static final int PIXELS_PER_SQUARE = 8;
@@ -105,25 +105,66 @@ final class Frontend {
             lockOntoPiece(Point.instance(x, y));
             return;
         }
-        switch (clickState.getMove(Point.instance(x, y))) {
-            case QUEEN_SIDE_CASTLE:
-                game.queenSideCastle();
-                break;
-            case KING_SIDE_CASTLE:
-                game.kingSideCastle();
-                break;
-            case EN_PASSANT:
-                game.enPassant(clickState);
-                break;
-            case PAWN_PROMOTION:
-                game.pawnPromotion(pawnPromotion(), clickState, Point.instance(x, y));
-                break;
-            case NORMAL:
-                game.normalMove(clickState, Point.instance(x, y));
-                break;
+        var status = performAction(x, y);
+        if (status == GameStatus.IN_CHECK) {
+            var text = RESOURCE.getString("inCheck");
+            String[] options = {RESOURCE.getString("acknowledge")};
+            Frontend.displayDialogText(text, options);
+        } else if (status != GameStatus.ONGOING) {
+            terminateGame(status);
         }
         clickState = ClickState.firstClickInstance();
         refreshPixels();
+    }
+
+    private GameStatus performAction(int x, int y) {
+        switch (clickState.getMove(Point.instance(x, y))) {
+            case QUEEN_SIDE_CASTLE:
+                game.queenSideCastle();
+                return GameStatus.ONGOING;
+            case KING_SIDE_CASTLE:
+                game.kingSideCastle();
+                return GameStatus.ONGOING;
+            case EN_PASSANT:
+                return game.enPassant(clickState);
+            case PAWN_PROMOTION:
+                return game.pawnPromotion(pawnPromotion(), clickState, Point.instance(x, y));
+            case NORMAL:
+                return game.normalMove(clickState, Point.instance(x, y));
+            case NONE:
+                return GameStatus.ONGOING;
+            default:
+                throw new IllegalStateException("Invalid move type");
+        }
+    }
+
+    private void terminateGame(GameStatus status) {
+        String text;
+        switch (status) {
+            case WHITE_WINS:
+                text = RESOURCE.getString("whiteWins");
+                break;
+            case BLACK_WINS:
+                text = RESOURCE.getString("blackWins");
+                break;
+            case STALEMATE:
+                text = RESOURCE.getString("stalemate");
+                break;
+            case TOO_MANY_MOVES:
+                text = RESOURCE.getString("tooManyMoves");
+                break;
+            case TOO_MANY_REPETITIONS:
+                text = RESOURCE.getString("boardRepeat");
+                break;
+            case INSUFFICIENT_MATING:
+                text = RESOURCE.getString("insufficientPieces");
+                break;
+            default:
+                throw new IllegalStateException("Invalid end condition");
+        }
+        String[] options = {RESOURCE.getString("acknowledge")};
+        Frontend.displayDialogText(text, options);
+        System.exit(0);
     }
 
     private PromotionPiece pawnPromotion() {
