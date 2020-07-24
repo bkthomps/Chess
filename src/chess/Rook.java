@@ -33,7 +33,7 @@ final class Rook extends Piece {
             int max = Math.max(start.y(), end.y());
             for (int i = min + 1; i < max; i++) {
                 var point = Point.instance(start.x(), i);
-                if (Board.getBoard(point) != null) {
+                if (Game.getBoard(point) != null) {
                     return false;
                 }
             }
@@ -42,7 +42,7 @@ final class Rook extends Piece {
             int max = Math.max(start.x(), end.x());
             for (int i = min + 1; i < max; i++) {
                 var point = Point.instance(i, start.y());
-                if (Board.getBoard(point) != null) {
+                if (Game.getBoard(point) != null) {
                     return false;
                 }
             }

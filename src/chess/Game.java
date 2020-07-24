@@ -8,7 +8,7 @@ import java.util.List;
  * Keeps track of the logic of the board, which contains information associated with the pieces on
  * the board, as well as historic information such as the history of moves which have been taken.
  */
-final class Board {
+final class Game {
     static final int BOARD_LENGTH = 8;
     static final int BOARD_WIDTH = 8;
 
@@ -23,7 +23,7 @@ final class Board {
     private boolean isWhiteTurn = true;
     private Point enPassant;
 
-    Board() {
+    Game() {
         setNonPawnRow(0, false);
         setPawnRow(1, false);
         setPawnRow(BOARD_LENGTH - 2, true);
@@ -321,17 +321,6 @@ final class Board {
             return null;
         }
         return piece;
-    }
-
-    boolean areBoardsEqual(Piece[][] boardOne, Piece[][] boardTwo) {
-        for (int i = 0; i < BOARD_LENGTH; i++) {
-            for (int j = 0; j < BOARD_WIDTH; j++) {
-                if (boardOne[i][j] != boardTwo[i][j]) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     static Piece getBoard(Point point) {

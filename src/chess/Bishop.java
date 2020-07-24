@@ -37,7 +37,7 @@ final class Bishop extends Piece {
         int yScale = Integer.signum(end.y() - start.y());
         for (int i = min + 1; i < max; i++) {
             start = Point.instance(start.x() + xScale, start.y() + yScale);
-            if (Board.getBoard(start) != null) {
+            if (Game.getBoard(start) != null) {
                 return false;
             }
         }

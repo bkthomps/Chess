@@ -17,12 +17,12 @@ final class Frontend {
             ResourceBundle.getBundle("chess.i18n", Locale.getDefault());
     private static final String GAME_TITLE = RESOURCE.getString("gameTitle");
     private static final int PIXELS_PER_SQUARE = 8;
-    private static final int BOARD_PIXELS_LENGTH = Board.BOARD_LENGTH * PIXELS_PER_SQUARE;
-    private static final int BOARD_PIXELS_WIDTH = Board.BOARD_WIDTH * PIXELS_PER_SQUARE;
+    private static final int BOARD_PIXELS_LENGTH = Game.BOARD_LENGTH * PIXELS_PER_SQUARE;
+    private static final int BOARD_PIXELS_WIDTH = Game.BOARD_WIDTH * PIXELS_PER_SQUARE;
 
     private final Color[][] pixels = new Color[BOARD_PIXELS_LENGTH][BOARD_PIXELS_WIDTH];
     private final JFrame frame = new JFrame(GAME_TITLE);
-    private final Board board = new Board();
+    private final Game board = new Game();
 
     private ClickState clickState = ClickState.firstClickInstance();
     private static boolean initDone;
@@ -58,8 +58,8 @@ final class Frontend {
     private void drawBackgroundGUI() {
         var darkBrown = new Color(160, 80, 0);
         var lightBrown = new Color(200, 100, 0);
-        for (int i = 0; i < Board.BOARD_LENGTH; i++) {
-            for (int j = 0; j < Board.BOARD_WIDTH; j++) {
+        for (int i = 0; i < Game.BOARD_LENGTH; i++) {
+            for (int j = 0; j < Game.BOARD_WIDTH; j++) {
                 var usedColor = ((i + j) % 2 == 0 ^ !board.isWhiteTurn()) ? lightBrown : darkBrown;
                 drawTileBackgroundGUI(usedColor, j, i);
             }
@@ -75,8 +75,8 @@ final class Frontend {
     }
 
     private void drawAllPiecesGUI() {
-        for (int i = 0; i < Board.BOARD_LENGTH; i++) {
-            for (int j = 0; j < Board.BOARD_WIDTH; j++) {
+        for (int i = 0; i < Game.BOARD_LENGTH; i++) {
+            for (int j = 0; j < Game.BOARD_WIDTH; j++) {
                 var image = board.getPieceImage(j, i);
                 if (image != null) {
                     drawPieceGUI(j * PIXELS_PER_SQUARE, i * PIXELS_PER_SQUARE, image);
@@ -173,8 +173,8 @@ final class Frontend {
         var darkGreen = new Color(0, 100, 40);
         var lightGreen = new Color(0, 140, 50);
         var moves = board.availableMoves(moving, from);
-        for (int i = 0; i < Board.BOARD_LENGTH; i++) {
-            for (int j = 0; j < Board.BOARD_WIDTH; j++) {
+        for (int i = 0; i < Game.BOARD_LENGTH; i++) {
+            for (int j = 0; j < Game.BOARD_WIDTH; j++) {
                 if (moves[i][j] != Move.NONE) {
                     var usedColor = ((i + j) % 2 == 0 ^ !board.isWhiteTurn()) ? lightGreen : darkGreen;
                     drawTileBackgroundGUI(usedColor, j, i);

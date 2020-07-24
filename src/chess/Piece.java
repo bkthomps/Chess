@@ -41,16 +41,16 @@ abstract class Piece {
     }
 
     final boolean canMoveToLocation(Point point) {
-        return Board.getBoard(point) == null || Board.getBoard(point).isWhite() != isWhite();
+        return Game.getBoard(point) == null || Game.getBoard(point).isWhite() != isWhite();
     }
 
     final boolean wouldNotPutAlliedKingIntoCheck(Point start, Point end) {
-        var backup = Board.getBoard(end);
-        Board.setBoard(end, this);
-        Board.setBoard(start, null);
-        boolean isAllowed = !Board.getAlliedKing(isWhite()).isKingInCheck(Board.locateAlliedKing(isWhite()));
-        Board.setBoard(start, this);
-        Board.setBoard(end, backup);
+        var backup = Game.getBoard(end);
+        Game.setBoard(end, this);
+        Game.setBoard(start, null);
+        boolean isAllowed = !Game.getAlliedKing(isWhite()).isKingInCheck(Game.locateAlliedKing(isWhite()));
+        Game.setBoard(start, this);
+        Game.setBoard(end, backup);
         return isAllowed;
     }
 }
