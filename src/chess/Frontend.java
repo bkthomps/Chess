@@ -106,12 +106,13 @@ final class Frontend {
             return;
         }
         var status = performAction(x, y);
-        if (status == GameStatus.IN_CHECK) {
-            var text = RESOURCE.getString("inCheck");
+        if (status.mustWarnUser()) {
+            String text = RESOURCE.getString(status.textCode());
             String[] options = {RESOURCE.getString("acknowledge")};
             Frontend.displayDialogText(text, options);
-        } else if (status != GameStatus.ONGOING) {
-            terminateGame(status);
+            if (status.isGameOver()) {
+                System.exit(0);
+            }
         }
         clickState = ClickState.firstClickInstance();
         refreshPixels();
@@ -136,35 +137,6 @@ final class Frontend {
             default:
                 throw new IllegalStateException("Invalid move type");
         }
-    }
-
-    private void terminateGame(GameStatus status) {
-        String text;
-        switch (status) {
-            case WHITE_WINS:
-                text = RESOURCE.getString("whiteWins");
-                break;
-            case BLACK_WINS:
-                text = RESOURCE.getString("blackWins");
-                break;
-            case STALEMATE:
-                text = RESOURCE.getString("stalemate");
-                break;
-            case TOO_MANY_MOVES:
-                text = RESOURCE.getString("tooManyMoves");
-                break;
-            case TOO_MANY_REPETITIONS:
-                text = RESOURCE.getString("boardRepeat");
-                break;
-            case INSUFFICIENT_MATING:
-                text = RESOURCE.getString("insufficientPieces");
-                break;
-            default:
-                throw new IllegalStateException("Invalid end condition");
-        }
-        String[] options = {RESOURCE.getString("acknowledge")};
-        Frontend.displayDialogText(text, options);
-        System.exit(0);
     }
 
     private PromotionPiece pawnPromotion() {
