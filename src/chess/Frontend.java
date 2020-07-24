@@ -95,7 +95,7 @@ final class Frontend {
         }
     }
 
-    static int displayDialogText(String text, String[] options) {
+    private static int displayDialogText(String text, String[] options) {
         return JOptionPane.showOptionDialog(null, text, GAME_TITLE, JOptionPane.DEFAULT_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
     }
