@@ -1,7 +1,5 @@
 package chess;
 
-import java.awt.Point;
-
 /**
  * The rook may move any amount of squares horizontally or vertically, but must not pass through
  * other pieces. The rook captures the piece it moves to if the destination tile has an enemy piece,
@@ -27,23 +25,23 @@ final class Rook extends Piece {
     }
 
     boolean isRookActionLegal(Point start, Point end) {
-        if ((start.x == end.x && start.y == end.y) || (start.x != end.x && start.y != end.y)) {
+        if (start.equals(end) || (start.x() != end.x() && start.y() != end.y())) {
             return false;
         }
-        if (start.x == end.x) {
-            int min = Math.min(start.y, end.y);
-            int max = Math.max(start.y, end.y);
+        if (start.x() == end.x()) {
+            int min = Math.min(start.y(), end.y());
+            int max = Math.max(start.y(), end.y());
             for (int i = min + 1; i < max; i++) {
-                var point = new Point(start.x, i);
+                var point = Point.instance(start.x(), i);
                 if (Board.getBoard(point) != null) {
                     return false;
                 }
             }
         } else {
-            int min = Math.min(start.x, end.x);
-            int max = Math.max(start.x, end.x);
+            int min = Math.min(start.x(), end.x());
+            int max = Math.max(start.x(), end.x());
             for (int i = min + 1; i < max; i++) {
-                var point = new Point(i, start.y);
+                var point = Point.instance(i, start.y());
                 if (Board.getBoard(point) != null) {
                     return false;
                 }

@@ -5,8 +5,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -105,7 +105,7 @@ final class Frontend {
 
     private void handleClick(int x, int y) {
         if (moving == null) {
-            lockOntoPiece(new Point(x, y));
+            lockOntoPiece(Point.instance(x, y));
             return;
         }
         // FIXME: might have to check for if king is in check
@@ -120,10 +120,10 @@ final class Frontend {
                 board.enPassant(moving, from);
                 break;
             case PAWN_PROMOTION:
-                board.doMove(pawnPromotion(), from, new Point(x, y));
+                board.doMove(pawnPromotion(), from, Point.instance(x, y));
                 break;
             case NORMAL:
-                board.doMove(moving, from, new Point(x, y));
+                board.doMove(moving, from, Point.instance(x, y));
                 break;
         }
         moving = null;

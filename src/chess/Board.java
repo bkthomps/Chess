@@ -41,10 +41,10 @@ final class Board {
         board[index][3] = new Queen(isWhite);
         if (isWhite) {
             board[index][4] = whiteKing;
-            whiteKingLocation = new Point(4, index);
+            whiteKingLocation = Point.instance(4, index);
         } else {
             board[index][4] = blackKing;
-            blackKingLocation = new Point(4, index);
+            blackKingLocation = Point.instance(4, index);
         }
         board[index][5] = new Bishop(isWhite);
         board[index][6] = new Knight(isWhite);
@@ -59,8 +59,8 @@ final class Board {
 
     void flipBoard() {
         isWhiteTurn = !isWhiteTurn;
-        whiteKingLocation.y = BOARD_LENGTH - 1 - whiteKingLocation.y;
-        blackKingLocation.y = BOARD_LENGTH - 1 - blackKingLocation.y;
+        whiteKingLocation = Point.instance(whiteKingLocation.x(), BOARD_LENGTH - 1 - whiteKingLocation.y());
+        blackKingLocation = Point.instance(blackKingLocation.x(), BOARD_LENGTH - 1 - blackKingLocation.y());
         for (int i = 0; i < BOARD_LENGTH / 2; i++) {
             var tempSlice = board[BOARD_LENGTH - i - 1];
             board[BOARD_LENGTH - i - 1] = board[i];
@@ -88,7 +88,7 @@ final class Board {
     }
 
     Piece getAlliedPieceAt(Point point) {
-        var piece = board[point.y][point.x];
+        var piece = board[point.y()][point.x()];
         if (piece == null || piece.isWhite() != isWhiteTurn) {
             return null;
         }
@@ -107,11 +107,11 @@ final class Board {
     }
 
     static Piece getBoard(Point point) {
-        return board[point.y][point.x];
+        return board[point.y()][point.x()];
     }
 
     static void setBoard(Point point, Piece piece) {
-        board[point.y][point.x] = piece;
+        board[point.y()][point.x()] = piece;
     }
 
     Move[][] availableMoves(Piece moving, Point from) {
@@ -121,7 +121,7 @@ final class Board {
         }
         for (int i = 0; i < BOARD_LENGTH; i++) {
             for (int j = 0; j < BOARD_WIDTH; j++) {
-                var checkAt = new Point(j, i);
+                var checkAt = Point.instance(j, i);
                 if (moving instanceof King) {
                     var backup = getBoard(from);
                     setBoard(from, null);
@@ -130,7 +130,7 @@ final class Board {
                     }
                     setBoard(from, backup);
                 } else if (moving.isActionLegal(from, checkAt)) {
-                    if (moving instanceof Pawn && checkAt.y == 0) {
+                    if (moving instanceof Pawn && checkAt.y() == 0) {
                         moves[i][j] = Move.PAWN_PROMOTION;
                     } else {
                         moves[i][j] = Move.NORMAL;
@@ -146,9 +146,9 @@ final class Board {
         }
         if (enPassant != null) {
             boolean canCaptureEnPassant =
-                    from.y == enPassant.y + 1 && Math.abs(from.x - enPassant.x) == 1;
+                    from.y() == enPassant.y() + 1 && Math.abs(from.x() - enPassant.x()) == 1;
             if (canCaptureEnPassant && canPerformEnPassant(moving, enPassant)) {
-                moves[enPassant.y][enPassant.x] = Move.EN_PASSANT;
+                moves[enPassant.y()][enPassant.x()] = Move.EN_PASSANT;
             }
         }
         return moves;
@@ -156,22 +156,22 @@ final class Board {
 
     private boolean canQueenSideCastle(Point from) {
         var king = new King(isWhiteTurn);
-        boolean isLockedOnKing = from.x == 4 && from.y == 7;
-        boolean isClearPath = hasPieceMoved(getBoard(new Point(0, 7)))
-                && getBoard(new Point(1, 7)) == null && getBoard(new Point(2, 7)) == null
-                && getBoard(new Point(3, 7)) == null && hasPieceMoved(getBoard(new Point(4, 7)));
-        boolean isNotPassingThroughCheck = !king.isKingInCheck(new Point(4, 7))
-                && !king.isKingInCheck(new Point(3, 7)) && !king.isKingInCheck(new Point(2, 7));
+        boolean isLockedOnKing = from.x() == 4 && from.y() == 7;
+        boolean isClearPath = hasPieceMoved(getBoard(Point.instance(0, 7)))
+                && getBoard(Point.instance(1, 7)) == null && getBoard(Point.instance(2, 7)) == null
+                && getBoard(Point.instance(3, 7)) == null && hasPieceMoved(getBoard(Point.instance(4, 7)));
+        boolean isNotPassingThroughCheck = !king.isKingInCheck(Point.instance(4, 7))
+                && !king.isKingInCheck(Point.instance(3, 7)) && !king.isKingInCheck(Point.instance(2, 7));
         return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
     }
 
     private boolean canKingSideCastle(Point from) {
         var king = new King(isWhiteTurn);
-        boolean isLockedOnKing = from.x == 4 && from.y == 7;
-        boolean isClearPath = hasPieceMoved(getBoard(new Point(4, 7))) && getBoard(new Point(5, 7)) == null
-                && getBoard(new Point(6, 7)) == null && hasPieceMoved(getBoard(new Point(7, 7)));
-        boolean isNotPassingThroughCheck = !king.isKingInCheck(new Point(4, 7))
-                && !king.isKingInCheck(new Point(5, 7)) && !king.isKingInCheck(new Point(6, 7));
+        boolean isLockedOnKing = from.x() == 4 && from.y() == 7;
+        boolean isClearPath = hasPieceMoved(getBoard(Point.instance(4, 7))) && getBoard(Point.instance(5, 7)) == null
+                && getBoard(Point.instance(6, 7)) == null && hasPieceMoved(getBoard(Point.instance(7, 7)));
+        boolean isNotPassingThroughCheck = !king.isKingInCheck(Point.instance(4, 7))
+                && !king.isKingInCheck(Point.instance(5, 7)) && !king.isKingInCheck(Point.instance(6, 7));
         return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
     }
 
@@ -180,32 +180,32 @@ final class Board {
     }
 
     private boolean canPerformEnPassant(Piece moving, Point to) {
-        var squareAboveEnemy = new Point(to.x, to.y + 1);
+        var squareAboveEnemy = Point.instance(to.x(), to.y() + 1);
         return to.equals(enPassant) && moving instanceof Pawn
                 && moving.isWhite() != getBoard(squareAboveEnemy).isWhite();
     }
 
     void queenSideCastle() {
-        performCastling(new Point(4, 7), new Point(2, 7));
+        performCastling(Point.instance(4, 7), Point.instance(2, 7));
         if (isWhiteTurn) {
-            whiteKingLocation = new Point(2, 7);
+            whiteKingLocation = Point.instance(2, 7);
         } else {
-            blackKingLocation = new Point(2, 7);
+            blackKingLocation = Point.instance(2, 7);
         }
-        performCastling(new Point(0, 7), new Point(3, 7));
+        performCastling(Point.instance(0, 7), Point.instance(3, 7));
         flipBoard();
         enPassant = null;
         enPassantHistory.add(null);
     }
 
     void kingSideCastle() {
-        performCastling(new Point(4, 7), new Point(6, 7));
+        performCastling(Point.instance(4, 7), Point.instance(6, 7));
         if (isWhiteTurn) {
-            whiteKingLocation = new Point(6, 7);
+            whiteKingLocation = Point.instance(6, 7);
         } else {
-            blackKingLocation = new Point(6, 7);
+            blackKingLocation = Point.instance(6, 7);
         }
-        performCastling(new Point(7, 7), new Point(5, 7));
+        performCastling(Point.instance(7, 7), Point.instance(5, 7));
         flipBoard();
         enPassant = null;
         enPassantHistory.add(null);
@@ -218,7 +218,7 @@ final class Board {
     }
 
     void enPassant(Piece moving, Point from) {
-        var squareAboveEnemy = new Point(enPassant.x, enPassant.y + 1);
+        var squareAboveEnemy = Point.instance(enPassant.x(), enPassant.y() + 1);
         movePiece(moving, from, enPassant);
         setBoard(squareAboveEnemy, null);
         enPassant = null;
@@ -242,8 +242,8 @@ final class Board {
     }
 
     private void recordEnPassantHistory(Piece moving, Point from, Point to) {
-        if (moving instanceof Pawn && from.y - to.y == 2) {
-            enPassant = new Point(to.x, to.y - 2);
+        if (moving instanceof Pawn && from.y() - to.y() == 2) {
+            enPassant = Point.instance(to.x(), to.y() - 2);
         } else {
             enPassant = null;
         }
@@ -261,7 +261,7 @@ final class Board {
             var boardCopy = new Piece[BOARD_LENGTH][BOARD_WIDTH];
             for (int i = 0; i < BOARD_LENGTH; i++) {
                 for (int j = 0; j < BOARD_WIDTH; j++) {
-                    var point = new Point(j, i);
+                    var point = Point.instance(j, i);
                     boardCopy[i][j] = getBoard(point);
                 }
             }
@@ -317,12 +317,12 @@ final class Board {
         }
         for (int i = 0; i < BOARD_LENGTH; i++) {
             for (int j = 0; j < BOARD_WIDTH; j++) {
-                var start = new Point(j, i);
+                var start = Point.instance(j, i);
                 var piece = getBoard(start);
                 if (piece != null && piece.isWhite() == isWhiteTurn) {
                     for (int k = 0; k < BOARD_LENGTH; k++) {
                         for (int l = 0; l < BOARD_WIDTH; l++) {
-                            var end = new Point(l, k);
+                            var end = Point.instance(l, k);
                             var save = getBoard(end);
                             if (piece.isActionLegal(start, end)) {
                                 rawMove(piece, start, end);
@@ -426,7 +426,7 @@ final class Board {
     private void findPieces(List<Piece> ally, List<Piece> enemy) {
         for (int i = 0; i < BOARD_LENGTH; i++) {
             for (int j = 0; j < BOARD_WIDTH; j++) {
-                var point = new Point(j, i);
+                var point = Point.instance(j, i);
                 var piece = getBoard(point);
                 if (piece != null && !(piece instanceof King)) {
                     if (piece.isWhite() == isWhiteTurn) {

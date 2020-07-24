@@ -1,7 +1,5 @@
 package chess;
 
-import java.awt.Point;
-
 /**
  * The queen may move as if it were a rook and a bishop. Meaning it can move horizontally,
  * vertically, or diagonally any amount of squares, as long as it does not pass through any other

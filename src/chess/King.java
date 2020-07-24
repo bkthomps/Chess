@@ -1,7 +1,5 @@
 package chess;
 
-import java.awt.Point;
-
 /**
  * The king may only move to any of the eight adjacent squares, unless there is a friendly piece. If
  * the tile which it moves to is an enemy piece, it captures it. If the king is in check, it must
@@ -28,22 +26,22 @@ final class King extends Piece {
 
     @Override
     boolean isActionLegal(Point start, Point end) {
-        return Math.abs(end.x - start.x) + Math.abs(end.y - start.y) != 0
-                && Math.abs(end.x - start.x) <= 1 && Math.abs(end.y - start.y) <= 1
+        return Math.abs(end.x() - start.x()) + Math.abs(end.y() - start.y()) != 0
+                && Math.abs(end.x() - start.x()) <= 1 && Math.abs(end.y() - start.y()) <= 1
                 && canMoveToLocation(end) && isNoAdjacentKing(end) && !isKingInCheck(end);
     }
 
     private boolean isNoAdjacentKing(Point point) {
-        return isKingNotAt(point.x - 1, point.y - 1) && isKingNotAt(point.x, point.y - 1) && isKingNotAt(point.x + 1, point.y - 1)
-                && isKingNotAt(point.x - 1, point.y) && isKingNotAt(point.x + 1, point.y)
-                && isKingNotAt(point.x - 1, point.y + 1) && isKingNotAt(point.x, point.y + 1) && isKingNotAt(point.x + 1, point.y + 1);
+        return isKingNotAt(point.x() - 1, point.y() - 1) && isKingNotAt(point.x(), point.y() - 1) && isKingNotAt(point.x() + 1, point.y() - 1)
+                && isKingNotAt(point.x() - 1, point.y()) && isKingNotAt(point.x() + 1, point.y())
+                && isKingNotAt(point.x() - 1, point.y() + 1) && isKingNotAt(point.x(), point.y() + 1) && isKingNotAt(point.x() + 1, point.y() + 1);
     }
 
     private boolean isKingNotAt(int x, int y) {
         if (x < 0 || x >= Board.BOARD_WIDTH || y < 0 || y >= Board.BOARD_LENGTH) {
             return true;
         }
-        var point = new Point(x, y);
+        var point = Point.instance(x, y);
         var item = Board.getBoard(point);
         return !(item instanceof King && item.isWhite() != isWhite());
     }
@@ -57,72 +55,66 @@ final class King extends Piece {
     }
 
     private boolean isCheckFromDiagonalLine(Point point, int xScale, int yScale) {
-        var mutatingPoint = new Point(point);
-        mutatingPoint.x += xScale;
-        mutatingPoint.y += yScale;
-        while (isInGridBounds(mutatingPoint)) {
-            var piece = Board.getBoard(mutatingPoint);
+        point = Point.instance(point.x() + xScale, point.y() + yScale);
+        while (isInGridBounds(point)) {
+            var piece = Board.getBoard(point);
             if ((piece instanceof Bishop || piece instanceof Queen) && piece.isWhite() != isWhite()) {
                 return true;
             }
             if (piece != null) {
                 return false;
             }
-            mutatingPoint.x += xScale;
-            mutatingPoint.y += yScale;
+            point = Point.instance(point.x() + xScale, point.y() + yScale);
         }
         return false;
     }
 
     private boolean isCheckFromStraightLine(Point point, int xScale, int yScale) {
-        var mutatingPoint = new Point(point);
-        mutatingPoint.x += xScale;
-        mutatingPoint.y += yScale;
-        while (isInGridBounds(mutatingPoint)) {
-            var piece = Board.getBoard(mutatingPoint);
+        point = Point.instance(point.x() + xScale, point.y() + yScale);
+        while (isInGridBounds(point)) {
+            var piece = Board.getBoard(point);
             if ((piece instanceof Rook || piece instanceof Queen) && piece.isWhite() != isWhite()) {
                 return true;
             }
             if (piece != null) {
                 return false;
             }
-            mutatingPoint.x += xScale;
-            mutatingPoint.y += yScale;
+            point = Point.instance(point.x() + xScale, point.y() + yScale);
         }
         return false;
     }
 
     private boolean isCheckDueToPawn(Point point) {
-        return isEnemyPawnAt(point.x - 1, point.y - 1) || isEnemyPawnAt(point.x + 1, point.y - 1);
+        return isEnemyPawnAt(point.x() - 1, point.y() - 1) || isEnemyPawnAt(point.x() + 1, point.y() - 1);
     }
 
     private boolean isEnemyPawnAt(int x, int y) {
         if (!isInGridBounds(x, y)) {
             return false;
         }
-        var point = new Point(x, y);
+        var point = Point.instance(x, y);
         var piece = Board.getBoard(point);
         return piece instanceof Pawn && piece.isWhite() != isWhite();
     }
 
     private boolean isCheckDueToKnight(Point point) {
-        return (isEnemyKnightAt(point.x - 2, point.y - 1)) || (isEnemyKnightAt(point.x - 1, point.y - 2))
-                || (isEnemyKnightAt(point.x - 2, point.y + 1)) || (isEnemyKnightAt(point.x - 1, point.y + 2))
-                || (isEnemyKnightAt(point.x + 2, point.y - 1)) || (isEnemyKnightAt(point.x + 1, point.y - 2))
-                || (isEnemyKnightAt(point.x + 2, point.y + 1)) || (isEnemyKnightAt(point.x + 1, point.y + 2));
+        return (isEnemyKnightAt(point.x() - 2, point.y() - 1)) || (isEnemyKnightAt(point.x() - 1, point.y() - 2))
+                || (isEnemyKnightAt(point.x() - 2, point.y() + 1)) || (isEnemyKnightAt(point.x() - 1, point.y() + 2))
+                || (isEnemyKnightAt(point.x() + 2, point.y() - 1)) || (isEnemyKnightAt(point.x() + 1, point.y() - 2))
+                || (isEnemyKnightAt(point.x() + 2, point.y() + 1)) || (isEnemyKnightAt(point.x() + 1, point.y() + 2));
     }
 
     private boolean isEnemyKnightAt(int x, int y) {
         if (!isInGridBounds(x, y)) {
             return false;
         }
-        var point = new Point(x, y);
+        var point = Point.instance(x, y);
         var piece = Board.getBoard(point);
         return piece instanceof Knight && piece.isWhite() != isWhite();
     }
 
     private boolean isInGridBounds(Point p) {
-        return isInGridBounds(p.x, p.y);
+        return isInGridBounds(p.x(), p.y());
     }
 
     private boolean isInGridBounds(int x, int y) {

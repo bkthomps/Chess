@@ -1,7 +1,6 @@
 package chess;
 
 import java.awt.Color;
-import java.awt.Point;
 
 /**
  * The chess board contains pieces which may be moved, and have their own abilities.
