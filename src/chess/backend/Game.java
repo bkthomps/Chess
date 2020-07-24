@@ -231,9 +231,10 @@ public final class Game {
             return false;
         }
         var group = (ally.size() == 0) ? enemy : ally;
-        return group.size() == 0
-                || (group.size() == 1 && (group.get(0) instanceof Knight || group.get(0) instanceof Bishop))
-                || (group.size() == 2 && group.get(0) instanceof Knight && group.get(1) instanceof Knight);
+        var size = group.size();
+        return size == 0
+                || (size == 1 && (group.get(0) instanceof Knight || group.get(0) instanceof Bishop))
+                || (size == 2 && group.get(0) instanceof Knight && group.get(1) instanceof Knight);
     }
 
     public Move[][] availableMoves(Piece moving, Point from) {
@@ -280,20 +281,26 @@ public final class Game {
         var king = board.getAlliedKing();
         boolean isLockedOnKing = from.x() == 4 && from.y() == 7;
         boolean isClearPath = hasPieceMoved(board.getBoard(Point.instance(0, 7)))
-                && board.getBoard(Point.instance(1, 7)) == null && board.getBoard(Point.instance(2, 7)) == null
-                && board.getBoard(Point.instance(3, 7)) == null && hasPieceMoved(board.getBoard(Point.instance(4, 7)));
+                && board.getBoard(Point.instance(1, 7)) == null
+                && board.getBoard(Point.instance(2, 7)) == null
+                && board.getBoard(Point.instance(3, 7)) == null
+                && hasPieceMoved(board.getBoard(Point.instance(4, 7)));
         boolean isNotPassingThroughCheck = !king.isKingInCheck(Point.instance(4, 7))
-                && !king.isKingInCheck(Point.instance(3, 7)) && !king.isKingInCheck(Point.instance(2, 7));
+                && !king.isKingInCheck(Point.instance(3, 7))
+                && !king.isKingInCheck(Point.instance(2, 7));
         return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
     }
 
     private boolean canKingSideCastle(Point from) {
         var king = board.getAlliedKing();
         boolean isLockedOnKing = from.x() == 4 && from.y() == 7;
-        boolean isClearPath = hasPieceMoved(board.getBoard(Point.instance(4, 7))) && board.getBoard(Point.instance(5, 7)) == null
-                && board.getBoard(Point.instance(6, 7)) == null && hasPieceMoved(board.getBoard(Point.instance(7, 7)));
+        boolean isClearPath = hasPieceMoved(board.getBoard(Point.instance(4, 7)))
+                && board.getBoard(Point.instance(5, 7)) == null
+                && board.getBoard(Point.instance(6, 7)) == null
+                && hasPieceMoved(board.getBoard(Point.instance(7, 7)));
         boolean isNotPassingThroughCheck = !king.isKingInCheck(Point.instance(4, 7))
-                && !king.isKingInCheck(Point.instance(5, 7)) && !king.isKingInCheck(Point.instance(6, 7));
+                && !king.isKingInCheck(Point.instance(5, 7))
+                && !king.isKingInCheck(Point.instance(6, 7));
         return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
     }
 
@@ -303,6 +310,7 @@ public final class Game {
 
     private boolean canPerformEnPassant(Piece moving, Point to) {
         var squareAboveEnemy = Point.instance(to.x(), to.y() + 1);
-        return moving instanceof Pawn && moving.isWhite() != board.getBoard(squareAboveEnemy).isWhite();
+        return moving instanceof Pawn
+                && moving.isWhite() != board.getBoard(squareAboveEnemy).isWhite();
     }
 }

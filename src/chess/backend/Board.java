@@ -64,8 +64,10 @@ public final class Board {
 
     void flip() {
         isWhiteTurn = !isWhiteTurn;
-        whiteKingLocation = Point.instance(whiteKingLocation.x(), BOARD_LENGTH - 1 - whiteKingLocation.y());
-        blackKingLocation = Point.instance(blackKingLocation.x(), BOARD_LENGTH - 1 - blackKingLocation.y());
+        var oppositeWhiteKingLocation = BOARD_LENGTH - 1 - whiteKingLocation.y();
+        var oppositeBlackKingLocation = BOARD_LENGTH - 1 - blackKingLocation.y();
+        whiteKingLocation = Point.instance(whiteKingLocation.x(), oppositeWhiteKingLocation);
+        blackKingLocation = Point.instance(blackKingLocation.x(), oppositeBlackKingLocation);
         for (int i = 0; i < BOARD_LENGTH / 2; i++) {
             var tempSlice = board[BOARD_LENGTH - i - 1];
             board[BOARD_LENGTH - i - 1] = board[i];

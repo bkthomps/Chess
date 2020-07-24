@@ -127,7 +127,8 @@ final class Frontend {
     }
 
     private GameStatus performAction(int x, int y) {
-        switch (clickState.getMove(Point.instance(x, y))) {
+        var point = Point.instance(x, y);
+        switch (clickState.getMove(point)) {
             case QUEEN_SIDE_CASTLE:
                 game.queenSideCastle();
                 return GameStatus.ONGOING;
@@ -137,9 +138,9 @@ final class Frontend {
             case EN_PASSANT:
                 return game.enPassant(clickState.getMoving(), clickState.getFrom());
             case PAWN_PROMOTION:
-                return game.pawnPromotion(pawnPromotion(), clickState.getFrom(), Point.instance(x, y));
+                return game.pawnPromotion(pawnPromotion(), clickState.getFrom(), point);
             case NORMAL:
-                return game.normalMove(clickState.getMoving(), clickState.getFrom(), Point.instance(x, y));
+                return game.normalMove(clickState.getMoving(), clickState.getFrom(), point);
             case NONE:
                 return GameStatus.ONGOING;
             default:
@@ -235,12 +236,12 @@ final class Frontend {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             var g2d = (Graphics2D) g.create();
-            int cellWidth = getWidth() / BOARD_PIXELS_WIDTH;
-            int cellHeight = getHeight() / BOARD_PIXELS_LENGTH;
+            int width = getWidth() / BOARD_PIXELS_WIDTH;
+            int height = getHeight() / BOARD_PIXELS_LENGTH;
             if (cells.isEmpty()) {
                 for (int row = 0; row < BOARD_PIXELS_WIDTH; row++) {
                     for (int col = 0; col < BOARD_PIXELS_LENGTH; col++) {
-                        var cell = new Rectangle(col * cellWidth, row * cellHeight, cellWidth, cellHeight);
+                        var cell = new Rectangle(col * width, row * height, width, height);
                         cells.add(cell);
                     }
                 }

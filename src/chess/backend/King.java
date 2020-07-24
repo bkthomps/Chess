@@ -32,9 +32,14 @@ final class King extends Piece {
     }
 
     private boolean isNoAdjacentKing(Point point) {
-        return isKingNotAt(point.x() - 1, point.y() - 1) && isKingNotAt(point.x(), point.y() - 1) && isKingNotAt(point.x() + 1, point.y() - 1)
-                && isKingNotAt(point.x() - 1, point.y()) && isKingNotAt(point.x() + 1, point.y())
-                && isKingNotAt(point.x() - 1, point.y() + 1) && isKingNotAt(point.x(), point.y() + 1) && isKingNotAt(point.x() + 1, point.y() + 1);
+        return isKingNotAt(point.x() - 1, point.y() - 1)
+                && isKingNotAt(point.x(), point.y() - 1)
+                && isKingNotAt(point.x() + 1, point.y() - 1)
+                && isKingNotAt(point.x() - 1, point.y())
+                && isKingNotAt(point.x() + 1, point.y())
+                && isKingNotAt(point.x() - 1, point.y() + 1)
+                && isKingNotAt(point.x(), point.y() + 1)
+                && isKingNotAt(point.x() + 1, point.y() + 1);
     }
 
     private boolean isKingNotAt(int x, int y) {
@@ -58,7 +63,8 @@ final class King extends Piece {
         point = Point.instance(point.x() + xScale, point.y() + yScale);
         while (isInGridBounds(point)) {
             var piece = board().getBoard(point);
-            if ((piece instanceof Bishop || piece instanceof Queen) && piece.isWhite() != isWhite()) {
+            var diagonalMovePossible = piece instanceof Bishop || piece instanceof Queen;
+            if (diagonalMovePossible && piece.isWhite() != isWhite()) {
                 return true;
             }
             if (piece != null) {
@@ -73,7 +79,8 @@ final class King extends Piece {
         point = Point.instance(point.x() + xScale, point.y() + yScale);
         while (isInGridBounds(point)) {
             var piece = board().getBoard(point);
-            if ((piece instanceof Rook || piece instanceof Queen) && piece.isWhite() != isWhite()) {
+            var straightMovePossible = piece instanceof Rook || piece instanceof Queen;
+            if (straightMovePossible && piece.isWhite() != isWhite()) {
                 return true;
             }
             if (piece != null) {
@@ -85,7 +92,8 @@ final class King extends Piece {
     }
 
     private boolean isCheckDueToPawn(Point point) {
-        return isEnemyPawnAt(point.x() - 1, point.y() - 1) || isEnemyPawnAt(point.x() + 1, point.y() - 1);
+        return isEnemyPawnAt(point.x() - 1, point.y() - 1)
+                || isEnemyPawnAt(point.x() + 1, point.y() - 1);
     }
 
     private boolean isEnemyPawnAt(int x, int y) {
@@ -98,10 +106,14 @@ final class King extends Piece {
     }
 
     private boolean isCheckDueToKnight(Point point) {
-        return (isEnemyKnightAt(point.x() - 2, point.y() - 1)) || (isEnemyKnightAt(point.x() - 1, point.y() - 2))
-                || (isEnemyKnightAt(point.x() - 2, point.y() + 1)) || (isEnemyKnightAt(point.x() - 1, point.y() + 2))
-                || (isEnemyKnightAt(point.x() + 2, point.y() - 1)) || (isEnemyKnightAt(point.x() + 1, point.y() - 2))
-                || (isEnemyKnightAt(point.x() + 2, point.y() + 1)) || (isEnemyKnightAt(point.x() + 1, point.y() + 2));
+        return (isEnemyKnightAt(point.x() - 2, point.y() - 1))
+                || (isEnemyKnightAt(point.x() - 1, point.y() - 2))
+                || (isEnemyKnightAt(point.x() - 2, point.y() + 1))
+                || (isEnemyKnightAt(point.x() - 1, point.y() + 2))
+                || (isEnemyKnightAt(point.x() + 2, point.y() - 1))
+                || (isEnemyKnightAt(point.x() + 1, point.y() - 2))
+                || (isEnemyKnightAt(point.x() + 2, point.y() + 1))
+                || (isEnemyKnightAt(point.x() + 1, point.y() + 2));
     }
 
     private boolean isEnemyKnightAt(int x, int y) {

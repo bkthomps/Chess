@@ -24,7 +24,8 @@ final class Queen extends Piece {
     boolean isActionLegal(Point start, Point end) {
         var bishop = new Bishop(board(), isWhite());
         if (bishop.isDiagonalLine(start, end)) {
-            return bishop.isBishopActionLegal(start, end) && wouldNotPutAlliedKingIntoCheck(start, end);
+            return bishop.isBishopActionLegal(start, end)
+                    && wouldNotPutAlliedKingIntoCheck(start, end);
         }
         var rook = new Rook(board(), isWhite());
         return rook.isRookActionLegal(start, end) && wouldNotPutAlliedKingIntoCheck(start, end);
