@@ -7,14 +7,12 @@ import java.util.Objects;
  * The state associated with a ply, which is an action taken by either white or black.
  */
 final class Ply {
-    private final Piece[][] board = new Piece[Game.BOARD_LENGTH][Game.BOARD_WIDTH];
+    private final Piece[][] board;
     private final Point enPassant;
     private final int hash;
 
-    Ply(Piece[][] board, Point enPassant) {
-        for (int i = 0; i < Game.BOARD_LENGTH; i++) {
-            this.board[i] = Arrays.copyOf(board[i], Game.BOARD_WIDTH);
-        }
+    Ply(Board board, Point enPassant) {
+        this.board = board.copyBoard();
         this.enPassant = enPassant;
         hash = 31 * Objects.hash(this.enPassant) + Arrays.deepHashCode(this.board);
     }

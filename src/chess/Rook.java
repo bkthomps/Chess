@@ -15,8 +15,8 @@ final class Rook extends Piece {
             {1, 1, 1, 1, 1, 1}
     };
 
-    Rook(boolean isWhite) {
-        super(isWhite, pixels);
+    Rook(Board board, boolean isWhite) {
+        super(board, isWhite, pixels);
     }
 
     @Override
@@ -33,7 +33,7 @@ final class Rook extends Piece {
             int max = Math.max(start.y(), end.y());
             for (int i = min + 1; i < max; i++) {
                 var point = Point.instance(start.x(), i);
-                if (Game.getBoard(point) != null) {
+                if (board().getBoard(point) != null) {
                     return false;
                 }
             }
@@ -42,7 +42,7 @@ final class Rook extends Piece {
             int max = Math.max(start.x(), end.x());
             for (int i = min + 1; i < max; i++) {
                 var point = Point.instance(i, start.y());
-                if (Game.getBoard(point) != null) {
+                if (board().getBoard(point) != null) {
                     return false;
                 }
             }

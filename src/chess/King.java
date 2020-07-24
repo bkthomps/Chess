@@ -20,8 +20,8 @@ final class King extends Piece {
             {0, 1, 1, 1, 1, 0}
     };
 
-    King(boolean isWhite) {
-        super(isWhite, pixels);
+    King(Board board, boolean isWhite) {
+        super(board, isWhite, pixels);
     }
 
     @Override
@@ -38,11 +38,11 @@ final class King extends Piece {
     }
 
     private boolean isKingNotAt(int x, int y) {
-        if (x < 0 || x >= Game.BOARD_WIDTH || y < 0 || y >= Game.BOARD_LENGTH) {
+        if (x < 0 || x >= Board.BOARD_WIDTH || y < 0 || y >= Board.BOARD_LENGTH) {
             return true;
         }
         var point = Point.instance(x, y);
-        var item = Game.getBoard(point);
+        var item = board().getBoard(point);
         return !(item instanceof King && item.isWhite() != isWhite());
     }
 
@@ -57,7 +57,7 @@ final class King extends Piece {
     private boolean isCheckFromDiagonalLine(Point point, int xScale, int yScale) {
         point = Point.instance(point.x() + xScale, point.y() + yScale);
         while (isInGridBounds(point)) {
-            var piece = Game.getBoard(point);
+            var piece = board().getBoard(point);
             if ((piece instanceof Bishop || piece instanceof Queen) && piece.isWhite() != isWhite()) {
                 return true;
             }
@@ -72,7 +72,7 @@ final class King extends Piece {
     private boolean isCheckFromStraightLine(Point point, int xScale, int yScale) {
         point = Point.instance(point.x() + xScale, point.y() + yScale);
         while (isInGridBounds(point)) {
-            var piece = Game.getBoard(point);
+            var piece = board().getBoard(point);
             if ((piece instanceof Rook || piece instanceof Queen) && piece.isWhite() != isWhite()) {
                 return true;
             }
@@ -93,7 +93,7 @@ final class King extends Piece {
             return false;
         }
         var point = Point.instance(x, y);
-        var piece = Game.getBoard(point);
+        var piece = board().getBoard(point);
         return piece instanceof Pawn && piece.isWhite() != isWhite();
     }
 
@@ -109,7 +109,7 @@ final class King extends Piece {
             return false;
         }
         var point = Point.instance(x, y);
-        var piece = Game.getBoard(point);
+        var piece = board().getBoard(point);
         return piece instanceof Knight && piece.isWhite() != isWhite();
     }
 
@@ -118,6 +118,6 @@ final class King extends Piece {
     }
 
     private boolean isInGridBounds(int x, int y) {
-        return x >= 0 && y >= 0 && x < Game.BOARD_WIDTH && y < Game.BOARD_LENGTH;
+        return x >= 0 && y >= 0 && x < Board.BOARD_WIDTH && y < Board.BOARD_LENGTH;
     }
 }

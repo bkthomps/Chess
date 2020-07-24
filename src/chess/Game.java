@@ -1,105 +1,65 @@
 package chess;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.*;
 import java.util.List;
 
 /**
- * Keeps track of the logic of the board, which contains information associated with the pieces on
- * the board, as well as historic information such as the history of moves which have been taken.
+ * Keeps track of the game, which means the board and its pieces, and the board history.
  */
 final class Game {
-    static final int BOARD_LENGTH = 8;
-    static final int BOARD_WIDTH = 8;
-
-    private static final Piece[][] board = new Piece[BOARD_LENGTH][BOARD_WIDTH];
-    private static final King whiteKing = new King(true);
-    private static final King blackKing = new King(false);
-    private static Point whiteKingLocation;
-    private static Point blackKingLocation;
-
+    private final Board board = new Board();
     private final Map<Ply, Integer> history = new HashMap<>();
     private int drawCounter;
-    private boolean isWhiteTurn = true;
     private Point enPassant;
-
-    Game() {
-        setNonPawnRow(0, false);
-        setPawnRow(1, false);
-        setPawnRow(BOARD_LENGTH - 2, true);
-        setNonPawnRow(BOARD_LENGTH - 1, true);
-    }
-
-    private void setNonPawnRow(int index, boolean isWhite) {
-        board[index][0] = new Rook(isWhite);
-        board[index][1] = new Knight(isWhite);
-        board[index][2] = new Bishop(isWhite);
-        board[index][3] = new Queen(isWhite);
-        if (isWhite) {
-            board[index][4] = whiteKing;
-            whiteKingLocation = Point.instance(4, index);
-        } else {
-            board[index][4] = blackKing;
-            blackKingLocation = Point.instance(4, index);
-        }
-        board[index][5] = new Bishop(isWhite);
-        board[index][6] = new Knight(isWhite);
-        board[index][7] = new Rook(isWhite);
-    }
-
-    private void setPawnRow(int index, boolean isWhite) {
-        for (int i = 0; i < BOARD_WIDTH; i++) {
-            board[index][i] = new Pawn(isWhite);
-        }
-    }
 
     void queenSideCastle() {
         performCastling(Point.instance(4, 7), Point.instance(2, 7));
-        if (isWhiteTurn) {
-            whiteKingLocation = Point.instance(2, 7);
-        } else {
-            blackKingLocation = Point.instance(2, 7);
-        }
         performCastling(Point.instance(0, 7), Point.instance(3, 7));
+        finishCastling(Point.instance(2, 7));
     }
 
     void kingSideCastle() {
         performCastling(Point.instance(4, 7), Point.instance(6, 7));
-        if (isWhiteTurn) {
-            whiteKingLocation = Point.instance(6, 7);
-        } else {
-            blackKingLocation = Point.instance(6, 7);
-        }
         performCastling(Point.instance(7, 7), Point.instance(5, 7));
+        finishCastling(Point.instance(6, 7));
     }
 
     private void performCastling(Point from, Point to) {
-        setBoard(to, getBoard(from));
-        setBoard(from, null);
-        getBoard(to).setMove();
-        enPassant = null;
-        history.clear();
-        flipBoard();
+        board.setBoard(to, board.getBoard(from));
+        board.setBoard(from, null);
+        board.getBoard(to).setMove();
     }
 
-    void enPassant(Piece moving, Point from) {
+    private void finishCastling(Point point) {
+        board.moveKing(point);
+        enPassant = null;
+        history.clear();
+        board.flip();
+    }
+
+    void enPassant(ClickState clickState) {
         var squareAboveEnemy = Point.instance(enPassant.x(), enPassant.y() + 1);
-        movePiece(moving, from, enPassant);
-        setBoard(squareAboveEnemy, null);
-        flipBoard();
+        movePiece(clickState.getMoving(), clickState.getFrom(), enPassant);
+        board.setBoard(squareAboveEnemy, null);
+        board.flip();
         checkIfGameOver(0);
     }
 
-    void doMove(Piece piece, Point from, Point to) {
+    void pawnPromotion(PromotionPiece promotion, ClickState clickState, Point to) {
+        doMove(board.getPromotionPiece(promotion), clickState.getFrom(), to);
+    }
+
+    void normalMove(ClickState clickState, Point to) {
+        doMove(clickState.getMoving(), clickState.getFrom(), to);
+    }
+
+    private void doMove(Piece piece, Point from, Point to) {
         if (piece instanceof King) {
-            if (isWhiteTurn) {
-                whiteKingLocation = to;
-            } else {
-                blackKingLocation = to;
-            }
+            board.moveKing(to);
         }
         int repetitionCount = movePiece(piece, from, to);
-        flipBoard();
+        board.flip();
         checkIfGameOver(repetitionCount);
     }
 
@@ -110,7 +70,7 @@ final class Game {
         } else {
             enPassant = null;
         }
-        if (getBoard(end) != null || piece instanceof Pawn) {
+        if (board.getBoard(end) != null || piece instanceof Pawn) {
             drawCounter = 0;
             history.clear();
         } else {
@@ -124,15 +84,16 @@ final class Game {
         return count;
     }
 
-    private void flipBoard() {
-        isWhiteTurn = !isWhiteTurn;
-        whiteKingLocation = Point.instance(whiteKingLocation.x(), BOARD_LENGTH - 1 - whiteKingLocation.y());
-        blackKingLocation = Point.instance(blackKingLocation.x(), BOARD_LENGTH - 1 - blackKingLocation.y());
-        for (int i = 0; i < BOARD_LENGTH / 2; i++) {
-            var tempSlice = board[BOARD_LENGTH - i - 1];
-            board[BOARD_LENGTH - i - 1] = board[i];
-            board[i] = tempSlice;
-        }
+    Color[][] getPieceImage(Point point) {
+        return board.getPieceImage(point);
+    }
+
+    Piece getAlliedPieceAt(Point point) {
+        return board.getAlliedPieceAt(point);
+    }
+
+    boolean isLightTile(Point point) {
+        return board.isLightTile(point);
     }
 
     /**
@@ -143,15 +104,15 @@ final class Game {
      * <p> 4. Insufficient mating material
      */
     private void checkIfGameOver(int repetitionCount) {
-        if (isGameOverDueToCheckmate(getAlliedKing(isWhiteTurn), locateAlliedKing(isWhiteTurn))) {
-            var text = Frontend.RESOURCE.getString(isWhiteTurn ? "blackWins" : "whiteWins");
+        if (isGameOverDueToCheckmate(board.getAlliedKing(), board.locateAlliedKing())) {
+            var text = Frontend.RESOURCE.getString(board.getAlliedKing().isWhite() ? "blackWins" : "whiteWins");
             endGameWithNotification(text);
-        } else if (isGameOverDueToStalemate(getAlliedKing(isWhiteTurn), locateAlliedKing(isWhiteTurn))) {
+        } else if (isGameOverDueToStalemate(board.getAlliedKing(), board.locateAlliedKing())) {
             var text = Frontend.RESOURCE.getString("stalemate");
             endGameWithNotification(text);
         }
         endGameIfNonStalemateDraw(repetitionCount);
-        warnIfKingInCheck(getAlliedKing(isWhiteTurn), locateAlliedKing(isWhiteTurn));
+        warnIfKingInCheck(board.getAlliedKing(), board.locateAlliedKing());
     }
 
     private boolean isGameOverDueToCheckmate(King king, Point point) {
@@ -180,24 +141,24 @@ final class Game {
      * @throws IllegalStateException if king is not at the specified area
      */
     private boolean isMoveImpossible(King king, Point point) {
-        if (!(getBoard(point) instanceof King)) {
+        if (!(board.getBoard(point) instanceof King)) {
             throw new IllegalStateException("King not where specified!");
         }
-        for (int i = 0; i < BOARD_LENGTH; i++) {
-            for (int j = 0; j < BOARD_WIDTH; j++) {
+        for (int i = 0; i < Board.BOARD_LENGTH; i++) {
+            for (int j = 0; j < Board.BOARD_WIDTH; j++) {
                 var start = Point.instance(j, i);
-                var piece = getBoard(start);
-                if (piece != null && piece.isWhite() == isWhiteTurn) {
-                    for (int k = 0; k < BOARD_LENGTH; k++) {
-                        for (int l = 0; l < BOARD_WIDTH; l++) {
+                var piece = board.getBoard(start);
+                if (piece != null && board.isAlly(piece)) {
+                    for (int k = 0; k < Board.BOARD_LENGTH; k++) {
+                        for (int l = 0; l < Board.BOARD_WIDTH; l++) {
                             var end = Point.instance(l, k);
-                            var save = getBoard(end);
+                            var save = board.getBoard(end);
                             if (piece.isActionLegal(start, end)) {
                                 rawMove(piece, start, end);
-                                var kingLocation = locateAlliedKing(isWhiteTurn);
+                                var kingLocation = board.locateAlliedKing();
                                 boolean isNotInCheck = !king.isKingInCheck(kingLocation);
                                 rawMove(piece, end, start);
-                                setBoard(end, save);
+                                board.setBoard(end, save);
                                 if (isNotInCheck) {
                                     return false;
                                 }
@@ -215,8 +176,8 @@ final class Game {
      * when checking the board and not actually moving pieces on it.
      */
     private void rawMove(Piece piece, Point start, Point end) {
-        setBoard(start, null);
-        setBoard(end, piece);
+        board.setBoard(start, null);
+        board.setBoard(end, piece);
     }
 
     private void endGameIfNonStalemateDraw(int repetitionCount) {
@@ -267,12 +228,12 @@ final class Game {
     }
 
     private void findPieces(List<Piece> ally, List<Piece> enemy) {
-        for (int i = 0; i < BOARD_LENGTH; i++) {
-            for (int j = 0; j < BOARD_WIDTH; j++) {
+        for (int i = 0; i < Board.BOARD_LENGTH; i++) {
+            for (int j = 0; j < Board.BOARD_WIDTH; j++) {
                 var point = Point.instance(j, i);
-                var piece = getBoard(point);
+                var piece = board.getBoard(point);
                 if (piece != null && !(piece instanceof King)) {
-                    if (piece.isWhite() == isWhiteTurn) {
+                    if (board.isAlly(piece)) {
                         ally.add(piece);
                     } else {
                         enemy.add(piece);
@@ -296,56 +257,21 @@ final class Game {
                 || (group.size() == 2 && group.get(0) instanceof Knight && group.get(1) instanceof Knight);
     }
 
-    Color[][] getPieceImage(int x, int y) {
-        if (board[y][x] == null) {
-            return null;
-        }
-        return board[y][x].getPieceImage();
-    }
-
-    boolean isWhiteTurn() {
-        return isWhiteTurn;
-    }
-
-    static King getAlliedKing(boolean isWhiteTurn) {
-        return isWhiteTurn ? whiteKing : blackKing;
-    }
-
-    static Point locateAlliedKing(boolean isWhiteTurn) {
-        return isWhiteTurn ? whiteKingLocation : blackKingLocation;
-    }
-
-    Piece getAlliedPieceAt(Point point) {
-        var piece = board[point.y()][point.x()];
-        if (piece == null || piece.isWhite() != isWhiteTurn) {
-            return null;
-        }
-        return piece;
-    }
-
-    static Piece getBoard(Point point) {
-        return board[point.y()][point.x()];
-    }
-
-    static void setBoard(Point point, Piece piece) {
-        board[point.y()][point.x()] = piece;
-    }
-
     Move[][] availableMoves(Piece moving, Point from) {
-        var moves = new Move[BOARD_LENGTH][BOARD_WIDTH];
+        var moves = new Move[Board.BOARD_LENGTH][Board.BOARD_WIDTH];
         for (var slice : moves) {
             Arrays.fill(slice, Move.NONE);
         }
-        for (int i = 0; i < BOARD_LENGTH; i++) {
-            for (int j = 0; j < BOARD_WIDTH; j++) {
+        for (int i = 0; i < Board.BOARD_LENGTH; i++) {
+            for (int j = 0; j < Board.BOARD_WIDTH; j++) {
                 var checkAt = Point.instance(j, i);
                 if (moving instanceof King) {
-                    var backup = getBoard(from);
-                    setBoard(from, null);
+                    var backup = board.getBoard(from);
+                    board.setBoard(from, null);
                     if (moving.isActionLegal(from, checkAt)) {
                         moves[i][j] = Move.NORMAL;
                     }
-                    setBoard(from, backup);
+                    board.setBoard(from, backup);
                 } else if (moving.isActionLegal(from, checkAt)) {
                     if (moving instanceof Pawn && checkAt.y() == 0) {
                         moves[i][j] = Move.PAWN_PROMOTION;
@@ -356,10 +282,10 @@ final class Game {
             }
         }
         if (canQueenSideCastle(from)) {
-            moves[BOARD_LENGTH - 1][0] = Move.QUEEN_SIDE_CASTLE;
+            moves[Board.BOARD_LENGTH - 1][0] = Move.QUEEN_SIDE_CASTLE;
         }
         if (canKingSideCastle(from)) {
-            moves[BOARD_LENGTH - 1][BOARD_WIDTH - 1] = Move.KING_SIDE_CASTLE;
+            moves[Board.BOARD_LENGTH - 1][Board.BOARD_WIDTH - 1] = Move.KING_SIDE_CASTLE;
         }
         if (enPassant != null) {
             boolean canCaptureEnPassant =
@@ -372,21 +298,21 @@ final class Game {
     }
 
     private boolean canQueenSideCastle(Point from) {
-        var king = new King(isWhiteTurn);
+        var king = board.getAlliedKing();
         boolean isLockedOnKing = from.x() == 4 && from.y() == 7;
-        boolean isClearPath = hasPieceMoved(getBoard(Point.instance(0, 7)))
-                && getBoard(Point.instance(1, 7)) == null && getBoard(Point.instance(2, 7)) == null
-                && getBoard(Point.instance(3, 7)) == null && hasPieceMoved(getBoard(Point.instance(4, 7)));
+        boolean isClearPath = hasPieceMoved(board.getBoard(Point.instance(0, 7)))
+                && board.getBoard(Point.instance(1, 7)) == null && board.getBoard(Point.instance(2, 7)) == null
+                && board.getBoard(Point.instance(3, 7)) == null && hasPieceMoved(board.getBoard(Point.instance(4, 7)));
         boolean isNotPassingThroughCheck = !king.isKingInCheck(Point.instance(4, 7))
                 && !king.isKingInCheck(Point.instance(3, 7)) && !king.isKingInCheck(Point.instance(2, 7));
         return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
     }
 
     private boolean canKingSideCastle(Point from) {
-        var king = new King(isWhiteTurn);
+        var king = board.getAlliedKing();
         boolean isLockedOnKing = from.x() == 4 && from.y() == 7;
-        boolean isClearPath = hasPieceMoved(getBoard(Point.instance(4, 7))) && getBoard(Point.instance(5, 7)) == null
-                && getBoard(Point.instance(6, 7)) == null && hasPieceMoved(getBoard(Point.instance(7, 7)));
+        boolean isClearPath = hasPieceMoved(board.getBoard(Point.instance(4, 7))) && board.getBoard(Point.instance(5, 7)) == null
+                && board.getBoard(Point.instance(6, 7)) == null && hasPieceMoved(board.getBoard(Point.instance(7, 7)));
         boolean isNotPassingThroughCheck = !king.isKingInCheck(Point.instance(4, 7))
                 && !king.isKingInCheck(Point.instance(5, 7)) && !king.isKingInCheck(Point.instance(6, 7));
         return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
@@ -398,6 +324,6 @@ final class Game {
 
     private boolean canPerformEnPassant(Piece moving, Point to) {
         var squareAboveEnemy = Point.instance(to.x(), to.y() + 1);
-        return moving instanceof Pawn && moving.isWhite() != getBoard(squareAboveEnemy).isWhite();
+        return moving instanceof Pawn && moving.isWhite() != board.getBoard(squareAboveEnemy).isWhite();
     }
 }

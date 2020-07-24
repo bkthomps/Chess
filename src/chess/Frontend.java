@@ -17,12 +17,12 @@ final class Frontend {
             ResourceBundle.getBundle("chess.i18n", Locale.getDefault());
     private static final String GAME_TITLE = RESOURCE.getString("gameTitle");
     private static final int PIXELS_PER_SQUARE = 8;
-    private static final int BOARD_PIXELS_LENGTH = Game.BOARD_LENGTH * PIXELS_PER_SQUARE;
-    private static final int BOARD_PIXELS_WIDTH = Game.BOARD_WIDTH * PIXELS_PER_SQUARE;
+    private static final int BOARD_PIXELS_LENGTH = Board.BOARD_LENGTH * PIXELS_PER_SQUARE;
+    private static final int BOARD_PIXELS_WIDTH = Board.BOARD_WIDTH * PIXELS_PER_SQUARE;
 
     private final Color[][] pixels = new Color[BOARD_PIXELS_LENGTH][BOARD_PIXELS_WIDTH];
     private final JFrame frame = new JFrame(GAME_TITLE);
-    private final Game board = new Game();
+    private final Game game = new Game();
 
     private ClickState clickState = ClickState.firstClickInstance();
     private static boolean initDone;
@@ -58,9 +58,9 @@ final class Frontend {
     private void drawBackgroundGUI() {
         var darkBrown = new Color(160, 80, 0);
         var lightBrown = new Color(200, 100, 0);
-        for (int i = 0; i < Game.BOARD_LENGTH; i++) {
-            for (int j = 0; j < Game.BOARD_WIDTH; j++) {
-                var usedColor = ((i + j) % 2 == 0 ^ !board.isWhiteTurn()) ? lightBrown : darkBrown;
+        for (int i = 0; i < Board.BOARD_LENGTH; i++) {
+            for (int j = 0; j < Board.BOARD_WIDTH; j++) {
+                var usedColor = game.isLightTile(Point.instance(i, j)) ? lightBrown : darkBrown;
                 drawTileBackgroundGUI(usedColor, j, i);
             }
         }
@@ -75,9 +75,9 @@ final class Frontend {
     }
 
     private void drawAllPiecesGUI() {
-        for (int i = 0; i < Game.BOARD_LENGTH; i++) {
-            for (int j = 0; j < Game.BOARD_WIDTH; j++) {
-                var image = board.getPieceImage(j, i);
+        for (int i = 0; i < Board.BOARD_WIDTH; i++) {
+            for (int j = 0; j < Board.BOARD_LENGTH; j++) {
+                var image = game.getPieceImage(Point.instance(j, i));
                 if (image != null) {
                     drawPieceGUI(j * PIXELS_PER_SQUARE, i * PIXELS_PER_SQUARE, image);
                 }
@@ -105,29 +105,28 @@ final class Frontend {
             lockOntoPiece(Point.instance(x, y));
             return;
         }
-        // FIXME: might have to check for if king is in check
         switch (clickState.getMove(Point.instance(x, y))) {
             case QUEEN_SIDE_CASTLE:
-                board.queenSideCastle();
+                game.queenSideCastle();
                 break;
             case KING_SIDE_CASTLE:
-                board.kingSideCastle();
+                game.kingSideCastle();
                 break;
             case EN_PASSANT:
-                board.enPassant(clickState.getMoving(), clickState.getFrom());
+                game.enPassant(clickState);
                 break;
             case PAWN_PROMOTION:
-                board.doMove(pawnPromotion(), clickState.getFrom(), Point.instance(x, y));
+                game.pawnPromotion(pawnPromotion(), clickState, Point.instance(x, y));
                 break;
             case NORMAL:
-                board.doMove(clickState.getMoving(), clickState.getFrom(), Point.instance(x, y));
+                game.normalMove(clickState, Point.instance(x, y));
                 break;
         }
         clickState = ClickState.firstClickInstance();
         refreshPixels();
     }
 
-    private Piece pawnPromotion() {
+    private PromotionPiece pawnPromotion() {
         var text = RESOURCE.getString("pawnPromotionOption");
         String[] options = {
                 RESOURCE.getString("queen"),
@@ -139,28 +138,22 @@ final class Frontend {
         while (promotion < 0) {
             promotion = displayDialogText(text, options);
         }
-        Piece piece;
         switch (promotion) {
             case 0:
-                piece = new Queen(clickState.getMoving().isWhite());
-                break;
+                return PromotionPiece.QUEEN;
             case 1:
-                piece = new Knight(clickState.getMoving().isWhite());
-                break;
+                return PromotionPiece.KNIGHT;
             case 2:
-                piece = new Rook(clickState.getMoving().isWhite());
-                break;
+                return PromotionPiece.ROOK;
             case 3:
-                piece = new Bishop(clickState.getMoving().isWhite());
-                break;
+                return PromotionPiece.BISHOP;
             default:
-                throw new IllegalStateException("Pawn promotion is mandatory.");
+                throw new IllegalStateException("Did not return promotion piece");
         }
-        return piece;
     }
 
     private void lockOntoPiece(Point point) {
-        var piece = board.getAlliedPieceAt(point);
+        var piece = game.getAlliedPieceAt(point);
         if (piece == null) {
             clickState = ClickState.firstClickInstance();
         } else {
@@ -172,11 +165,11 @@ final class Frontend {
     private Move[][] highlightLegalMoves(Piece moving, Point from) {
         var darkGreen = new Color(0, 100, 40);
         var lightGreen = new Color(0, 140, 50);
-        var moves = board.availableMoves(moving, from);
-        for (int i = 0; i < Game.BOARD_LENGTH; i++) {
-            for (int j = 0; j < Game.BOARD_WIDTH; j++) {
+        var moves = game.availableMoves(moving, from);
+        for (int i = 0; i < Board.BOARD_LENGTH; i++) {
+            for (int j = 0; j < Board.BOARD_WIDTH; j++) {
                 if (moves[i][j] != Move.NONE) {
-                    var usedColor = ((i + j) % 2 == 0 ^ !board.isWhiteTurn()) ? lightGreen : darkGreen;
+                    var usedColor = game.isLightTile(Point.instance(i, j)) ? lightGreen : darkGreen;
                     drawTileBackgroundGUI(usedColor, j, i);
                 }
             }

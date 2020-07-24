@@ -16,17 +16,17 @@ final class Queen extends Piece {
             {1, 1, 1, 1, 1, 1}
     };
 
-    Queen(boolean isWhite) {
-        super(isWhite, pixels);
+    Queen(Board board, boolean isWhite) {
+        super(board, isWhite, pixels);
     }
 
     @Override
     boolean isActionLegal(Point start, Point end) {
-        var bishop = new Bishop(isWhite());
+        var bishop = new Bishop(board(), isWhite());
         if (bishop.isDiagonalLine(start, end)) {
             return bishop.isBishopActionLegal(start, end) && wouldNotPutAlliedKingIntoCheck(start, end);
         }
-        var rook = new Rook(isWhite());
+        var rook = new Rook(board(), isWhite());
         return rook.isRookActionLegal(start, end) && wouldNotPutAlliedKingIntoCheck(start, end);
     }
 }

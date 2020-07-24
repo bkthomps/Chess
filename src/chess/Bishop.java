@@ -16,8 +16,8 @@ final class Bishop extends Piece {
             {1, 1, 1, 1, 1, 1}
     };
 
-    Bishop(boolean isWhite) {
-        super(isWhite, pixels);
+    Bishop(Board board, boolean isWhite) {
+        super(board, isWhite, pixels);
     }
 
     @Override
@@ -37,7 +37,7 @@ final class Bishop extends Piece {
         int yScale = Integer.signum(end.y() - start.y());
         for (int i = min + 1; i < max; i++) {
             start = Point.instance(start.x() + xScale, start.y() + yScale);
-            if (Game.getBoard(start) != null) {
+            if (board().getBoard(start) != null) {
                 return false;
             }
         }

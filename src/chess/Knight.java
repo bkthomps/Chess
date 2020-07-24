@@ -16,8 +16,8 @@ final class Knight extends Piece {
             {1, 1, 1, 1, 1, 1}
     };
 
-    Knight(boolean isWhite) {
-        super(isWhite, pixels);
+    Knight(Board board, boolean isWhite) {
+        super(board, isWhite, pixels);
     }
 
     @Override

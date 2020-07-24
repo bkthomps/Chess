@@ -2,8 +2,11 @@ package chess;
 
 import java.util.Objects;
 
+/**
+ * An immutable point class.
+ */
 final class Point {
-    private static final Point[][] pool = new Point[Game.BOARD_LENGTH + 2][Game.BOARD_WIDTH + 2];
+    private static final Point[][] pool = new Point[Board.BOARD_LENGTH + 2][Board.BOARD_WIDTH + 2];
     private final int x;
     private final int y;
 

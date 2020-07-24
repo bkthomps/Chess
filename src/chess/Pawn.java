@@ -14,19 +14,19 @@ final class Pawn extends Piece {
             {1, 1, 1, 1, 1, 1}
     };
 
-    Pawn(boolean isWhite) {
-        super(isWhite, pixels);
+    Pawn(Board board, boolean isWhite) {
+        super(board, isWhite, pixels);
     }
 
     @Override
     boolean isActionLegal(Point start, Point end) {
-        boolean isForward = Game.getBoard(end) == null && end.x() == start.x();
+        boolean isForward = board().getBoard(end) == null && end.x() == start.x();
         boolean isOneBlock = end.y() == start.y() - 1;
         var oneBelowStart = Point.instance(start.x(), start.y() - 1);
-        boolean isJump = end.y() == start.y() - 2 && Game.getBoard(oneBelowStart) == null && !hasMoved();
+        boolean isJump = end.y() == start.y() - 2 && board().getBoard(oneBelowStart) == null && !hasMoved();
         boolean isForwardAllowed = isForward && (isOneBlock || isJump);
-        boolean isCapture = Game.getBoard(end) != null
-                && Game.getBoard(end).isWhite() != isWhite()
+        boolean isCapture = board().getBoard(end) != null
+                && board().getBoard(end).isWhite() != isWhite()
                 && end.y() == start.y() - 1 && Math.abs(end.x() - start.x()) == 1;
         return (isForwardAllowed || isCapture) && wouldNotPutAlliedKingIntoCheck(start, end);
     }
