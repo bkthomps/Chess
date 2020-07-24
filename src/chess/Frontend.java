@@ -24,10 +24,7 @@ final class Frontend {
     private final JFrame frame = new JFrame(GAME_TITLE);
     private final Board board = new Board();
 
-    private Piece moving;
-    private Point from;
-    private Move[][] moves;
-
+    private ClickState clickState = ClickState.firstClickInstance();
     private static boolean initDone;
 
     public static void main(String[] args) {
@@ -104,12 +101,12 @@ final class Frontend {
     }
 
     private void handleClick(int x, int y) {
-        if (moving == null) {
+        if (clickState.isFirstClick()) {
             lockOntoPiece(Point.instance(x, y));
             return;
         }
         // FIXME: might have to check for if king is in check
-        switch (moves[y][x]) {
+        switch (clickState.getMove(Point.instance(x, y))) {
             case QUEEN_SIDE_CASTLE:
                 board.queenSideCastle();
                 break;
@@ -117,18 +114,16 @@ final class Frontend {
                 board.kingSideCastle();
                 break;
             case EN_PASSANT:
-                board.enPassant(moving, from);
+                board.enPassant(clickState.getMoving(), clickState.getFrom());
                 break;
             case PAWN_PROMOTION:
-                board.doMove(pawnPromotion(), from, Point.instance(x, y));
+                board.doMove(pawnPromotion(), clickState.getFrom(), Point.instance(x, y));
                 break;
             case NORMAL:
-                board.doMove(moving, from, Point.instance(x, y));
+                board.doMove(clickState.getMoving(), clickState.getFrom(), Point.instance(x, y));
                 break;
         }
-        moving = null;
-        from = null;
-        moves = null;
+        clickState = ClickState.firstClickInstance();
         refreshPixels();
     }
 
@@ -147,16 +142,16 @@ final class Frontend {
         Piece piece;
         switch (promotion) {
             case 0:
-                piece = new Queen(moving.isWhite());
+                piece = new Queen(clickState.getMoving().isWhite());
                 break;
             case 1:
-                piece = new Knight(moving.isWhite());
+                piece = new Knight(clickState.getMoving().isWhite());
                 break;
             case 2:
-                piece = new Rook(moving.isWhite());
+                piece = new Rook(clickState.getMoving().isWhite());
                 break;
             case 3:
-                piece = new Bishop(moving.isWhite());
+                piece = new Bishop(clickState.getMoving().isWhite());
                 break;
             default:
                 throw new IllegalStateException("Pawn promotion is mandatory.");
@@ -167,17 +162,14 @@ final class Frontend {
     private void lockOntoPiece(Point point) {
         var piece = board.getAlliedPieceAt(point);
         if (piece == null) {
-            moving = null;
-            from = null;
-            moves = null;
+            clickState = ClickState.firstClickInstance();
         } else {
-            moving = piece;
-            from = point;
-            moves = highlightLegalMoves();
+            var moves = highlightLegalMoves(piece, point);
+            clickState = ClickState.secondClickInstance(piece, point, moves);
         }
     }
 
-    private Move[][] highlightLegalMoves() {
+    private Move[][] highlightLegalMoves(Piece moving, Point from) {
         var darkGreen = new Color(0, 100, 40);
         var lightGreen = new Color(0, 140, 50);
         var moves = board.availableMoves(moving, from);
