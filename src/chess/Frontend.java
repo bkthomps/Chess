@@ -114,6 +114,8 @@ final class Frontend {
             return;
         }
         var status = performAction(x, y);
+        clickState = ClickState.firstClickInstance();
+        refreshPixels();
         if (status.mustWarnUser()) {
             String text = RESOURCE.getString(status.textCode());
             String[] options = {RESOURCE.getString("acknowledge")};
@@ -122,8 +124,6 @@ final class Frontend {
                 System.exit(0);
             }
         }
-        clickState = ClickState.firstClickInstance();
-        refreshPixels();
     }
 
     private GameStatus performAction(int x, int y) {
