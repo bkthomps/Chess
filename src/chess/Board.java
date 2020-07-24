@@ -1,8 +1,7 @@
 package chess;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -19,13 +18,10 @@ final class Board {
     private static Point whiteKingLocation;
     private static Point blackKingLocation;
 
+    private final Map<GameState, Integer> history = new HashMap<>();
+    private int drawCounter;
     private boolean isWhiteTurn = true;
     private Point enPassant;
-
-    private final List<Piece[][]> boardHistory = new ArrayList<>();
-    private final List<Boolean> canCastleHistory = new ArrayList<>();
-    private final List<Point> enPassantHistory = new ArrayList<>();
-    private int drawCounter;
 
     Board() {
         setNonPawnRow(0, false);
@@ -65,9 +61,6 @@ final class Board {
             blackKingLocation = Point.instance(2, 7);
         }
         performCastling(Point.instance(0, 7), Point.instance(3, 7));
-        flipBoard();
-        enPassant = null;
-        enPassantHistory.add(null);
     }
 
     void kingSideCastle() {
@@ -78,15 +71,14 @@ final class Board {
             blackKingLocation = Point.instance(6, 7);
         }
         performCastling(Point.instance(7, 7), Point.instance(5, 7));
-        flipBoard();
-        enPassant = null;
-        enPassantHistory.add(null);
     }
 
     private void performCastling(Point from, Point to) {
         setBoard(to, getBoard(from));
         setBoard(from, null);
         getBoard(to).setMove();
+        enPassant = null;
+        flipBoard();
     }
 
     void enPassant(Piece moving, Point from) {
@@ -94,9 +86,8 @@ final class Board {
         movePiece(moving, from, enPassant);
         setBoard(squareAboveEnemy, null);
         enPassant = null;
-        enPassantHistory.add(null);
         flipBoard();
-        checkIfGameOver();
+        checkIfGameOver(0);
     }
 
     void doMove(Piece piece, Point from, Point to) {
@@ -107,32 +98,30 @@ final class Board {
                 blackKingLocation = to;
             }
         }
-        recordEnPassantHistory(piece, from, to);
-        movePiece(piece, from, to);
+        if (piece instanceof Pawn && from.y() - to.y() == 2) {
+            enPassant = Point.instance(to.x(), to.y() - 2);
+        } else {
+            enPassant = null;
+        }
+        int repetitionCount = movePiece(piece, from, to);
         flipBoard();
-        checkIfGameOver();
+        checkIfGameOver(repetitionCount);
     }
 
-    private void movePiece(Piece piece, Point start, Point end) {
+    private int movePiece(Piece piece, Point start, Point end) {
+        int count = 0;
         if (getBoard(end) != null || piece instanceof Pawn) {
             drawCounter = 0;
-            boardHistory.clear();
-            enPassantHistory.clear();
-            canCastleHistory.clear();
+            history.clear();
         } else {
             drawCounter++;
-            var boardCopy = new Piece[BOARD_LENGTH][BOARD_WIDTH];
-            for (int i = 0; i < BOARD_LENGTH; i++) {
-                for (int j = 0; j < BOARD_WIDTH; j++) {
-                    var point = Point.instance(j, i);
-                    boardCopy[i][j] = getBoard(point);
-                }
-            }
-            boardHistory.add(boardCopy);
-            canCastleHistory.add(getAlliedKing(isWhiteTurn).hasMoved());
+            var gameState = new GameState(board, enPassant, getAlliedKing(isWhiteTurn).hasMoved());
+            count = history.getOrDefault(gameState, 0) + 1;
+            history.put(gameState, count);
         }
         rawMove(piece, start, end);
         piece.setMove();
+        return count;
     }
 
     private void flipBoard() {
@@ -146,15 +135,6 @@ final class Board {
         }
     }
 
-    private void recordEnPassantHistory(Piece moving, Point from, Point to) {
-        if (moving instanceof Pawn && from.y() - to.y() == 2) {
-            enPassant = Point.instance(to.x(), to.y() - 2);
-        } else {
-            enPassant = null;
-        }
-        enPassantHistory.add(enPassant);
-    }
-
     /**
      * The game may be over by checkmate or by draw. There are 4 types of draws:
      * <p> 1. Stalemate
@@ -162,7 +142,7 @@ final class Board {
      * <p> 3. Board repeated 3 times
      * <p> 4. Insufficient mating material
      */
-    private void checkIfGameOver() {
+    private void checkIfGameOver(int repetitionCount) {
         if (isGameOverDueToCheckmate(getAlliedKing(isWhiteTurn), locateAlliedKing(isWhiteTurn))) {
             var text = Frontend.RESOURCE.getString(isWhiteTurn ? "blackWins" : "whiteWins");
             endGameWithNotification(text);
@@ -170,7 +150,7 @@ final class Board {
             var text = Frontend.RESOURCE.getString("stalemate");
             endGameWithNotification(text);
         }
-        endGameIfNonStalemateDraw();
+        endGameIfNonStalemateDraw(repetitionCount);
         warnIfKingInCheck(getAlliedKing(isWhiteTurn), locateAlliedKing(isWhiteTurn));
     }
 
@@ -239,9 +219,9 @@ final class Board {
         setBoard(end, piece);
     }
 
-    private void endGameIfNonStalemateDraw() {
+    private void endGameIfNonStalemateDraw(int repetitionCount) {
         endGameIfTooManyMoves();
-        endGameIfTooManyBoardRepetitions();
+        endGameIfTooManyBoardRepetitions(repetitionCount);
         endGameIfInsufficientMatingMaterial();
     }
 
@@ -265,46 +245,12 @@ final class Board {
     /**
      * Draw if board repeated 3 times.
      */
-    private void endGameIfTooManyBoardRepetitions() {
-        if (isTooManyBoardRepetitions()) {
+    private void endGameIfTooManyBoardRepetitions(int repetitionCount) {
+        int maxRepetitions = 3;
+        if (repetitionCount >= maxRepetitions) {
             var text = Frontend.RESOURCE.getString("boardRepeat");
             endGameWithNotification(text);
         }
-    }
-
-    /**
-     * @return true if the board has repeated 3 times
-     * @throws IllegalStateException if castle or en passant history size is invalid
-     */
-    private boolean isTooManyBoardRepetitions() {
-        int historySize = boardHistory.size();
-        Point enPassantBackup = null;
-        if (historySize == enPassantHistory.size() - 1) {
-            enPassantBackup = enPassantHistory.get(enPassantHistory.size() - 1);
-            enPassantHistory.remove(enPassantHistory.size() - 1);
-        }
-        if (historySize != canCastleHistory.size() || historySize != enPassantHistory.size()) {
-            throw new IllegalStateException("History lists are not same size!");
-        }
-        for (int i = 0; i < historySize; i++) {
-            int count = 0;
-            for (int j = 0; j < historySize; j++) {
-                if (areBoardsEqual(boardHistory.get(i), boardHistory.get(j))
-                        && canCastleHistory.get(i).equals(canCastleHistory.get(j))
-                        && ((enPassantHistory.get(i) == null && enPassantHistory.get(j) == null)
-                        || (enPassantHistory.get(i) != null && enPassantHistory.get(j) != null
-                        && enPassantHistory.get(i).equals(enPassantHistory.get(j))))) {
-                    count++;
-                }
-                if (count == 3) {
-                    return true;
-                }
-            }
-        }
-        if (enPassantBackup != null) {
-            enPassantHistory.add(enPassantBackup);
-        }
-        return false;
     }
 
     /**
@@ -463,7 +409,6 @@ final class Board {
 
     private boolean canPerformEnPassant(Piece moving, Point to) {
         var squareAboveEnemy = Point.instance(to.x(), to.y() + 1);
-        return to.equals(enPassant) && moving instanceof Pawn
-                && moving.isWhite() != getBoard(squareAboveEnemy).isWhite();
+        return moving instanceof Pawn && moving.isWhite() != getBoard(squareAboveEnemy).isWhite();
     }
 }
