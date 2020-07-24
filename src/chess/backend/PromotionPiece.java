@@ -1,9 +1,9 @@
-package chess;
+package chess.backend;
 
 /**
  * Pieces which may replace a pawn when it is promoted.
  */
-enum PromotionPiece {
+public enum PromotionPiece {
     QUEEN,
     KNIGHT,
     ROOK,

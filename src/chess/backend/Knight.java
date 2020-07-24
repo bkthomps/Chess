@@ -1,4 +1,4 @@
-package chess;
+package chess.backend;
 
 /**
  * The knight is a chess piece which must travel in an L-shape. It may move two spaces horizontally

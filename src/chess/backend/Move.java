@@ -1,9 +1,9 @@
-package chess;
+package chess.backend;
 
 /**
  * Specifies the type of move.
  */
-enum Move {
+public enum Move {
     NONE,
     QUEEN_SIDE_CASTLE,
     KING_SIDE_CASTLE,

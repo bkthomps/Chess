@@ -1,4 +1,4 @@
-package chess;
+package chess.backend;
 
 /**
  * The queen may move as if it were a rook and a bishop. Meaning it can move horizontally,

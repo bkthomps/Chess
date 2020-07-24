@@ -1,5 +1,9 @@
 package chess;
 
+import chess.backend.Move;
+import chess.backend.Piece;
+import chess.backend.Point;
+
 /**
  * Keeps track of what the user has clicked on. There are two modes: the first one in which the user
  * has not clicked on anything, and nothing is highlighted, and the second one where the cursor is

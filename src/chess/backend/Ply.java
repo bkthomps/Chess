@@ -1,4 +1,4 @@
-package chess;
+package chess.backend;
 
 import java.util.Arrays;
 import java.util.Objects;

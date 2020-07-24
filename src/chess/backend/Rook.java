@@ -1,4 +1,4 @@
-package chess;
+package chess.backend;
 
 /**
  * The rook may move any amount of squares horizontally or vertically, but must not pass through

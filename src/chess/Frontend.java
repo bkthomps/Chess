@@ -1,5 +1,13 @@
 package chess;
 
+import chess.backend.Board;
+import chess.backend.Game;
+import chess.backend.GameStatus;
+import chess.backend.Move;
+import chess.backend.Piece;
+import chess.backend.Point;
+import chess.backend.PromotionPiece;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -127,11 +135,11 @@ final class Frontend {
                 game.kingSideCastle();
                 return GameStatus.ONGOING;
             case EN_PASSANT:
-                return game.enPassant(clickState);
+                return game.enPassant(clickState.getMoving(), clickState.getFrom());
             case PAWN_PROMOTION:
-                return game.pawnPromotion(pawnPromotion(), clickState, Point.instance(x, y));
+                return game.pawnPromotion(pawnPromotion(), clickState.getFrom(), Point.instance(x, y));
             case NORMAL:
-                return game.normalMove(clickState, Point.instance(x, y));
+                return game.normalMove(clickState.getMoving(), clickState.getFrom(), Point.instance(x, y));
             case NONE:
                 return GameStatus.ONGOING;
             default:

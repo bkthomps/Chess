@@ -1,4 +1,4 @@
-package chess;
+package chess.backend;
 
 import java.awt.Color;
 import java.util.Arrays;
@@ -10,19 +10,19 @@ import java.util.HashMap;
 /**
  * Keeps track of the game, which means the board and its pieces, and the board history.
  */
-final class Game {
+public final class Game {
     private final Board board = new Board();
     private final Map<Ply, Integer> history = new HashMap<>();
     private int drawCounter;
     private Point enPassant;
 
-    void queenSideCastle() {
+    public void queenSideCastle() {
         performCastling(Point.instance(4, 7), Point.instance(2, 7));
         performCastling(Point.instance(0, 7), Point.instance(3, 7));
         finishCastling(Point.instance(2, 7));
     }
 
-    void kingSideCastle() {
+    public void kingSideCastle() {
         performCastling(Point.instance(4, 7), Point.instance(6, 7));
         performCastling(Point.instance(7, 7), Point.instance(5, 7));
         finishCastling(Point.instance(6, 7));
@@ -41,20 +41,20 @@ final class Game {
         board.flip();
     }
 
-    GameStatus enPassant(ClickState clickState) {
+    public GameStatus enPassant(Piece moving, Point from) {
         var squareAboveEnemy = Point.instance(enPassant.x(), enPassant.y() + 1);
-        movePiece(clickState.getMoving(), clickState.getFrom(), enPassant);
+        movePiece(moving, from, enPassant);
         board.setBoard(squareAboveEnemy, null);
         board.flip();
         return gameOverState(0);
     }
 
-    GameStatus pawnPromotion(PromotionPiece promotion, ClickState clickState, Point to) {
-        return doMove(board.getPromotionPiece(promotion), clickState.getFrom(), to);
+    public GameStatus pawnPromotion(PromotionPiece promotion, Point from, Point to) {
+        return doMove(board.getPromotionPiece(promotion), from, to);
     }
 
-    GameStatus normalMove(ClickState clickState, Point to) {
-        return doMove(clickState.getMoving(), clickState.getFrom(), to);
+    public GameStatus normalMove(Piece moving, Point from, Point to) {
+        return doMove(moving, from, to);
     }
 
     private GameStatus doMove(Piece piece, Point from, Point to) {
@@ -87,15 +87,15 @@ final class Game {
         return count;
     }
 
-    Color[][] getPieceImage(Point point) {
+    public Color[][] getPieceImage(Point point) {
         return board.getPieceImage(point);
     }
 
-    Piece getAlliedPieceAt(Point point) {
+    public Piece getAlliedPieceAt(Point point) {
         return board.getAlliedPieceAt(point);
     }
 
-    boolean isLightTile(Point point) {
+    public boolean isLightTile(Point point) {
         return board.isLightTile(point);
     }
 
@@ -236,7 +236,7 @@ final class Game {
                 || (group.size() == 2 && group.get(0) instanceof Knight && group.get(1) instanceof Knight);
     }
 
-    Move[][] availableMoves(Piece moving, Point from) {
+    public Move[][] availableMoves(Piece moving, Point from) {
         var moves = new Move[Board.BOARD_LENGTH][Board.BOARD_WIDTH];
         for (var slice : moves) {
             Arrays.fill(slice, Move.NONE);

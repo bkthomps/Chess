@@ -1,11 +1,11 @@
-package chess;
+package chess.backend;
 
 import java.util.Objects;
 
 /**
  * An immutable point class.
  */
-final class Point {
+public final class Point {
     private static final Point[][] pool = new Point[Board.BOARD_LENGTH + 2][Board.BOARD_WIDTH + 2];
     private final int x;
     private final int y;
@@ -15,18 +15,18 @@ final class Point {
         this.y = y;
     }
 
-    static Point instance(int x, int y) {
+    public static Point instance(int x, int y) {
         if (pool[y + 1][x + 1] == null) {
             pool[y + 1][x + 1] = new Point(x, y);
         }
         return pool[y + 1][x + 1];
     }
 
-    int x() {
+    public int x() {
         return x;
     }
 
-    int y() {
+    public int y() {
         return y;
     }
 

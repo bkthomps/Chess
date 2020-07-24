@@ -1,4 +1,4 @@
-package chess;
+package chess.backend;
 
 /**
  * The pawn can only move one square forward, but can move two on its first move. The pawn may not

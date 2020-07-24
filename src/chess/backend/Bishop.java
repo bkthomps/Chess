@@ -1,4 +1,4 @@
-package chess;
+package chess.backend;
 
 /**
  * The bishop is a chess piece which may travel as many squares as it wants diagonally, with the

@@ -1,11 +1,14 @@
-package chess;
+package chess.backend;
 
 import java.awt.Color;
 import java.util.Arrays;
 
-final class Board {
-    static final int BOARD_LENGTH = 8;
-    static final int BOARD_WIDTH = 8;
+/**
+ * Keeps track of the board and which player is currently moving.
+ */
+public final class Board {
+    public static final int BOARD_LENGTH = 8;
+    public static final int BOARD_WIDTH = 8;
 
     private final Piece[][] board = new Piece[BOARD_LENGTH][BOARD_WIDTH];
     private final King whiteKing = new King(this, true);

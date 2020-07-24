@@ -1,7 +1,4 @@
-package chess;
-
-import java.util.HashMap;
-import java.util.Map;
+package chess.backend;
 
 /**
  * Represents the game state which occurs after each move.
@@ -30,15 +27,15 @@ public enum GameStatus {
         this.continueStatus = continueStatus;
     }
 
-    String textCode() {
+    public String textCode() {
         return text;
     }
 
-    boolean mustWarnUser() {
+    public boolean mustWarnUser() {
         return continueStatus != ContinueStatus.CONTINUE;
     }
 
-    boolean isGameOver() {
+    public boolean isGameOver() {
         return continueStatus == ContinueStatus.TERMINATE;
     }
 }

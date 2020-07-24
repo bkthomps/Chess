@@ -1,4 +1,4 @@
-package chess;
+package chess.backend;
 
 /**
  * The king may only move to any of the eight adjacent squares, unless there is a friendly piece. If
