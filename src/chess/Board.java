@@ -18,7 +18,7 @@ final class Board {
     private static Point whiteKingLocation;
     private static Point blackKingLocation;
 
-    private final Map<GameState, Integer> history = new HashMap<>();
+    private final Map<Ply, Integer> history = new HashMap<>();
     private int drawCounter;
     private boolean isWhiteTurn = true;
     private Point enPassant;
@@ -115,7 +115,7 @@ final class Board {
             history.clear();
         } else {
             drawCounter++;
-            var gameState = new GameState(board, enPassant);
+            var gameState = new Ply(board, enPassant);
             count = history.getOrDefault(gameState, 0) + 1;
             history.put(gameState, count);
         }

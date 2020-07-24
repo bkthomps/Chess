@@ -3,12 +3,15 @@ package chess;
 import java.util.Arrays;
 import java.util.Objects;
 
-final class GameState {
+/**
+ * The state associated with a ply, which is an action taken by either white or black.
+ */
+final class Ply {
     private final Piece[][] board = new Piece[Board.BOARD_LENGTH][Board.BOARD_WIDTH];
     private final Point enPassant;
     private final int hash;
 
-    GameState(Piece[][] board, Point enPassant) {
+    Ply(Piece[][] board, Point enPassant) {
         for (int i = 0; i < Board.BOARD_LENGTH; i++) {
             this.board[i] = Arrays.copyOf(board[i], Board.BOARD_WIDTH);
         }
@@ -21,10 +24,10 @@ final class GameState {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof GameState)) {
+        if (!(o instanceof Ply)) {
             return false;
         }
-        var history = (GameState) o;
+        var history = (Ply) o;
         for (int i = 0; i < board.length; i++) {
             if (!Arrays.equals(board[i], history.board[i])) {
                 return false;
