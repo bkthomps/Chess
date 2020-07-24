@@ -179,25 +179,29 @@ final class Frontend {
         if (piece == null) {
             clickState = ClickState.firstClickInstance();
         } else {
-            var moves = highlightLegalMoves(piece, point);
-            clickState = ClickState.secondClickInstance(piece, point, moves);
+            clickState = highlightLegalMoves(piece, point);
         }
     }
 
-    private Move[][] highlightLegalMoves(Piece moving, Point from) {
+    private ClickState highlightLegalMoves(Piece moving, Point from) {
         var darkGreen = new Color(0, 100, 40);
         var lightGreen = new Color(0, 140, 50);
         var moves = game.availableMoves(moving, from);
+        boolean areThereMoves = false;
         for (int i = 0; i < Board.BOARD_LENGTH; i++) {
             for (int j = 0; j < Board.BOARD_WIDTH; j++) {
                 if (moves[i][j] != Move.NONE) {
+                    areThereMoves = true;
                     var usedColor = game.isLightTile(Point.instance(i, j)) ? lightGreen : darkGreen;
                     drawTileBackgroundGUI(usedColor, j, i);
                 }
             }
         }
         drawAllPiecesGUI();
-        return moves;
+        if (areThereMoves) {
+            return ClickState.secondClickInstance(moving, from, moves);
+        }
+        return ClickState.firstClickInstance();
     }
 
     /**
