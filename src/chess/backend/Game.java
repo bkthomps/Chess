@@ -267,12 +267,8 @@ public final class Game {
         if (canKingSideCastle(from)) {
             moves[Board.BOARD_LENGTH - 1][Board.BOARD_WIDTH - 1] = Move.KING_SIDE_CASTLE;
         }
-        if (enPassant != null) {
-            boolean canCaptureEnPassant =
-                    from.y() == enPassant.y() + 1 && Math.abs(from.x() - enPassant.x()) == 1;
-            if (canCaptureEnPassant && canPerformEnPassant(moving, enPassant)) {
-                moves[enPassant.y()][enPassant.x()] = Move.EN_PASSANT;
-            }
+        if (canPerformEnPassant(moving, from)) {
+            moves[enPassant.y()][enPassant.x()] = Move.EN_PASSANT;
         }
         return moves;
     }
@@ -308,9 +304,13 @@ public final class Game {
         return piece != null && !piece.hasMoved();
     }
 
-    private boolean canPerformEnPassant(Piece moving, Point to) {
-        var squareAboveEnemy = Point.instance(to.x(), to.y() + 1);
-        return moving instanceof Pawn
-                && moving.isWhite() != board.getBoard(squareAboveEnemy).isWhite();
+    private boolean canPerformEnPassant(Piece moving, Point from) {
+        if (enPassant == null || !(moving instanceof Pawn)) {
+            return false;
+        }
+        var squareAbovePiece = Point.instance(enPassant.x(), enPassant.y() + 1);
+        var isPieceAnEnemy = moving.isWhite() != board.getBoard(squareAbovePiece).isWhite();
+        var diffX = Math.abs(from.x() - enPassant.x());
+        return isPieceAnEnemy && from.y() == enPassant.y() + 1 && diffX == 1;
     }
 }
