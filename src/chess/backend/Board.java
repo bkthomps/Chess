@@ -9,6 +9,7 @@ import java.util.Arrays;
 public final class Board {
     public static final int BOARD_LENGTH = 8;
     public static final int BOARD_WIDTH = 8;
+    static final int KING_X_COORD = (BOARD_WIDTH - 1) / 2 + 1;
 
     private final Piece[][] board = new Piece[BOARD_LENGTH][BOARD_WIDTH];
     private final King whiteKing = new King(this, true);
@@ -26,19 +27,19 @@ public final class Board {
 
     private void setNonPawnRow(int index, boolean isWhite) {
         board[index][0] = new Rook(this, isWhite);
+        board[index][BOARD_WIDTH - 1] = new Rook(this, isWhite);
         board[index][1] = new Knight(this, isWhite);
+        board[index][BOARD_WIDTH - 2] = new Knight(this, isWhite);
         board[index][2] = new Bishop(this, isWhite);
-        board[index][3] = new Queen(this, isWhite);
+        board[index][BOARD_WIDTH - 3] = new Bishop(this, isWhite);
+        board[index][(BOARD_WIDTH - 1) / 2] = new Queen(this, isWhite);
         if (isWhite) {
-            board[index][4] = whiteKing;
-            whiteKingLocation = Point.instance(4, index);
+            board[index][KING_X_COORD] = whiteKing;
+            whiteKingLocation = Point.instance(KING_X_COORD, index);
         } else {
-            board[index][4] = blackKing;
-            blackKingLocation = Point.instance(4, index);
+            board[index][KING_X_COORD] = blackKing;
+            blackKingLocation = Point.instance(KING_X_COORD, index);
         }
-        board[index][5] = new Bishop(this, isWhite);
-        board[index][6] = new Knight(this, isWhite);
-        board[index][7] = new Rook(this, isWhite);
     }
 
     private void setPawnRow(int index, boolean isWhite) {
