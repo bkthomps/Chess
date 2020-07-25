@@ -69,7 +69,7 @@ public final class Game {
     private int movePiece(Piece piece, Point start, Point end) {
         int count = 0;
         if (piece instanceof Pawn && start.y() - end.y() == 2) {
-            enPassant = Point.instance(end.x(), end.y() - 2);
+            enPassant = Point.instance(end.x(), Board.BOARD_LENGTH - 1 - end.y() - 1);
         } else {
             enPassant = null;
         }
