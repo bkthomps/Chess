@@ -192,7 +192,7 @@ final class Frontend {
             for (int j = 0; j < Board.BOARD_WIDTH; j++) {
                 if (moves[i][j] != Move.NONE) {
                     areThereMoves = true;
-                    var usedColor = game.isLightTile(Point.instance(i, j)) ? lightGreen : darkGreen;
+                    var usedColor = game.isLightTile(Point.instance(j, i)) ? lightGreen : darkGreen;
                     drawTileBackgroundGUI(usedColor, j, i);
                 }
             }
@@ -216,8 +216,8 @@ final class Frontend {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (initDone) {
-                        int horizontalClickPosition = Board.BOARD_LENGTH * e.getX() / getWidth();
-                        int verticalClickPosition = Board.BOARD_WIDTH * e.getY() / getHeight();
+                        int horizontalClickPosition = Board.BOARD_WIDTH * e.getX() / getWidth();
+                        int verticalClickPosition = Board.BOARD_LENGTH * e.getY() / getHeight();
                         handleClick(horizontalClickPosition, verticalClickPosition);
                     }
                 }
@@ -243,8 +243,8 @@ final class Frontend {
             int width = getWidth() / BOARD_PIXELS_WIDTH;
             int height = getHeight() / BOARD_PIXELS_LENGTH;
             if (cells.isEmpty()) {
-                for (int row = 0; row < BOARD_PIXELS_WIDTH; row++) {
-                    for (int col = 0; col < BOARD_PIXELS_LENGTH; col++) {
+                for (int row = 0; row < BOARD_PIXELS_LENGTH; row++) {
+                    for (int col = 0; col < BOARD_PIXELS_WIDTH; col++) {
                         var cell = new Rectangle(col * width, row * height, width, height);
                         cells.add(cell);
                     }
