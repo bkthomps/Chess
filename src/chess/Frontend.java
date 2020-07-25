@@ -216,8 +216,8 @@ final class Frontend {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (initDone) {
-                        int horizontalClickPosition = (e.getX()) / (getWidth() / PIXELS_PER_SQUARE);
-                        int verticalClickPosition = (e.getY()) / (getHeight() / PIXELS_PER_SQUARE);
+                        int horizontalClickPosition = Board.BOARD_LENGTH * e.getX() / getWidth();
+                        int verticalClickPosition = Board.BOARD_WIDTH * e.getY() / getHeight();
                         handleClick(horizontalClickPosition, verticalClickPosition);
                     }
                 }
