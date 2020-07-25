@@ -68,7 +68,7 @@ final class Frontend {
         var lightBrown = new Color(200, 100, 0);
         for (int i = 0; i < Board.BOARD_LENGTH; i++) {
             for (int j = 0; j < Board.BOARD_WIDTH; j++) {
-                var usedColor = game.isLightTile(Point.instance(i, j)) ? lightBrown : darkBrown;
+                var usedColor = game.isLightTile(Point.instance(j, i)) ? lightBrown : darkBrown;
                 drawTileBackgroundGUI(usedColor, j, i);
             }
         }
@@ -83,8 +83,8 @@ final class Frontend {
     }
 
     private void drawAllPiecesGUI() {
-        for (int i = 0; i < Board.BOARD_WIDTH; i++) {
-            for (int j = 0; j < Board.BOARD_LENGTH; j++) {
+        for (int i = 0; i < Board.BOARD_LENGTH; i++) {
+            for (int j = 0; j < Board.BOARD_WIDTH; j++) {
                 var image = game.getPieceImage(Point.instance(j, i));
                 if (image != null) {
                     drawPieceGUI(j * PIXELS_PER_SQUARE, i * PIXELS_PER_SQUARE, image);
@@ -253,7 +253,7 @@ final class Frontend {
             for (int i = 0; i < BOARD_PIXELS_LENGTH; i++) {
                 for (int j = 0; j < BOARD_PIXELS_WIDTH; j++) {
                     g2d.setColor(pixels[i][j]);
-                    var cell = cells.get(j + i * BOARD_PIXELS_LENGTH);
+                    var cell = cells.get(j + i * BOARD_PIXELS_WIDTH);
                     g2d.fill(cell);
                     repaint();
                 }
