@@ -17,15 +17,19 @@ public final class Game {
     private Point enPassant;
 
     public void queenSideCastle() {
-        performCastling(Point.instance(4, 7), Point.instance(2, 7));
-        performCastling(Point.instance(0, 7), Point.instance(3, 7));
-        finishCastling(Point.instance(2, 7));
+        var king = Point.instance(Board.KING_X_COORD, Board.BOARD_LENGTH - 1);
+        var rook = Point.instance(0, Board.BOARD_LENGTH - 1);
+        performCastling(king, Point.instance(Board.KING_X_COORD - 2, Board.BOARD_LENGTH - 1));
+        performCastling(rook, Point.instance(Board.KING_X_COORD - 1, Board.BOARD_LENGTH - 1));
+        finishCastling(Point.instance(Board.KING_X_COORD - 2, Board.BOARD_LENGTH - 1));
     }
 
     public void kingSideCastle() {
-        performCastling(Point.instance(4, 7), Point.instance(6, 7));
-        performCastling(Point.instance(7, 7), Point.instance(5, 7));
-        finishCastling(Point.instance(6, 7));
+        var king = Point.instance(Board.KING_X_COORD, Board.BOARD_LENGTH - 1);
+        var rook = Point.instance(Board.BOARD_WIDTH - 1, Board.BOARD_LENGTH - 1);
+        performCastling(king, Point.instance(Board.KING_X_COORD + 2, Board.BOARD_LENGTH - 1));
+        performCastling(rook, Point.instance(Board.KING_X_COORD + 1, Board.BOARD_LENGTH - 1));
+        finishCastling(Point.instance(Board.KING_X_COORD + 2, Board.BOARD_LENGTH - 1));
     }
 
     private void performCastling(Point from, Point to) {
@@ -69,7 +73,7 @@ public final class Game {
     private int movePiece(Piece piece, Point start, Point end) {
         int count = 0;
         if (piece instanceof Pawn && start.y() - end.y() == 2) {
-            enPassant = Point.instance(end.x(), end.y() - 2);
+            enPassant = Point.instance(end.x(), Board.BOARD_LENGTH - 1 - end.y() - 1);
         } else {
             enPassant = null;
         }
@@ -107,10 +111,10 @@ public final class Game {
      * <p> 4. Insufficient mating material
      */
     private GameStatus gameOverState(int repetitionCount) {
-        if (isGameOverDueToCheckmate(board.getAlliedKing(), board.locateAlliedKing())) {
+        if (isGameOverDueToCheckmate()) {
             return board.getAlliedKing().isWhite() ? GameStatus.BLACK_WINS : GameStatus.WHITE_WINS;
         }
-        if (isGameOverDueToStalemate(board.getAlliedKing(), board.locateAlliedKing())) {
+        if (isGameOverDueToStalemate()) {
             return GameStatus.STALEMATE;
         }
         if (isTooManyMoves()) {
@@ -128,21 +132,20 @@ public final class Game {
         return GameStatus.ONGOING;
     }
 
-    private boolean isGameOverDueToCheckmate(King king, Point point) {
-        return king.isKingInCheck(point) && isMoveImpossible(king, point);
+    private boolean isGameOverDueToCheckmate() {
+        var king = board.getAlliedKing();
+        var kingLocation = board.locateAlliedKing();
+        return king.isKingInCheck(kingLocation) && isMoveImpossible();
     }
 
-    private boolean isGameOverDueToStalemate(King king, Point point) {
-        return !king.isKingInCheck(point) && isMoveImpossible(king, point);
+    private boolean isGameOverDueToStalemate() {
+        var king = board.getAlliedKing();
+        var kingLocation = board.locateAlliedKing();
+        return !king.isKingInCheck(kingLocation) && isMoveImpossible();
     }
 
-    /**
-     * @throws IllegalStateException if king is not at the specified area
-     */
-    private boolean isMoveImpossible(King king, Point point) {
-        if (!(board.getBoard(point) instanceof King)) {
-            throw new IllegalStateException("King not where specified!");
-        }
+    private boolean isMoveImpossible() {
+        var king = board.getAlliedKing();
         for (int i = 0; i < Board.BOARD_LENGTH; i++) {
             for (int j = 0; j < Board.BOARD_WIDTH; j++) {
                 var start = Point.instance(j, i);
@@ -267,50 +270,57 @@ public final class Game {
         if (canKingSideCastle(from)) {
             moves[Board.BOARD_LENGTH - 1][Board.BOARD_WIDTH - 1] = Move.KING_SIDE_CASTLE;
         }
-        if (enPassant != null) {
-            boolean canCaptureEnPassant =
-                    from.y() == enPassant.y() + 1 && Math.abs(from.x() - enPassant.x()) == 1;
-            if (canCaptureEnPassant && canPerformEnPassant(moving, enPassant)) {
-                moves[enPassant.y()][enPassant.x()] = Move.EN_PASSANT;
-            }
+        if (canPerformEnPassant(moving, from)) {
+            moves[enPassant.y()][enPassant.x()] = Move.EN_PASSANT;
         }
         return moves;
     }
 
     private boolean canQueenSideCastle(Point from) {
-        var king = board.getAlliedKing();
-        boolean isLockedOnKing = from.x() == 4 && from.y() == 7;
-        boolean isClearPath = hasPieceMoved(board.getBoard(Point.instance(0, 7)))
-                && board.getBoard(Point.instance(1, 7)) == null
-                && board.getBoard(Point.instance(2, 7)) == null
-                && board.getBoard(Point.instance(3, 7)) == null
-                && hasPieceMoved(board.getBoard(Point.instance(4, 7)));
-        boolean isNotPassingThroughCheck = !king.isKingInCheck(Point.instance(4, 7))
-                && !king.isKingInCheck(Point.instance(3, 7))
-                && !king.isKingInCheck(Point.instance(2, 7));
-        return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
+        return canCastle(from, 0);
     }
 
     private boolean canKingSideCastle(Point from) {
+        return canCastle(from, Board.BOARD_WIDTH - 1);
+    }
+
+    private boolean canCastle(Point from, int xCoordRook) {
+        if (!from.equals(Point.instance(Board.KING_X_COORD, Board.BOARD_LENGTH - 1))) {
+            return false;
+        }
         var king = board.getAlliedKing();
-        boolean isLockedOnKing = from.x() == 4 && from.y() == 7;
-        boolean isClearPath = hasPieceMoved(board.getBoard(Point.instance(4, 7)))
-                && board.getBoard(Point.instance(5, 7)) == null
-                && board.getBoard(Point.instance(6, 7)) == null
-                && hasPieceMoved(board.getBoard(Point.instance(7, 7)));
-        boolean isNotPassingThroughCheck = !king.isKingInCheck(Point.instance(4, 7))
-                && !king.isKingInCheck(Point.instance(5, 7))
-                && !king.isKingInCheck(Point.instance(6, 7));
-        return isLockedOnKing && isClearPath && isNotPassingThroughCheck;
+        var rook = board.getBoard(Point.instance(xCoordRook, Board.BOARD_LENGTH - 1));
+        if (hasPieceMoved(king) || hasPieceMoved(rook)) {
+            return false;
+        }
+        int min = Math.min(xCoordRook, board.locateAlliedKing().x());
+        int max = Math.max(xCoordRook, board.locateAlliedKing().x());
+        for (int x = min + 1; x < max; x++) {
+            if (board.getBoard(Point.instance(x, Board.BOARD_LENGTH - 1)) != null) {
+                return false;
+            }
+        }
+        int direction = Integer.signum(xCoordRook - board.locateAlliedKing().x());
+        for (int i = 0; i <= 2; i++) {
+            var tile = Point.instance(Board.KING_X_COORD + i * direction, Board.BOARD_LENGTH - 1);
+            if (king.isKingInCheck(tile)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean hasPieceMoved(Piece piece) {
-        return piece != null && !piece.hasMoved();
+        return piece == null || piece.hasMoved();
     }
 
-    private boolean canPerformEnPassant(Piece moving, Point to) {
-        var squareAboveEnemy = Point.instance(to.x(), to.y() + 1);
-        return moving instanceof Pawn
-                && moving.isWhite() != board.getBoard(squareAboveEnemy).isWhite();
+    private boolean canPerformEnPassant(Piece moving, Point from) {
+        if (enPassant == null || !(moving instanceof Pawn)) {
+            return false;
+        }
+        var squareAbovePiece = Point.instance(enPassant.x(), enPassant.y() + 1);
+        var isPieceAnEnemy = moving.isWhite() != board.getBoard(squareAbovePiece).isWhite();
+        var diffX = Math.abs(from.x() - enPassant.x());
+        return isPieceAnEnemy && from.y() == enPassant.y() + 1 && diffX == 1;
     }
 }

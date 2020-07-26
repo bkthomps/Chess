@@ -68,7 +68,7 @@ final class Frontend {
         var lightBrown = new Color(200, 100, 0);
         for (int i = 0; i < Board.BOARD_LENGTH; i++) {
             for (int j = 0; j < Board.BOARD_WIDTH; j++) {
-                var usedColor = game.isLightTile(Point.instance(i, j)) ? lightBrown : darkBrown;
+                var usedColor = game.isLightTile(Point.instance(j, i)) ? lightBrown : darkBrown;
                 drawTileBackgroundGUI(usedColor, j, i);
             }
         }
@@ -83,8 +83,8 @@ final class Frontend {
     }
 
     private void drawAllPiecesGUI() {
-        for (int i = 0; i < Board.BOARD_WIDTH; i++) {
-            for (int j = 0; j < Board.BOARD_LENGTH; j++) {
+        for (int i = 0; i < Board.BOARD_LENGTH; i++) {
+            for (int j = 0; j < Board.BOARD_WIDTH; j++) {
                 var image = game.getPieceImage(Point.instance(j, i));
                 if (image != null) {
                     drawPieceGUI(j * PIXELS_PER_SQUARE, i * PIXELS_PER_SQUARE, image);
@@ -192,7 +192,7 @@ final class Frontend {
             for (int j = 0; j < Board.BOARD_WIDTH; j++) {
                 if (moves[i][j] != Move.NONE) {
                     areThereMoves = true;
-                    var usedColor = game.isLightTile(Point.instance(i, j)) ? lightGreen : darkGreen;
+                    var usedColor = game.isLightTile(Point.instance(j, i)) ? lightGreen : darkGreen;
                     drawTileBackgroundGUI(usedColor, j, i);
                 }
             }
@@ -216,8 +216,8 @@ final class Frontend {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (initDone) {
-                        int horizontalClickPosition = (e.getX()) / (getWidth() / PIXELS_PER_SQUARE);
-                        int verticalClickPosition = (e.getY()) / (getHeight() / PIXELS_PER_SQUARE);
+                        int horizontalClickPosition = Board.BOARD_WIDTH * e.getX() / getWidth();
+                        int verticalClickPosition = Board.BOARD_LENGTH * e.getY() / getHeight();
                         handleClick(horizontalClickPosition, verticalClickPosition);
                     }
                 }
@@ -243,8 +243,8 @@ final class Frontend {
             int width = getWidth() / BOARD_PIXELS_WIDTH;
             int height = getHeight() / BOARD_PIXELS_LENGTH;
             if (cells.isEmpty()) {
-                for (int row = 0; row < BOARD_PIXELS_WIDTH; row++) {
-                    for (int col = 0; col < BOARD_PIXELS_LENGTH; col++) {
+                for (int row = 0; row < BOARD_PIXELS_LENGTH; row++) {
+                    for (int col = 0; col < BOARD_PIXELS_WIDTH; col++) {
                         var cell = new Rectangle(col * width, row * height, width, height);
                         cells.add(cell);
                     }
@@ -253,7 +253,7 @@ final class Frontend {
             for (int i = 0; i < BOARD_PIXELS_LENGTH; i++) {
                 for (int j = 0; j < BOARD_PIXELS_WIDTH; j++) {
                     g2d.setColor(pixels[i][j]);
-                    var cell = cells.get(j + i * BOARD_PIXELS_LENGTH);
+                    var cell = cells.get(j + i * BOARD_PIXELS_WIDTH);
                     g2d.fill(cell);
                     repaint();
                 }
